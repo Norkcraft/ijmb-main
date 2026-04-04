@@ -8,16 +8,18 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, profile, loading } = useAuth();
   const router = useRouter();
 
+  const isAdmin = ['super_admin', 'coordinator'].includes(profile?.role || '');
+
   useEffect(() => {
     if (loading) return;
     if (!user) {
-      router.push('/login');
+      router.push('/admin-login');
       return;
     }
-    if (profile?.role !== 'admin') {
-      router.push('/login');
+    if (!isAdmin) {
+      router.push('/admin-login');
     }
-  }, [user, profile, loading, router]);
+  }, [user, profile, loading, router, isAdmin]);
 
   if (loading) {
     return (
@@ -27,7 +29,7 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!user || profile?.role !== 'admin') return null;
+  if (!user || !isAdmin) return null;
 
   return <>{children}</>;
 };

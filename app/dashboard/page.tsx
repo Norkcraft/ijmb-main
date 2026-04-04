@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Dashboard from '@/pages/Dashboard';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +14,9 @@ export const metadata: Metadata = {
 export default function DashboardPage() {
   return (
     <Suspense>
-      <Dashboard />
+      <ProtectedRoute>
+        <Dashboard />
+      </ProtectedRoute>
     </Suspense>
   );
 }
