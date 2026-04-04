@@ -1,4 +1,6 @@
-import { Link } from 'react-router-dom';
+'use client';
+
+import Link from "next/link";
 import SEOHead from '@/components/SEOHead';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -43,8 +45,8 @@ const VerifyEmail = () => {
             </div>
             <CardTitle className="font-heading">Verify Your Email</CardTitle>
             <CardDescription>
-              {user 
-                ? `You need to verify your email address (${user.email}) to access the dashboard.` 
+              {user
+                ? `You need to verify your email address (${user.email}) to access the dashboard.`
                 : "We've sent a verification link to your email address. Click the link to verify your account."}
             </CardDescription>
           </CardHeader>
@@ -54,12 +56,12 @@ const VerifyEmail = () => {
                 {resending ? "Sending..." : "Resend Verification Email"}
               </Button>
             )}
-            
+
             <div className="flex justify-center">
                {user ? (
                  <Button variant="ghost" onClick={() => supabase.auth.signOut()}>Logout</Button>
                ) : (
-                 <Link to="/login"><Button>Go to Login</Button></Link>
+                 <Link href="/login"><Button>Go to Login</Button></Link>
                )}
             </div>
           </CardContent>

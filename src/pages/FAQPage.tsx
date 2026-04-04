@@ -1,3 +1,5 @@
+'use client';
+
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CTASection from "@/components/CTASection";
@@ -45,7 +47,7 @@ const FAQPage = () => (
       <div className="container-narrow">
         <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB Frequently Asked Questions</h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-          Get answers to the most frequently asked questions about the IJMB programme, registration, requirements, fees, 
+          Get answers to the most frequently asked questions about the IJMB programme, registration, requirements, fees,
           and university admission. If your question is not answered here, contact us for assistance.
         </p>
         <InternalLinks />

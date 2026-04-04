@@ -1,6 +1,7 @@
+'use client';
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/navigation";
 import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,7 +15,7 @@ const AdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -43,11 +44,12 @@ const AdminLogin = () => {
 
         console.log('Profile Role Check:', profile, profileError);
 
-        if (profile?.role !== 'admin') {
+        const adminRoles = ['super_admin', 'coordinator'];
+        if (!profile || !adminRoles.includes(profile.role)) {
           await supabase.auth.signOut();
           toast({
             title: "Access Denied",
-            description: `Role is: ${profile?.role || 'null'}. Expected: admin`,
+            description: "You do not have admin access.",
             variant: "destructive"
           });
           setLoading(false);
@@ -58,7 +60,7 @@ const AdminLogin = () => {
           title: "Welcome Back",
           description: "Logged in successfully.",
         });
-        navigate('/portal-admin');
+        router.push('/portal-admin');
       }
     } catch (error: any) {
       toast({
@@ -74,7 +76,7 @@ const AdminLogin = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted/20 px-4">
       <SEOHead title="Admin Login – IJMB Portal" description="Restricted access for administrators." canonical="https://www.ijmb.info/admin-login" />
-      
+
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-2">

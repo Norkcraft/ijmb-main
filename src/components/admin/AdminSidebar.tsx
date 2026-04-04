@@ -1,8 +1,10 @@
+'use client';
 
 import { cn } from "@/lib/utils";
-import { Link, useLocation } from "react-router-dom";
-import { 
-  LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, 
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
+import {
+  LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar,
   DollarSign, LogOut, Bell, Users, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,9 +28,8 @@ interface AdminSidebarProps {
 }
 
 export function AdminSidebar({ className, user, signOut, newNotifications }: AdminSidebarProps) {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const currentTab = searchParams.get('tab') || 'overview';
+  const searchParams = useSearchParams();
+  const currentTab = searchParams?.get('tab') || 'overview';
 
   return (
     <aside className={cn("hidden lg:flex w-64 flex-col bg-white border-r h-screen", className)}>
@@ -39,16 +40,16 @@ export function AdminSidebar({ className, user, signOut, newNotifications }: Adm
         </div>
         {newNotifications && <Bell size={16} className="text-red-500 animate-pulse" />}
       </div>
-      
+
       <nav className="flex-1 overflow-y-auto p-4 space-y-1">
         {sidebarItems.map((item) => {
           const isActive = item.id === currentTab;
           return (
-            <Link key={item.id} to={item.href}>
+            <Link key={item.id} href={item.href}>
               <button
                 className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors ${
-                  isActive 
-                    ? 'bg-primary/10 text-primary' 
+                  isActive
+                    ? 'bg-primary/10 text-primary'
                     : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 }`}
               >

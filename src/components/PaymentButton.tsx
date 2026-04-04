@@ -1,3 +1,5 @@
+'use client';
+
 import { PaystackButton } from 'react-paystack';
 import { Button } from '@/components/ui/button';
 import { CreditCard, Loader2 } from 'lucide-react';
@@ -20,7 +22,7 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
   const { toast } = useToast();
   
   // Replace with your actual Paystack public key from environment variable
-  const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+  const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
 
   const componentProps = {
     email,

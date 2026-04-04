@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/hooks/use-toast';
@@ -6,7 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
-import PaymentButton from '@/components/PaymentButton';
+import dynamic from 'next/dynamic';
+const PaymentButton = dynamic(() => import('@/components/PaymentButton'), { ssr: false });
 
 interface DashboardPaymentsProps {
   user: any;
@@ -93,11 +96,11 @@ export const DashboardPayments = ({
             <>
               {isAdmitted && (
                 <div className="flex items-center space-x-2 mb-6 p-4 bg-muted/20 rounded-lg border">
-                  <Switch 
-                    id="hostel-mode" 
-                    checked={hostelNeeded} 
-                    onCheckedChange={toggleHostel} 
-                    disabled={processing} 
+                  <Switch
+                    id="hostel-mode"
+                    checked={hostelNeeded}
+                    onCheckedChange={toggleHostel}
+                    disabled={processing}
                   />
                   <Label htmlFor="hostel-mode" className="font-medium">I require Hostel Accommodation (Optional)</Label>
                 </div>
@@ -109,7 +112,7 @@ export const DashboardPayments = ({
                   if (name === 'hostel_fee' && !hostelNeeded) return null;
 
                   const amount = Number(fee.amount) || 0;
-                  
+
                   // Determine status
                   let paid = false;
                   let isPartPaid = false;
@@ -132,7 +135,7 @@ export const DashboardPayments = ({
                   const isFormFee = name === 'form_fee';
                   const blocked = !isFormFee && requiresAdmission(name) && !isAdmitted;
                   const notConfigured = amount <= 0;
-                  
+
                   // Installment logic
                   const showInstallment = name === 'tuition_fee' && application?.installments_allowed && !paid;
                   const balance = amount - amountPaid;
@@ -163,11 +166,11 @@ export const DashboardPayments = ({
                           )}
                         </div>
                         <p className="text-sm text-muted-foreground mb-2">{fee.description || '—'}</p>
-                        
+
                         <div className="text-xl font-bold">
                           {notConfigured ? '₦—' : `₦${amount.toLocaleString()}`}
                         </div>
-                        
+
                         {isPartPaid && (
                           <div className="text-sm mt-1">
                             <span className="text-green-600 font-medium">Paid: ₦{amountPaid.toLocaleString()}</span>
@@ -205,7 +208,7 @@ export const DashboardPayments = ({
                                     await fetchData();
                                   }}
                                 />
-                                
+
                                 {showInstallment && !isPartPaid && (
                                   <PaymentButton
                                     email={user.email || ''}

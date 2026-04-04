@@ -1,10 +1,9 @@
+'use client';
 
 import { Button } from "@/components/ui/button";
-import { 
-  Menu, LogOut, LayoutDashboard, CreditCard, MapPin, 
-  BookOpen, Calendar, DollarSign 
-} from "lucide-react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Menu, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Overview", href: "/portal-admin", id: 'overview' },
@@ -22,14 +21,14 @@ interface AdminMobileHeaderProps {
   newNotifications?: boolean;
 }
 
-export const AdminMobileHeader = ({ 
-  isMobileMenuOpen, 
-  setIsMobileMenuOpen, 
+export const AdminMobileHeader = ({
+  isMobileMenuOpen,
+  setIsMobileMenuOpen,
   signOut,
-  newNotifications 
+  newNotifications
 }: AdminMobileHeaderProps) => {
-  const [searchParams] = useSearchParams();
-  const currentTab = searchParams.get('tab') || 'overview';
+  const searchParams = useSearchParams();
+  const currentTab = searchParams?.get('tab') || 'overview';
 
   return (
     <>
@@ -43,17 +42,16 @@ export const AdminMobileHeader = ({
         </Button>
       </header>
 
-      {/* Mobile Menu Overlay */}
       {isMobileMenuOpen && (
         <div className="lg:hidden absolute inset-0 z-50 bg-background border-b shadow-lg p-4 space-y-2 h-fit">
           <div className="flex justify-between items-center mb-4">
-             <span className="font-bold">Menu</span>
-             <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(false)}>Close</Button>
+            <span className="font-bold">Menu</span>
+            <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(false)}>Close</Button>
           </div>
           {sidebarItems.map((item) => {
-             const isActive = item.id === currentTab;
-             return (
-              <Link key={item.id} to={item.href} onClick={() => setIsMobileMenuOpen(false)}>
+            const isActive = item.id === currentTab;
+            return (
+              <Link key={item.id} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
                 <button
                   className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md ${
                     isActive ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
@@ -62,14 +60,14 @@ export const AdminMobileHeader = ({
                   <item.icon size={18} />
                   {item.label}
                   {item.id === 'payments' && newNotifications && (
-                     <span className="ml-auto h-2 w-2 rounded-full bg-red-600 animate-pulse" />
+                    <span className="ml-auto h-2 w-2 rounded-full bg-red-600 animate-pulse" />
                   )}
                 </button>
               </Link>
-             )
+            );
           })}
           <div className="pt-4 mt-4 border-t">
-             <Button variant="outline" className="w-full justify-start text-red-600" onClick={signOut}>
+            <Button variant="outline" className="w-full justify-start text-red-600" onClick={signOut}>
               <LogOut size={16} className="mr-2" /> Logout
             </Button>
           </div>

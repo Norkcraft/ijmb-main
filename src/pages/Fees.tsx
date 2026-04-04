@@ -1,3 +1,5 @@
+'use client';
+
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
@@ -25,7 +27,7 @@ const Fees = () => (
       <div className="container-narrow">
         <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB Fees in Nigeria 2026/2027</h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-          Understanding the IJMB fees is essential before you begin your registration. The total cost of the IJMB programme 
+          Understanding the IJMB fees is essential before you begin your registration. The total cost of the IJMB programme
           in Nigeria varies by centre but remains affordable compared to private university tuition or years of repeated UTME attempts.
         </p>
 
@@ -64,7 +66,7 @@ const Fees = () => (
             <div className="p-8 h-full flex flex-col justify-center text-center">
               <h3 className="text-2xl font-bold font-heading mb-2">Total Estimated Cost</h3>
               <p className="text-primary-foreground/80 mb-6">Complete academic session</p>
-              
+
               <div className="text-4xl font-bold mb-2">₦80k – ₦150k</div>
               <p className="text-sm opacity-90 mb-8">per session</p>
 
@@ -84,7 +86,7 @@ const Fees = () => (
 
         <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg mb-8">
           <p className="text-sm text-muted-foreground">
-            <strong>Note:</strong> These are estimated fees and may vary by centre. Some centres in Lagos and Abuja may charge higher 
+            <strong>Note:</strong> These are estimated fees and may vary by centre. Some centres in Lagos and Abuja may charge higher
             fees than centres in other locations. Contact us for the most current IJMB fees for your preferred centre.
           </p>
         </div>
@@ -128,9 +130,9 @@ const Fees = () => (
 
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">Is IJMB Worth the Investment?</h2>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          Absolutely. The IJMB fees are a worthwhile investment when you consider that you will skip 100 level entirely and 
-          enter 200 level directly. This saves you at least one year of university tuition, accommodation, and living expenses. 
-          Many students who have spent years writing UTME without success find that IJMB is the most cost-effective and reliable 
+          Absolutely. The IJMB fees are a worthwhile investment when you consider that you will skip 100 level entirely and
+          enter 200 level directly. This saves you at least one year of university tuition, accommodation, and living expenses.
+          Many students who have spent years writing UTME without success find that IJMB is the most cost-effective and reliable
           path to university admission in Nigeria.
         </p>
 

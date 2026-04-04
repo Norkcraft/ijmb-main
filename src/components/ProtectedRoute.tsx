@@ -1,8 +1,24 @@
-import { Navigate } from 'react-router-dom';
+'use client';
+
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (loading) return;
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+    if (!user.email_confirmed_at && !user.app_metadata?.provider?.includes('google')) {
+      // If email not confirmed (and not a social login which usually auto-confirms), redirect
+      router.push('/verify-email');
+    }
+  }, [user, loading, router]);
 
   if (loading) {
     return (
@@ -12,11 +28,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  if (!user) return null;
 
   if (!user.email_confirmed_at && !user.app_metadata?.provider?.includes('google')) {
-     // If email not confirmed (and not a social login which usually auto-confirms), redirect
-     return <Navigate to="/verify-email" replace />;
+    return null;
   }
 
   return <>{children}</>;

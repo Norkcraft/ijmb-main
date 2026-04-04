@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from "next/link";
 import { supabase } from '@/lib/supabaseClient';
 import SEOHead from '@/components/SEOHead';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -49,7 +51,7 @@ const ForgotPassword = () => {
             {sent ? (
               <div className="text-center">
                 <p className="text-muted-foreground mb-4">We sent a reset link to <strong>{email}</strong></p>
-                <Link to="/login"><Button variant="outline">Back to Login</Button></Link>
+                <Link href="/login"><Button variant="outline">Back to Login</Button></Link>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
@@ -60,7 +62,7 @@ const ForgotPassword = () => {
                 <Button type="submit" className="w-full" disabled={loading}>
                   {loading ? <><Loader2 className="animate-spin mr-2" size={16} /> Sending...</> : 'Send Reset Link'}
                 </Button>
-                <p className="text-center text-sm"><Link to="/login" className="text-primary hover:underline">Back to Login</Link></p>
+                <p className="text-center text-sm"><Link href="/login" className="text-primary hover:underline">Back to Login</Link></p>
               </form>
             )}
           </CardContent>

@@ -2,6 +2,8 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
 import { supabaseServer } from '../src/lib/supabaseServer';
 import { generateApplicationPDF } from '../src/lib/generateApplicationPDF';
+import { sendEmail } from '../src/lib/resendClient';
+import { paymentConfirmationEmail, applicationSubmittedEmail } from '../src/lib/emailTemplates';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // 1. Verify Request Method
@@ -56,14 +58,41 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         console.error('Error recording payment:', paymentError);
       }
 
+      // Fetch user profile for email notifications
+      let userEmail = '';
+      let userFullName = '';
+      if (metadata?.user_id) {
+        const { data: profile } = await supabaseServer
+          .from('profiles')
+          .select('full_name')
+          .eq('id', metadata.user_id)
+          .single();
+        userFullName = profile?.full_name || 'Student';
+
+        const { data: authUser } = await supabaseServer.auth.admin.getUserById(metadata.user_id);
+        userEmail = authUser?.user?.email || '';
+      }
+
+      // Send payment confirmation email
+      if (userEmail) {
+        const amountNaira = Math.round(amount / 100);
+        const { html, subject } = paymentConfirmationEmail(
+          userFullName,
+          amountNaira,
+          reference,
+          paymentType || 'payment'
+        );
+        await sendEmail({ to: userEmail, subject, html });
+      }
+
       // If it's the Form Fee, update application status and Generate PDF
       if (paymentType === 'form_fee') {
-        
+
         // Update Application Status
         await supabaseServer
           .from('applications')
-          .update({ 
-            form_fee_paid: true, 
+          .update({
+            form_fee_paid: true,
             status: 'submitted',
             updated_at: new Date().toISOString()
           })
@@ -114,6 +143,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         } catch (pdfError) {
           console.error('PDF Generation failed:', pdfError);
           // We swallow the error so we don't fail the webhook response
+        }
+
+        // Send application submitted email
+        if (userEmail) {
+          try {
+            const { data: appData } = await supabaseServer
+              .from('applications')
+              .select('id, preferred_centre_id, subject_combination_id, centres(name), subject_combinations(name)')
+              .eq('id', applicationId)
+              .single();
+
+            const centreName = (appData as any)?.centres?.name || 'To be assigned';
+            const subjectsName = (appData as any)?.subject_combinations?.name || 'As selected';
+
+            const { html, subject } = applicationSubmittedEmail(
+              userFullName,
+              applicationId,
+              centreName,
+              subjectsName
+            );
+            await sendEmail({ to: userEmail, subject, html });
+          } catch (emailErr) {
+            console.error('Failed to send application submitted email:', emailErr);
+          }
         }
       }
 

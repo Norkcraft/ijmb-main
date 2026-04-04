@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
@@ -33,7 +35,7 @@ const Registration = () => (
               IJMB Registration Form 2026/2027
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              The IJMB registration form for the 2026/2027 academic session is now available. Register today to secure your spot 
+              The IJMB registration form for the 2026/2027 academic session is now available. Register today to secure your spot
               in the Interim Joint Matriculation Board programme and gain direct entry admission into 200 level of any Nigerian university without writing UTME.
             </p>
 
@@ -113,7 +115,7 @@ const Registration = () => (
           <div className="lg:col-span-2">
             <div className="sticky top-24 space-y-6">
               <div className="rounded-2xl overflow-hidden shadow-xl">
-                <img src={studentLibrary} alt="Student completing IJMB registration form" className="w-full h-[250px] object-cover" loading="lazy" />
+                <img src={studentLibrary.src} alt="Student completing IJMB registration form" className="w-full h-[250px] object-cover" loading="lazy" />
               </div>
               <div className="bg-primary text-primary-foreground p-6 rounded-xl">
                 <h3 className="font-heading font-bold text-lg mb-3">Start Your Registration</h3>
@@ -121,7 +123,7 @@ const Registration = () => (
                   The 2026/2027 IJMB registration is open. Secure your spot now.
                 </p>
                 <Link
-                  to="/register"
+                  href="/register"
                   className="block w-full text-center px-6 py-3 font-bold rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity"
                 >
                   Apply Now <ArrowRight size={16} className="inline ml-1" />
@@ -130,10 +132,10 @@ const Registration = () => (
               <div className="bg-secondary p-6 rounded-xl">
                 <h3 className="font-heading font-bold mb-3">Quick Links</h3>
                 <ul className="space-y-2 text-sm">
-                  <li><Link to="/ijmb-admission-requirements" className="text-primary hover:underline">→ IJMB Requirements</Link></li>
-                  <li><Link to="/ijmb-fees" className="text-primary hover:underline">→ IJMB Fees</Link></li>
-                  <li><Link to="/ijmb-centres-in-nigeria" className="text-primary hover:underline">→ Study Centres</Link></li>
-                  <li><Link to="/universities-accepting-ijmb" className="text-primary hover:underline">→ Accepting Universities</Link></li>
+                  <li><Link href="/ijmb-admission-requirements" className="text-primary hover:underline">→ IJMB Requirements</Link></li>
+                  <li><Link href="/ijmb-fees" className="text-primary hover:underline">→ IJMB Fees</Link></li>
+                  <li><Link href="/ijmb-centres-in-nigeria" className="text-primary hover:underline">→ Study Centres</Link></li>
+                  <li><Link href="/universities-accepting-ijmb" className="text-primary hover:underline">→ Accepting Universities</Link></li>
                 </ul>
               </div>
             </div>

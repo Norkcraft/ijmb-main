@@ -1,5 +1,8 @@
+'use client';
+
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import SEOHead from '@/components/SEOHead';
@@ -15,7 +18,7 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -38,9 +41,9 @@ const Login = () => {
       .single();
 
     if (profile?.role === 'admin') {
-      navigate('/portal-admin');
+      router.push('/portal-admin');
     } else {
-      navigate('/dashboard');
+      router.push('/dashboard');
     }
     setLoading(false);
   };
@@ -72,8 +75,8 @@ const Login = () => {
                 {loading ? <><Loader2 className="animate-spin mr-2" size={16} /> Signing In...</> : 'Sign In'}
               </Button>
               <div className="flex justify-between text-sm">
-                <Link to="/forgot-password" className="text-primary hover:underline">Forgot Password?</Link>
-                <Link to="/register" className="text-primary hover:underline">Create Account</Link>
+                <Link href="/forgot-password" className="text-primary hover:underline">Forgot Password?</Link>
+                <Link href="/register" className="text-primary hover:underline">Create Account</Link>
               </div>
             </form>
           </CardContent>

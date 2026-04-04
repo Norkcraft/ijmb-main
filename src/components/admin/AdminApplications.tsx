@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import Link from "next/link";
 import { supabase } from '@/lib/supabaseClient';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -168,9 +170,9 @@ export default function AdminApplications() {
                     </TableCell>
                     <TableCell>
                       {app.application_form_url ? (
-                         <Button 
-                           variant="link" 
-                           size="sm" 
+                         <Button
+                           variant="link"
+                           size="sm"
                            className="h-auto p-0 text-blue-600"
                            onClick={(e) => {
                              e.stopPropagation();
@@ -186,7 +188,7 @@ export default function AdminApplications() {
                     <TableCell><Badge className={STATUS_COLORS[app.status] || ''}>{app.status.replace('_', ' ')}</Badge></TableCell>
                     <TableCell className="text-sm text-muted-foreground">{new Date(app.created_at).toLocaleDateString()}</TableCell>
                     <TableCell>
-                      <Link to={`/portal-admin/applications/${app.id}`}>
+                      <Link href={`/portal-admin/applications/${app.id}`}>
                         <Button size="sm" variant="outline">View</Button>
                       </Link>
                     </TableCell>

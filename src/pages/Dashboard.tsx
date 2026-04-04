@@ -1,3 +1,4 @@
+'use client';
 
 import { Loader2, Download, Eye, Printer, FileText } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
@@ -8,7 +9,7 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardPrintView } from '@/components/dashboard/DashboardPrintView';
 import { DashboardPayments } from '@/components/dashboard/DashboardPayments';
 import { ApplicationForm } from '@/components/application/ApplicationForm';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from "next/navigation";
 
 const Dashboard = () => {
   const {
@@ -29,12 +30,12 @@ const Dashboard = () => {
     fetchData
   } = useStudentDashboard();
 
-  const [searchParams] = useSearchParams();
-  const currentTab = searchParams.get('tab') || 'dashboard';
+  const searchParams = useSearchParams();
+  const currentTab = searchParams?.get('tab') || 'dashboard';
 
   // Step calculation
   const formFeePaid = application?.form_fee_paid || false;
-  
+
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application.status);
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
   const hasAdmissionLetter = isAdmitted && application?.admission_letter_path;
@@ -64,7 +65,7 @@ const Dashboard = () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
-        
+
         const response = await fetch(`/api/application/${application.id}/download`, {
           headers: {
             'Authorization': `Bearer ${session.access_token}`
@@ -74,7 +75,7 @@ const Dashboard = () => {
         if (response.ok) {
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
-          
+
           if (action === 'download') {
             const a = document.createElement('a');
             a.href = url;
@@ -88,7 +89,7 @@ const Dashboard = () => {
                 newWindow.addEventListener('load', () => newWindow.print());
              }
           }
-          
+
           // Cleanup
           setTimeout(() => window.URL.revokeObjectURL(url), 1000);
         } else {
@@ -128,7 +129,7 @@ const Dashboard = () => {
               <h1 className="text-3xl font-bold tracking-tight">Complete Your IJMB Application</h1>
               <p className="text-muted-foreground">Please fill in all required information to proceed with your application.</p>
             </div>
-            <ApplicationForm 
+            <ApplicationForm
               application={application}
               initialOlevels={olevelResults}
               user={user}
@@ -157,7 +158,7 @@ const Dashboard = () => {
               <h1 className="text-3xl font-bold tracking-tight">Application Submitted Successfully</h1>
               <p className="text-muted-foreground">Please pay the registration form fee to complete the process and send your application for review.</p>
             </div>
-            <DashboardPayments 
+            <DashboardPayments
               user={user}
               application={application}
               onFeePaymentSuccess={async (feeName) => {
@@ -186,18 +187,18 @@ const Dashboard = () => {
                </Button>
                <h1 className="text-2xl font-bold tracking-tight">Payments</h1>
             </div>
-            
+
             <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-md border border-blue-200">
                <h3 className="font-semibold mb-1 flex items-center gap-2">
                  <Loader2 size={16} /> Payment Instructions
                </h3>
                <p className="text-sm">
-                 After your admission is granted, you will be required to pay the Acceptance Fee to download your admission letter. 
+                 After your admission is granted, you will be required to pay the Acceptance Fee to download your admission letter.
                  Subsequent payments (Tuition, Hostel) will be enabled after acceptance.
                </p>
             </div>
 
-            <DashboardPayments 
+            <DashboardPayments
               user={user}
               application={application}
               onFeePaymentSuccess={async (feeName) => {
@@ -229,9 +230,9 @@ const Dashboard = () => {
   return (
     <>
       <SEOHead title="Student Dashboard – IJMB" description="Manage your IJMB application." canonical="https://www.ijmb.info/dashboard" />
-      
+
       {/* Print-only section for PDF generation */}
-      <DashboardPrintView 
+      <DashboardPrintView
         application={application}
         profile={profile}
         user={user}
@@ -260,9 +261,9 @@ const Dashboard = () => {
                 <div>
                   <h3 className="text-sm font-semibold text-muted-foreground mb-1">Review Status</h3>
                   <div className="font-medium text-lg">
-                    {application?.status === 'submitted' ? 'Under Review' : 
-                     application?.status === 'review' ? 'Under Review' : 
-                     application?.status === 'admitted' ? 'Approved' : 
+                    {application?.status === 'submitted' ? 'Under Review' :
+                     application?.status === 'review' ? 'Under Review' :
+                     application?.status === 'admitted' ? 'Approved' :
                      application?.status === 'rejected' ? 'Rejected' : 'Under Review'}
                   </div>
                 </div>
@@ -285,13 +286,13 @@ const Dashboard = () => {
             <div className="md:col-span-2 space-y-6">
               <div className="bg-white p-6 rounded-lg shadow-sm border">
                 <h2 className="text-xl font-bold mb-4">Application Details</h2>
-                
+
                 {!isAdmitted && application?.status !== 'rejected' && (
                   <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-md border border-blue-200">
                     <p>Your application is currently under review. You will be notified once a decision has been made.</p>
                   </div>
                 )}
-                
+
                 {isAdmitted && !hasPaidAcceptanceFee && (
                   <div className="mb-6 p-4 bg-yellow-50 text-yellow-800 rounded-md border border-yellow-200">
                     <h3 className="font-bold text-lg mb-1">Admission Approved!</h3>
@@ -335,13 +336,13 @@ const Dashboard = () => {
                     <FileText className="text-primary" />
                     <h2 className="text-xl font-bold">Application Documents</h2>
                   </div>
-                  
+
                   <div className="border rounded-md p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div>
                       <h3 className="font-semibold text-base">Your Application Form</h3>
                       <p className="text-sm text-muted-foreground">ID: {application?.application_number || application?.id?.split('-')[0].toUpperCase()}</p>
                     </div>
-                    
+
                     {!application?.application_form_url ? (
                        <div className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-100 flex items-center gap-2">
                          <Loader2 className="animate-spin h-4 w-4" />

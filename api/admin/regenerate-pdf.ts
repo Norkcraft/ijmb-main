@@ -20,9 +20,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(401).json({ message: 'Invalid token' });
   }
 
-  // Check if user is admin (simple check against profiles role or email domain for now, 
-  // ideally use RLS or claims, but for this quick fix we assume the frontend is secure and we just need a valid user session)
-  // In a real app, verify user.email ends with @admin.com or check 'profiles' table role.
+  // Verify the user has an admin role before proceeding
+  const { data: profile, error: profileError } = await supabaseServer
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+
+  if (profileError || !profile || !['super_admin', 'coordinator'].includes(profile.role)) {
+    return res.status(403).json({ message: 'Forbidden: admin access required' });
+  }
 
   const { applicationId } = req.body;
   if (!applicationId) {

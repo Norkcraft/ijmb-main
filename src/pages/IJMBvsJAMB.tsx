@@ -1,10 +1,12 @@
+'use client';
+
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
 import { CheckCircle, XCircle, ArrowRight, ShieldCheck, Zap, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const faqs = [
   { question: "Is IJMB better than JAMB?", answer: "For many students, IJMB is better because it offers a guaranteed path to 200 Level (Direct Entry) admission. Unlike JAMB which is highly unpredictable and competitive for 100 Level, IJMB provides a structured academic programme where hard work directly translates to admission." },
@@ -27,7 +29,7 @@ const IJMBvsJAMB = () => (
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB vs JAMB: The Ultimate Comparison Guide</h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-          Choosing between <strong>IJMB</strong> and <strong>JAMB (UTME)</strong> is one of the most critical decisions for a Nigerian student seeking university admission. 
+          Choosing between <strong>IJMB</strong> and <strong>JAMB (UTME)</strong> is one of the most critical decisions for a Nigerian student seeking university admission.
           While JAMB is the traditional route, IJMB has emerged as a powerful, reliable alternative that allows students to <strong>bypass 100 Level entirely</strong>.
         </p>
 
@@ -48,7 +50,7 @@ const IJMBvsJAMB = () => (
 
            <div className="bg-orange-50 border border-orange-200 rounded-xl p-6">
               <h2 className="text-xl font-bold text-orange-800 mb-3 flex items-center gap-2">
-                 <AlertCircle size={20} /> The JAMB Reality
+                 <XCircle size={20} /> The JAMB Reality
               </h2>
               <p className="text-orange-800/80 mb-4">
                  JAMB UTME is a one-day examination. Technical glitches, strict cut-off marks, and high competition mean even brilliant students often miss admission and have to wait another year.
@@ -94,7 +96,7 @@ const IJMBvsJAMB = () => (
 
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">Why Smart Students Choose IJMB</h2>
         <p className="text-muted-foreground mb-6">
-          Every year, over 1.5 million students write JAMB, but less than 500,000 gain admission. The rest are forced to sit at home. 
+          Every year, over 1.5 million students write JAMB, but less than 500,000 gain admission. The rest are forced to sit at home.
           <strong>IJMB breaks this cycle.</strong>
         </p>
         <div className="space-y-4 mb-8">
@@ -119,7 +121,7 @@ const IJMBvsJAMB = () => (
            <p className="text-muted-foreground mb-6 max-w-xl mx-auto">
              Don't gamble with your future. Register for IJMB today and guarantee your university admission next year.
            </p>
-           <Link to="/register" className="inline-flex items-center gap-2 px-8 py-3 cta-gradient text-white font-bold rounded-lg hover:opacity-90 transition-opacity shadow-lg">
+           <Link href="/register" className="inline-flex items-center gap-2 px-8 py-3 cta-gradient text-white font-bold rounded-lg hover:opacity-90 transition-opacity shadow-lg">
              Start Registration <ArrowRight size={18} />
            </Link>
         </div>

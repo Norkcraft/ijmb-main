@@ -1,15 +1,18 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from '@/lib/supabaseClient';
 import { CheckCircle2, XCircle, Loader2, ShieldCheck, Home } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import SEOHead from '@/components/SEOHead';
-import logo from '/ijmb-logo.jpeg';
+const logo = '/ijmb-logo.jpeg';
 
 const VerifyApplication = () => {
-  const { applicationId } = useParams();
+  const params = useParams(); const applicationId = params?.applicationId as string;
   const [loading, setLoading] = useState(true);
   const [application, setApplication] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -84,7 +87,7 @@ const VerifyApplication = () => {
               </p>
               <div className="pt-4 border-t">
                 <Button asChild variant="outline" className="w-full">
-                  <Link to="/">
+                  <Link href="/">
                     <Home className="mr-2 h-4 w-4" /> Return Home
                   </Link>
                 </Button>
@@ -104,7 +107,7 @@ const VerifyApplication = () => {
     <>
       <SEOHead title={`Verify Application: ${fullName}`} noindex />
       <div className="min-h-screen bg-muted/20 flex flex-col items-center justify-center p-4">
-        
+
         {/* Verification Card */}
         <Card className="max-w-lg w-full shadow-xl border-t-4 border-t-green-600 overflow-hidden">
           {/* Header */}
@@ -130,7 +133,7 @@ const VerifyApplication = () => {
                 <span className="text-muted-foreground col-span-1">Student Name:</span>
                 <span className="font-semibold col-span-2 text-foreground">{fullName}</span>
               </div>
-              
+
               <div className="grid grid-cols-3 gap-2 text-sm">
                 <span className="text-muted-foreground col-span-1">Application ID:</span>
                 <span className="font-mono font-medium col-span-2 text-primary">{displayId}</span>
@@ -167,7 +170,7 @@ const VerifyApplication = () => {
             </div>
 
             <Button asChild variant="ghost" size="sm" className="w-full text-xs text-muted-foreground hover:text-primary">
-              <Link to="/">
+              <Link href="/">
                 &larr; Go to Official Website
               </Link>
             </Button>

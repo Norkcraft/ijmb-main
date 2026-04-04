@@ -1,5 +1,7 @@
-import { Link } from "react-router-dom";
-import { useEffect, useRef } from "react";
+'use client';
+
+import Link from "next/link";
+import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import SEOHead from "@/components/SEOHead";
 import FAQSection from "@/components/FAQSection";
@@ -12,45 +14,45 @@ import graduateMale from "@/assets/graduate-male.jpeg";
 import studentLibrary from "@/assets/student-library.jpeg";
 import studentsLaptop from "@/assets/students-laptop.jpeg";
 import { useScrollReveal, useCountUp } from "@/hooks/useScrollReveal";
-import { GraduationCap, CheckCircle, BookOpen, Users, ArrowRight, MapPin, Star } from "lucide-react";
+import { GraduationCap, CheckCircle, BookOpen, Users, ArrowRight, MapPin, Star, ChevronLeft, ChevronRight } from "lucide-react";
 
 const stats = [
-  { value: 200, suffix: "+", label: "Partner Universities" },
+  { value: 200, suffix: "+", label: "Universities Nationwide" },
   { value: 50, suffix: "K+", label: "Students Enrolled" },
-  { value: 95, suffix: "%", label: "Success Rate" },
+  { value: 95, suffix: "%", label: "Admission Success Rate" },
   { value: 36, suffix: "", label: "States Covered" },
 ];
 
 const benefits = [
-  { icon: GraduationCap, title: "Skip to 200 Level", desc: "Enter university directly into second year without writing UTME again." },
-  { icon: CheckCircle, title: "No JAMB Required", desc: "IJMB certificate qualifies you for direct entry admission without UTME." },
-  { icon: BookOpen, title: "Recognised Nationwide", desc: "Accepted by over 200 federal, state, and private universities across Nigeria." },
-  { icon: Users, title: "Flexible Study Options", desc: "Study at accredited centres across Nigeria with experienced lecturers." },
+  { icon: GraduationCap, title: "Enter at 200 Level", desc: "Bypass 100 level entirely. Your IJMB certificate places you directly into second year at university." },
+  { icon: CheckCircle, title: "No UTME Required", desc: "IJMB qualifies you for Direct Entry admission. No more failed JAMB attempts or UTME stress." },
+  { icon: BookOpen, title: "Accepted by 200+ Universities", desc: "Recognised by all federal, state, and private universities in Nigeria that offer Direct Entry admission." },
+  { icon: Users, title: "Study Centres Nationwide", desc: "Accredited IJMB centres in all 36 states. Study close to home with qualified A-Level tutors." },
 ];
 
 const publicSteps = [
-  { num: "01", title: "Register", desc: "Create your account, fill the application form, and upload required documents." },
-  { num: "02", title: "Pay Form Fee (₦5,500)", desc: "Pay the registration form fee to submit your application for processing." },
-  { num: "03", title: "Resume Studies", desc: "After admission approval, receive your admission letter and resume at your assigned centre." },
+  { num: "01", title: "Create Your Account", desc: "Register online, fill in your personal and academic details, and upload your O-Level result and passport photograph." },
+  { num: "02", title: "Pay the Form Fee", desc: "Pay the ₦5,500 IJMB registration form fee securely online. Your application is then submitted for review and processing." },
+  { num: "03", title: "Get Admitted & Start", desc: "Receive your admission letter, get assigned to an accredited study centre, and begin your 9-month A-Level programme." },
 ];
 
 const testimonials = [
-  { name: "Aisha Mohammed", uni: "ABU Zaria", quote: "IJMB gave me a second chance. I got into 200 level without UTME stress!", img: graduateFemale, emoji: "🎓" },
-  { name: "Chidi Okonkwo", uni: "University of Lagos", quote: "I registered, studied hard, and got admitted. The process was smooth.", img: graduateMale, emoji: "🚀" },
-  { name: "Fatima Ibrahim", uni: "University of Ilorin", quote: "Best decision I ever made. IJMB is legitimate and widely accepted.", img: studentLibrary, emoji: "💯" },
-  { name: "Samuel Adeyemi", uni: "University of Ibadan", quote: "I was tired of JAMB wahala. IJMB was my shortcut to 200 level. No stress!", img: studentsLaptop, emoji: "⚡" },
-  { name: "Blessing Okoro", uni: "UNIBEN", quote: "My friends didn't believe me until they saw my admission letter. IJMB is real!", img: graduateFemale, emoji: "✨" },
+  { name: "Aisha Mohammed", uni: "Ahmadu Bello University, Zaria", course: "Medicine & Surgery", quote: "IJMB provided a clear and credible path into 200 level. The registration process was seamless and the programme is genuinely well-structured." },
+  { name: "Chidi Okonkwo", uni: "University of Lagos", course: "Computer Science", quote: "From registration to admission, everything was handled professionally. I gained direct entry and have not looked back since." },
+  { name: "Fatima Ibrahim", uni: "University of Ilorin", course: "Law", quote: "I had concerns about acceptance, but my admission letter put every doubt to rest. IJMB is recognised and respected across universities." },
+  { name: "Samuel Adeyemi", uni: "University of Ibadan", course: "Economics", quote: "The direct entry route through IJMB is underrated. It saved me time and gave me a stronger academic foundation than I expected." },
+  { name: "Blessing Okoro", uni: "University of Benin", course: "Pharmacy", quote: "A legitimate, structured programme with real outcomes. My university placement was confirmed within weeks of completing the process." },
 ];
 
 const faqs = [
-  { question: "What is IJMB?", answer: "IJMB stands for Interim Joint Matriculation Board. It is an Advanced Level (A-Level) programme that qualifies candidates for direct entry admission into 200 level of Nigerian universities without writing UTME." },
-  { question: "Is IJMB recognised by Nigerian universities?", answer: "Yes. IJMB is recognised by the Federal Government of Nigeria and accepted by over 200 federal, state, and private universities for direct entry admission." },
-  { question: "Who can register for IJMB?", answer: "Any candidate with at least 5 O-Level credits including English and Mathematics can register for the IJMB programme." },
-  { question: "How long is the IJMB programme?", answer: "The IJMB programme runs for approximately 9 months (one academic session). After completion, you write the IJMB examination." },
-  { question: "Do I need JAMB for IJMB?", answer: "You do not need to write UTME to register for IJMB. However, you will need a JAMB registration to process your direct entry admission after passing the IJMB exams." },
-  { question: "How much is IJMB registration?", answer: "The IJMB registration form fee is ₦5,500. Total programme fees (tuition, materials, exams) range from ₦80,000 to ₦150,000 depending on the study centre." },
-  { question: "Can I use IJMB for Medicine or Law?", answer: "Yes! Many universities accept IJMB for Medicine, Law, Engineering, Pharmacy, and other competitive courses. You typically need high scores (9+ points)." },
-  { question: "Is IJMB the same as JUPEB?", answer: "No. IJMB is run by ABU Zaria while JUPEB is run by UNILAG. Both offer A-Level qualifications for direct entry, but they have different curricula and exam bodies." },
+  { question: "What is IJMB?", answer: "IJMB stands for Interim Joint Matriculation Board. It is an Advanced Level (A-Level) programme administered by Ahmadu Bello University (ABU) Zaria that qualifies candidates for direct entry admission into 200 level of Nigerian universities without writing UTME." },
+  { question: "Is IJMB recognised by Nigerian universities?", answer: "Yes. IJMB is recognised by the Federal Government of Nigeria and accepted by over 200 federal, state, and private universities for direct entry admission into 200 level." },
+  { question: "Who can register for IJMB?", answer: "Any candidate with at least 5 O-Level credits including English Language and Mathematics can register for the IJMB programme. There is no age restriction." },
+  { question: "How long is the IJMB programme?", answer: "The IJMB programme runs for approximately 9 months (one academic session). After completion, candidates sit for the IJMB A-Level examination administered by ABU Zaria." },
+  { question: "Do I need JAMB for IJMB?", answer: "You do not need to write UTME to register for IJMB. However, you will need a JAMB Direct Entry form to process your university admission after passing the IJMB examinations." },
+  { question: "How much is IJMB registration?", answer: "The IJMB registration form fee is ₦5,500. Total programme fees including tuition, study materials, and examinations range from ₦80,000 to ₦150,000 depending on your chosen study centre." },
+  { question: "Can I use IJMB for Medicine or Law?", answer: "Yes. Many universities accept IJMB for Medicine, Law, Engineering, Pharmacy, and other competitive courses. You typically need to score 9 points or higher in your IJMB A-Level examinations." },
+  { question: "Is IJMB the same as JUPEB?", answer: "No. IJMB is administered by Ahmadu Bello University (ABU) Zaria while JUPEB is administered by the University of Lagos (UNILAG). Both offer A-Level qualifications for direct entry but have different curricula and examination bodies." },
 ];
 
 const StatItem = ({ value, suffix, label }: { value: number; suffix: string; label: string }) => {
@@ -69,9 +71,41 @@ const Index = () => {
   const heroRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useScrollReveal<HTMLDivElement>({ children: true, stagger: 0.12 });
   const stepsRef = useScrollReveal<HTMLDivElement>({ children: true, stagger: 0.15 });
-  const testimonialsRef = useScrollReveal<HTMLDivElement>({ children: true, stagger: 0.12 });
   const whatIsRef = useScrollReveal<HTMLDivElement>({ y: 30 });
   const centresRef = useScrollReveal<HTMLDivElement>({ y: 30 });
+
+  // Testimonials slider
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [animating, setAnimating] = useState(false);
+  const [direction, setDirection] = useState<'left' | 'right'>('right');
+  const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const goTo = useCallback((idx: number, dir: 'left' | 'right') => {
+    if (animating) return;
+    setDirection(dir);
+    setAnimating(true);
+    setTimeout(() => {
+      setActiveIdx(idx);
+      setAnimating(false);
+    }, 350);
+  }, [animating]);
+
+  const prev = useCallback(() => {
+    const idx = (activeIdx - 1 + testimonials.length) % testimonials.length;
+    goTo(idx, 'left');
+  }, [activeIdx, goTo]);
+
+  const next = useCallback(() => {
+    const idx = (activeIdx + 1) % testimonials.length;
+    goTo(idx, 'right');
+  }, [activeIdx, goTo]);
+
+  useEffect(() => {
+    autoplayRef.current = setInterval(() => {
+      setActiveIdx(prev => (prev + 1) % testimonials.length);
+    }, 5000);
+    return () => { if (autoplayRef.current) clearInterval(autoplayRef.current); };
+  }, []);
 
   // Hero entrance animation
   useEffect(() => {
@@ -146,7 +180,7 @@ const Index = () => {
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center">
         <div className="absolute inset-0">
-          <img src={studentsWalking} alt="IJMB students walking on campus in Nigeria" className="w-full h-full object-cover" />
+          <img src={studentsWalking.src} alt="IJMB students walking on campus in Nigeria" className="w-full h-full object-cover" />
           <div className="absolute inset-0 hero-overlay" />
         </div>
         <div ref={heroRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -155,22 +189,22 @@ const Index = () => {
               2026/2027 Registration Now Open
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold leading-tight mb-6 text-primary-foreground">
-              Gain Admission into 200 Level{" "}
-              <span className="text-accent">Without UTME</span>
+              IJMB Registration 2026/2027 —{" "}
+              <span className="text-accent">200 Level Without UTME</span>
             </h1>
             <p className="hero-desc text-lg lg:text-xl mb-8 leading-relaxed text-primary-foreground/90">
-              The IJMB programme is your fastest path to university admission in Nigeria. 
-              Register today and skip UTME completely with direct entry into 200 level.
+              The IJMB A-Level programme is Nigeria's most trusted path to Direct Entry university admission.
+              Skip UTME, enter 200 level, and join 50,000+ students who have already gained admission through IJMB.
             </p>
             <div className="hero-btns flex flex-col sm:flex-row gap-4">
               <Link
-                to="/register"
+                href="/register"
                 className="px-8 py-4 font-bold text-base rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2"
               >
                 Register Now <ArrowRight size={18} />
               </Link>
               <Link
-                to="/ijmb-admission-requirements"
+                href="/ijmb-admission-requirements"
                 className="px-8 py-4 font-bold text-base rounded-lg border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 transition-colors inline-flex items-center justify-center"
               >
                 View Requirements
@@ -191,35 +225,62 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Trust Bar */}
+      <section className="border-y border-border bg-muted/30 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <CheckCircle size={16} className="text-primary flex-shrink-0" />
+              Administered by ABU Zaria
+            </div>
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <CheckCircle size={16} className="text-primary flex-shrink-0" />
+              Federal Government Recognised
+            </div>
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <CheckCircle size={16} className="text-primary flex-shrink-0" />
+              Accepted by 200+ Universities
+            </div>
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <CheckCircle size={16} className="text-primary flex-shrink-0" />
+              50,000+ Students Enrolled
+            </div>
+            <div className="flex items-center gap-2 font-medium text-foreground">
+              <CheckCircle size={16} className="text-primary flex-shrink-0" />
+              All 36 States Covered
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* What is IJMB */}
       <section className="section-padding">
         <div ref={whatIsRef} className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
+              <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">About the Programme</p>
               <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-6">
                 What is <span className="text-primary">IJMB</span>?
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                IJMB (Interim Joint Matriculation Board) is a nationally recognized Advanced Level programme 
-                administered by Ahmadu Bello University (ABU) Zaria. It is designed for candidates who wish to 
-                gain direct entry admission into 200 level of Nigerian universities without writing UTME.
+                <strong className="text-foreground">IJMB (Interim Joint Matriculation Board)</strong> is a nationally recognised Advanced Level (A-Level) programme
+                administered by <strong className="text-foreground">Ahmadu Bello University (ABU) Zaria</strong>. It is the most widely accepted direct entry qualification in Nigeria, designed for candidates who want to gain
+                university admission into <strong className="text-foreground">200 level without writing UTME</strong>.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                The IJMB programme runs for nine months. Candidates study three A-level subjects at accredited 
-                centres across Nigeria. Upon successful completion, graduates receive an IJMB certificate that 
-                qualifies them for direct entry admission into over 200 universities nationwide.
+                The IJMB programme runs for <strong className="text-foreground">nine months</strong>. Students study three A-Level subjects at an accredited IJMB study centre, then sit for the IJMB examination.
+                A pass qualifies you for <strong className="text-foreground">Direct Entry admission</strong> into over 200 federal, state, and private universities across Nigeria.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Unlike UTME, which limits you to 100 level, the IJMB certificate gives you a competitive advantage 
-                by placing you directly into second year. This saves time, money, and eliminates the stress of 
-                repeated JAMB examinations.
+                Unlike UTME, which places you at 100 level and requires scoring high in a highly competitive exam every year,
+                IJMB places you <strong className="text-foreground">directly into second year</strong> — saving you one full year of university and eliminating the uncertainty of repeated JAMB attempts.
               </p>
               <InternalLinks />
             </div>
             <div className="rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
               <img
-                src={studentsLaptop}
-                alt="IJMB students studying together on campus"
+                src={studentsLaptop.src}
+                alt="IJMB students studying A-Level subjects at an accredited study centre in Nigeria"
                 className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700"
                 loading="lazy"
               />
@@ -232,11 +293,12 @@ const Index = () => {
       <section className="section-alt section-padding">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">Why IJMB</p>
             <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">
               Why Choose IJMB Over UTME?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              IJMB registration gives you a faster, more reliable path to university admission in Nigeria.
+              IJMB gives you a faster, more reliable route to university admission in Nigeria — without the annual JAMB cycle.
             </p>
           </div>
           <div ref={benefitsRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -257,11 +319,12 @@ const Index = () => {
       <section className="section-padding">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">How It Works</p>
             <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">
-              How to Register for IJMB
+              How to Register for IJMB 2026/2027
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
-              IJMB registration is straightforward. Follow these three simple steps to start your journey.
+              IJMB registration is straightforward. Complete these three steps online and start your Direct Entry journey today.
             </p>
           </div>
           <div ref={stepsRef} className="grid sm:grid-cols-3 gap-8">
@@ -275,7 +338,7 @@ const Index = () => {
           </div>
           <div className="text-center mt-10">
             <Link
-              to="/register"
+              href="/register"
               className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity"
             >
               Start Registration <ArrowRight size={18} />
@@ -284,41 +347,91 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Testimonials Slider */}
       <section className="section-alt section-padding overflow-hidden">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-3xl lg:text-4xl font-heading font-bold text-center mb-4">
-            Success Stories from IJMB Students
-          </h2>
-          <p className="text-center text-muted-foreground mb-10 max-w-xl mx-auto">Real students. Real results. No cap. 🎯</p>
-          <div ref={testimonialsRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {testimonials.map((t, idx) => (
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">Student Outcomes</p>
+            <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">What Our Students Say</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Testimonials from students admitted to Nigerian universities through the IJMB Direct Entry programme.
+            </p>
+          </div>
+
+          {/* Slide */}
+          <div className="relative">
+            <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
               <div
-                key={t.name}
-                className={`relative group p-6 rounded-2xl border-2 border-border bg-card hover:border-primary/40 hover:shadow-xl hover:-translate-y-2 transition-all duration-400 ${idx === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}
+                key={activeIdx}
+                className={`p-10 md:p-14 transition-all duration-350 ${
+                  animating
+                    ? direction === 'right'
+                      ? 'opacity-0 translate-x-8'
+                      : 'opacity-0 -translate-x-8'
+                    : 'opacity-100 translate-x-0'
+                }`}
+                style={{ transition: 'opacity 0.35s ease, transform 0.35s ease' }}
               >
-                {/* Decorative emoji */}
-                <span className="absolute -top-4 -right-2 text-3xl opacity-80 group-hover:scale-125 transition-transform duration-300">{t.emoji}</span>
-                
-                {/* Stars */}
-                <div className="flex gap-1 mb-3">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={16} className="fill-accent text-accent" />
-                  ))}
-                </div>
+                {/* Large quote mark */}
+                <div className="text-7xl font-serif leading-none text-primary/15 mb-4 select-none">&ldquo;</div>
 
-                {/* Quote */}
-                <p className="text-foreground font-medium leading-relaxed mb-5 text-[15px]">"{t.quote}"</p>
+                {/* Quote text */}
+                <p className="text-lg md:text-xl text-foreground/80 leading-relaxed font-light mb-10 max-w-2xl">
+                  {testimonials[activeIdx].quote}
+                </p>
 
-                {/* Author */}
-                <div className="flex items-center gap-3 pt-4 border-t border-border/50">
-                  <img src={t.img} alt={`${t.name} IJMB graduate`} className="w-11 h-11 rounded-full object-cover ring-2 ring-primary/20" loading="lazy" />
-                  <div>
-                    <div className="font-bold text-sm">{t.name}</div>
-                    <div className="text-xs text-primary font-medium">{t.uni}</div>
+                {/* Author row */}
+                <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex items-center gap-4">
+                    {/* Initials avatar */}
+                    <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0">
+                      {testimonials[activeIdx].name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-foreground">{testimonials[activeIdx].name}</p>
+                      <p className="text-sm text-muted-foreground">{testimonials[activeIdx].course} &mdash; {testimonials[activeIdx].uni}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} size={14} className="fill-amber-400 text-amber-400" />
+                    ))}
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Prev / Next buttons */}
+            <button
+              onClick={prev}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft size={18} />
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+              aria-label="Next testimonial"
+            >
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          {/* Dot indicators */}
+          <div className="flex justify-center gap-2 mt-8">
+            {testimonials.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => goTo(i, i > activeIdx ? 'right' : 'left')}
+                className={`rounded-full transition-all duration-300 ${
+                  i === activeIdx
+                    ? 'w-6 h-2 bg-primary'
+                    : 'w-2 h-2 bg-border hover:bg-muted-foreground'
+                }`}
+                aria-label={`Go to testimonial ${i + 1}`}
+              />
             ))}
           </div>
         </div>
@@ -330,7 +443,7 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
               <img
-                src={studentsGroup}
+                src={studentsGroup.src}
                 alt="IJMB students at a study centre in Nigeria"
                 className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700"
                 loading="lazy"
@@ -338,21 +451,20 @@ const Index = () => {
             </div>
             <div>
               <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-6">
-                IJMB Study Centres Across Nigeria
+                IJMB Accredited Study Centres Across Nigeria
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                IJMB approved study centres are located in major cities across all 36 states of Nigeria. 
-                Whether you are in Lagos, Abuja, Kano, or Port Harcourt, there is an accredited centre near you.
+                IJMB accredited study centres are located in major cities across all 36 states of Nigeria.
+                Whether you are in <strong className="text-foreground">Lagos, Abuja, Kano, Ibadan, Port Harcourt,</strong> or any other city, there is an approved IJMB centre near you.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Each centre provides quality tuition, study materials, and examination preparation to ensure 
-                you achieve the best grades in your IJMB examinations.
+                Each accredited centre provides structured A-Level tuition, study materials, and examination preparation guided by experienced lecturers — giving you the best chance of scoring high in your IJMB exams and securing your preferred university course.
               </p>
               <div className="flex flex-wrap gap-2 mb-6">
                 {["Lagos", "Abuja", "Ibadan", "Kano", "Port Harcourt", "Ilorin"].map((city) => (
                   <Link
                     key={city}
-                    to={`/ijmb-in-${city.toLowerCase().replace(/ /g, "-")}`}
+                    href={`/ijmb-in-${city.toLowerCase().replace(/ /g, "-")}`}
                     className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded-full hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
                     <MapPin size={14} /> {city}
@@ -360,7 +472,7 @@ const Index = () => {
                 ))}
               </div>
               <Link
-                to="/ijmb-centres-in-nigeria"
+                href="/ijmb-centres-in-nigeria"
                 className="text-primary font-medium inline-flex items-center gap-1 hover:gap-2 transition-all"
               >
                 View All Centres <ArrowRight size={16} />

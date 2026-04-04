@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 interface CTASectionProps {
@@ -19,13 +21,13 @@ const CTASection = ({
         <p className="text-lg opacity-90 mb-8 max-w-2xl mx-auto">{subtitle}</p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            to="/register"
+            href="/register"
             className="px-8 py-4 font-bold text-base rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity"
           >
             Register for IJMB Now
           </Link>
           <Link
-            to="/contact"
+            href="/contact"
             className="px-8 py-4 font-bold text-base rounded-lg border-2 border-primary-foreground/30 hover:bg-primary-foreground/10 transition-colors"
           >
             Contact Us

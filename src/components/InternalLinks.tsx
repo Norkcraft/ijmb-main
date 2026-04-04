@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
 
 const links = [
   { label: "IJMB Registration", href: "/ijmb-registration" },
@@ -15,7 +17,7 @@ const InternalLinks = ({ exclude }: { exclude?: string }) => (
       .map((l) => (
         <Link
           key={l.href}
-          to={l.href}
+          href={l.href}
           className="px-4 py-2 text-sm font-medium bg-secondary text-secondary-foreground rounded-lg hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           {l.label}

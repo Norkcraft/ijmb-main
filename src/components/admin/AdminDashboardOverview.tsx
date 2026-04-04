@@ -27,7 +27,7 @@ export default function AdminDashboardOverview() {
       const payments = paymentRes.data || [];
 
       const totalApplications = applications.length;
-      const pendingApplications = applications.filter(a => ['review', 'submitted', 'payment_completed'].includes(a.status)).length;
+      const pendingApplications = applications.filter(a => ['submitted', 'under_review'].includes(a.status)).length;
       const admittedStudents = applications.filter(a => ['admitted', 'fees_pending', 'active'].includes(a.status)).length;
       const totalRevenue = payments.reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
 

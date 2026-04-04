@@ -1,10 +1,12 @@
+'use client';
+
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
 import { CheckCircle, AlertCircle, BookOpen, GraduationCap } from "lucide-react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 const federalUnis = [
   "University of Lagos (UNILAG)", "Ahmadu Bello University (ABU) Zaria", "University of Ibadan (UI)",
@@ -51,8 +53,8 @@ const Universities = () => (
           Universities Accepting IJMB for Direct Entry 2026/2027
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-          One of the biggest advantages of the <strong>Interim Joint Matriculation Board (IJMB)</strong> programme is its wide acceptance. 
-          Currently, over <strong>80% of Nigerian universities</strong> accept the IJMB certificate for admission into 200 Level via Direct Entry. 
+          One of the biggest advantages of the <strong>Interim Joint Matriculation Board (IJMB)</strong> programme is its wide acceptance.
+          Currently, over <strong>80% of Nigerian universities</strong> accept the IJMB certificate for admission into 200 Level via Direct Entry.
           This means you can secure university admission without writing JAMB UTME.
         </p>
 
@@ -61,8 +63,8 @@ const Universities = () => (
              <AlertCircle size={20} /> Important Note on Admission
            </h2>
            <p className="text-blue-800/80 mb-0">
-             While most universities accept IJMB, each institution sets its own <strong>cut-off points</strong>. 
-             Competitive courses like Medicine and Law typically require <strong>13 points and above</strong>, while other courses may accept <strong>5–8 points</strong>. 
+             While most universities accept IJMB, each institution sets its own <strong>cut-off points</strong>.
+             Competitive courses like Medicine and Law typically require <strong>13 points and above</strong>, while other courses may accept <strong>5–8 points</strong>.
              Always aim for the highest possible score.
            </p>
         </div>
@@ -115,25 +117,25 @@ const Universities = () => (
         <div className="bg-secondary p-8 rounded-2xl text-center mb-10">
            <h3 className="text-2xl font-bold mb-4">Don't See Your Preferred University?</h3>
            <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-             The list above is not exhaustive. Most universities in Nigeria accept IJMB. 
-             If your school of choice is not listed, it likely still accepts the programme. 
+             The list above is not exhaustive. Most universities in Nigeria accept IJMB.
+             If your school of choice is not listed, it likely still accepts the programme.
              You can contact us to verify specific university requirements.
            </p>
-           <Link to="/contact" className="inline-block px-8 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90">
+           <Link href="/contact" className="inline-block px-8 py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90">
              Verify My University
            </Link>
         </div>
 
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">Does UNILAG Accept IJMB?</h2>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          <strong>Yes, the University of Lagos (UNILAG) accepts IJMB</strong> for direct entry admission. 
-          However, UNILAG is highly competitive. To stand a good chance, you typically need to score <strong>12 points and above</strong> 
+          <strong>Yes, the University of Lagos (UNILAG) accepts IJMB</strong> for direct entry admission.
+          However, UNILAG is highly competitive. To stand a good chance, you typically need to score <strong>12 points and above</strong>
           in your IJMB final examination. Additionally, you must have the correct O-Level subject combination.
         </p>
 
         <h2 className="text-2xl font-heading font-bold mt-4 mb-4">Does UI Accept IJMB?</h2>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          <strong>Yes, the University of Ibadan (UI) accepts IJMB.</strong> Similar to UNILAG, UI requires high points. 
+          <strong>Yes, the University of Ibadan (UI) accepts IJMB.</strong> Similar to UNILAG, UI requires high points.
           Candidates are also expected to participate in the university's Direct Entry screening exercise.
         </p>
 

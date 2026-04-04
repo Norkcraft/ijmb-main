@@ -1,5 +1,8 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { supabase } from '@/lib/supabaseClient';
 import SEOHead from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -12,8 +15,9 @@ import { ArrowLeft, Upload, ExternalLink, Loader2, CheckCircle, XCircle, FileTex
 import { Textarea } from '@/components/ui/textarea';
 
 const AdminApplicationDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const params = useParams();
+  const id = params?.id as string;
+  const router = useRouter();
   const { toast } = useToast();
   const [app, setApp] = useState<any>(null);
   const [centres, setCentres] = useState<any[]>([]);
@@ -81,6 +85,7 @@ const AdminApplicationDetail = () => {
     if (!app) return;
     setSaving(true);
     const isAdmitted = ['admitted', 'fees_pending', 'active'].includes(status);
+    const wasAdmittedBefore = ['admitted', 'fees_pending', 'active'].includes(app.status);
     const { error } = await supabase.from('applications').update({
       status,
       assigned_centre_id: assignedCentreId || null,
@@ -98,6 +103,39 @@ const AdminApplicationDetail = () => {
     } else {
       toast({ title: 'Application updated!' });
       if (isAdmitted) setAdmissionGranted(true);
+
+      // Send admission offer email when status is set to admitted for the first time
+      if (isAdmitted && !wasAdmittedBefore) {
+        const studentEmail = app.profiles?.email;
+        const studentName = app.surname
+          ? `${app.first_name} ${app.surname}`
+          : (app.profiles?.full_name || 'Student');
+        const centreName = centres.find(c => c.id === (assignedCentreId || app.preferred_centre_id))?.name
+          || app.preferred_centre?.name
+          || 'To be confirmed';
+        const appId = app.application_number || app.id.split('-')[0].toUpperCase();
+
+        if (studentEmail) {
+          fetch('/api/send-email', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '',
+            },
+            body: JSON.stringify({
+              type: 'admission_offer',
+              data: {
+                email: studentEmail,
+                fullName: studentName,
+                applicationId: appId,
+                centre: centreName,
+                resumptionDate: 'As communicated by your centre',
+                subjects: app.subject_combination?.name || 'As selected',
+              },
+            }),
+          }).catch(() => {});
+        }
+      }
     }
     setSaving(false);
   };
@@ -121,7 +159,7 @@ const AdminApplicationDetail = () => {
         },
         body: JSON.stringify({ applicationId: app.id })
       });
-      
+
       if (!res.ok) {
         // Try to parse JSON error, fallback to text if not JSON
         const contentType = res.headers.get('content-type');
@@ -133,13 +171,13 @@ const AdminApplicationDetail = () => {
           throw new Error(errText || 'Generation failed with server error');
         }
       }
-      
+
       const data = await res.json();
-      
+
       // Update local state
       setApp((prev: any) => ({ ...prev, application_form_url: data.url }));
       toast({ title: 'Success', description: 'Application form generated successfully' });
-      
+
     } catch (error: any) {
       console.error(error);
       toast({ title: 'Error', description: error.message || 'Failed to generate PDF', variant: 'destructive' });
@@ -187,7 +225,7 @@ const AdminApplicationDetail = () => {
     <>
       <SEOHead title={`Application – ${app.profiles?.full_name || 'Student'}`} description="Admin view of student application." canonical={`https://www.ijmb.info/portal-admin/applications/${id}`} />
       <div className="section-padding max-w-6xl mx-auto space-y-6 py-8">
-        <Button variant="ghost" onClick={() => navigate('/portal-admin')} className="mb-2">
+        <Button variant="ghost" onClick={() => router.push('/portal-admin')} className="mb-2">
           <ArrowLeft size={16} className="mr-2" /> Back to Dashboard
         </Button>
 
@@ -293,7 +331,7 @@ const AdminApplicationDetail = () => {
                   <input type="checkbox" id="admGranted" checked={admissionGranted} onChange={e => setAdmissionGranted(e.target.checked)} className="h-4 w-4" />
                   <Label htmlFor="admGranted">Admission Granted</Label>
                 </div>
-                
+
                 <div className="flex items-center gap-2 pt-2">
                   <Switch id="inst" checked={installmentsAllowed} onCheckedChange={setInstallmentsAllowed} />
                   <Label htmlFor="inst">Allow Tuition Installments</Label>
@@ -301,7 +339,7 @@ const AdminApplicationDetail = () => {
 
                 <div className="pt-4 border-t space-y-2 text-sm">
                   <h4 className="font-semibold mb-2">Application Documents</h4>
-                  
+
                   {app.application_form_url ? (
                     <div className="bg-muted/30 p-3 rounded-md border space-y-3">
                       <div className="flex items-center justify-between">
@@ -312,19 +350,19 @@ const AdminApplicationDetail = () => {
                          <Badge variant="outline" className="bg-green-50 text-green-700">Generated</Badge>
                       </div>
                       <div className="text-xs text-muted-foreground">ID: {app.application_number || app.id.split('-')[0].toUpperCase()}</div>
-                      
+
                       <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
+                        <Button
+                          size="sm"
+                          variant="outline"
                           className="flex-1 h-8 text-xs"
                           onClick={() => window.open(app.application_form_url, '_blank')}
                         >
                           <Download size={12} className="mr-1" /> Download
                         </Button>
-                        <Button 
-                          size="sm" 
-                          variant="outline" 
+                        <Button
+                          size="sm"
+                          variant="outline"
                           className="flex-1 h-8 text-xs"
                           onClick={() => window.open(`/verify/${app.id}`, '_blank')}
                         >
@@ -335,9 +373,9 @@ const AdminApplicationDetail = () => {
                   ) : (
                     <div className="bg-muted/30 p-3 rounded-md border flex items-center justify-between text-muted-foreground">
                       <span className="text-xs italic">Form not yet generated (Fee unpaid or missing)</span>
-                      <Button 
-                        size="sm" 
-                        variant="ghost" 
+                      <Button
+                        size="sm"
+                        variant="ghost"
                         className="h-6 text-xs"
                         onClick={generateApplicationPdf}
                         disabled={generatingPdf}
@@ -389,16 +427,16 @@ const AdminApplicationDetail = () => {
                   {app.passport_path && (
                     <div className="pl-2 space-y-2 border-l-2 border-primary/20">
                       <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant={docReview.passport_status === 'approved' ? 'default' : 'outline'}
                           className={docReview.passport_status === 'approved' ? 'bg-green-600 hover:bg-green-700' : ''}
                           onClick={() => setDocReview(p => ({ ...p, passport_status: 'approved' }))}
                         >
                           <CheckCircle size={14} className="mr-1" /> Approve
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant={docReview.passport_status === 'rejected' ? 'destructive' : 'outline'}
                           onClick={() => setDocReview(p => ({ ...p, passport_status: 'rejected' }))}
                         >
@@ -406,7 +444,7 @@ const AdminApplicationDetail = () => {
                         </Button>
                       </div>
                       {docReview.passport_status === 'rejected' && (
-                        <Textarea 
+                        <Textarea
                           placeholder="Reason for rejection (sent to student)..."
                           value={docReview.passport_msg}
                           onChange={(e) => setDocReview(p => ({ ...p, passport_msg: e.target.value }))}
@@ -430,16 +468,16 @@ const AdminApplicationDetail = () => {
                   {app.olevel_path && (
                     <div className="pl-2 space-y-2 border-l-2 border-primary/20">
                       <div className="flex gap-2">
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant={docReview.olevel_status === 'approved' ? 'default' : 'outline'}
                           className={docReview.olevel_status === 'approved' ? 'bg-green-600 hover:bg-green-700' : ''}
                           onClick={() => setDocReview(p => ({ ...p, olevel_status: 'approved' }))}
                         >
                           <CheckCircle size={14} className="mr-1" /> Approve
                         </Button>
-                        <Button 
-                          size="sm" 
+                        <Button
+                          size="sm"
                           variant={docReview.olevel_status === 'rejected' ? 'destructive' : 'outline'}
                           onClick={() => setDocReview(p => ({ ...p, olevel_status: 'rejected' }))}
                         >
@@ -447,7 +485,7 @@ const AdminApplicationDetail = () => {
                         </Button>
                       </div>
                       {docReview.olevel_status === 'rejected' && (
-                        <Textarea 
+                        <Textarea
                           placeholder="Reason for rejection (sent to student)..."
                           value={docReview.olevel_msg}
                           onChange={(e) => setDocReview(p => ({ ...p, olevel_msg: e.target.value }))}
@@ -457,7 +495,7 @@ const AdminApplicationDetail = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="pt-4 border-t mt-4">
                   <Label className="mb-2 block">Admission Letter</Label>
                   <div className="flex flex-col gap-2">

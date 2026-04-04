@@ -1,10 +1,11 @@
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/hooks/use-toast';
 import SEOHead from '@/components/SEOHead';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams } from "next/navigation";
 import AdminDashboardOverview from '@/components/admin/AdminDashboardOverview';
 import AdminApplications from '@/components/admin/AdminApplications';
 import AdminCentres from '@/components/admin/AdminCentres';
@@ -18,8 +19,8 @@ import { AdminMobileHeader } from '@/components/admin/AdminMobileHeader';
 const AdminDashboard = () => {
   const { signOut, user } = useAuth();
   const { toast } = useToast();
-  const [searchParams] = useSearchParams();
-  const currentTab = searchParams.get('tab') || 'overview';
+  const searchParams = useSearchParams();
+  const currentTab = searchParams?.get('tab') || 'overview';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [newNotifications, setNewNotifications] = useState(false);
 
@@ -57,18 +58,18 @@ const AdminDashboard = () => {
   return (
     <>
       <SEOHead title="Admin Dashboard – IJMB Portal" description="IJMB admin dashboard for managing applications." canonical="https://www.ijmb.info/portal-admin" />
-      
+
       <div className="flex h-screen bg-muted/20">
         {/* Sidebar (Desktop) */}
-        <AdminSidebar 
-            user={user} 
-            signOut={signOut} 
-            newNotifications={newNotifications} 
+        <AdminSidebar
+            user={user}
+            signOut={signOut}
+            newNotifications={newNotifications}
         />
 
         {/* Mobile Header & Content */}
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-          <AdminMobileHeader 
+          <AdminMobileHeader
              isMobileMenuOpen={isMobileMenuOpen}
              setIsMobileMenuOpen={setIsMobileMenuOpen}
              signOut={signOut}

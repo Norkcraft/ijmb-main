@@ -1,4 +1,6 @@
+'use client';
 
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 
 interface DashboardPrintViewProps {
@@ -24,6 +26,14 @@ export const DashboardPrintView = ({
 }: DashboardPrintViewProps) => {
   const formFeeDisplay = `₦${formFee.toLocaleString()}`;
   const appDate = application?.created_at ? new Date(application.created_at).toLocaleDateString() : new Date().toLocaleDateString();
+
+  const [passportUrl, setPassportUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (application?.passport_path) {
+      supabase.storage.from('student-documents').createSignedUrl(application.passport_path, 3600)
+        .then(({ data }) => { if (data?.signedUrl) setPassportUrl(data.signedUrl); });
+    }
+  }, [application?.passport_path]);
 
   return (
     <div className="hidden print:block p-10 bg-white text-black w-[210mm] min-h-[297mm] mx-auto">
@@ -131,7 +141,7 @@ export const DashboardPrintView = ({
             <div className="w-full aspect-square border-2 border-gray-300 p-1 bg-gray-50 rounded shadow-sm">
                {application?.passport_path ? (
                   <img 
-                    src={supabase.storage.from('student-documents').getPublicUrl(application.passport_path).data.publicUrl} 
+                    src={passportUrl || ''} 
                     alt="Passport" 
                     className="w-full h-full object-cover rounded-sm" 
                   /> 

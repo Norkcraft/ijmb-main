@@ -1,10 +1,13 @@
+'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, CreditCard, Download, FileText, Printer, Building, Banknote } from 'lucide-react';
-import PaymentButton from '@/components/PaymentButton';
+import dynamic from 'next/dynamic';
+const PaymentButton = dynamic(() => import('@/components/PaymentButton'), { ssr: false });
+const DownloadApplicationPDF = dynamic(() => import('./DownloadApplicationPDF'), { ssr: false });
 import { Separator } from '@/components/ui/separator';
 
 interface DashboardMainProps {
@@ -48,17 +51,17 @@ export const DashboardMain = ({
             {isAdmitted ? "Congratulations!" : "Welcome back!"}
           </h2>
           <p className="text-primary-foreground/80 mb-6 max-w-md">
-            {isAdmitted 
+            {isAdmitted
               ? "Your admission has been approved. Please follow the steps below to complete your clearance."
               : "Complete your application to secure your admission into the IJMB programme."}
           </p>
-          
+
           <div className="bg-black/20 rounded-xl p-4 backdrop-blur-sm">
             <div className="flex justify-between text-sm mb-2 font-medium">
               <span>Application Progress</span>
               <span>{isAdmitted ? 100 : progressPercent}%</span>
             </div>
-            <Progress value={isAdmitted ? 100 : progressPercent} className="h-3 bg-white/20" indicatorClassName="bg-white" />
+            <Progress value={isAdmitted ? 100 : progressPercent} className="h-3 bg-white/20" />
           </div>
         </CardContent>
       </Card>
@@ -118,7 +121,7 @@ export const DashboardMain = ({
                   </div>
                </div>
             </div>
-            
+
             <div className="bg-blue-50 border border-blue-100 p-4 rounded-lg flex gap-3">
                <div className="text-blue-600 mt-1"><FileText size={18} /></div>
                <div className="text-sm text-blue-800">
@@ -160,23 +163,21 @@ export const DashboardMain = ({
 
                 <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 space-y-3">
                     <h3 className="font-semibold text-blue-900 flex items-center gap-2">
-                        <Download size={18} /> Download Registration Form
+                        <Download size={18} /> Your Application Form
                     </h3>
                     <p className="text-sm text-blue-800">
-                        Please download the blank registration form below, print it, and fill it in by hand.
+                        Download your personalised IJMB application form with all your details pre-filled. Print and present it at your study centre.
                     </p>
-                    <a href="/forms/IJMB_Registration_Form.pdf" download="IJMB_Registration_Form.pdf" className="block w-full">
-                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
-                            <FileText size={16} className="mr-2" /> Download Blank Form (PDF)
-                        </Button>
-                    </a>
+                    {application?.id && (
+                      <DownloadApplicationPDF applicationId={application.id} />
+                    )}
                     <div className="text-xs text-blue-800 mt-2 space-y-1">
                         <p><strong>Instructions:</strong></p>
                         <ol className="list-decimal pl-4 space-y-1">
-                            <li>Print on A4 paper.</li>
-                            <li>Fill in all sections with a black or blue pen.</li>
-                            <li>Attach a passport photograph.</li>
-                            <li>Submit to your study centre or upload here.</li>
+                            <li>Click the button above — your form opens in a new window.</li>
+                            <li>Use <strong>File → Print → Save as PDF</strong> (or press Ctrl+P).</li>
+                            <li>Print on A4 paper and sign the declaration section.</li>
+                            <li>Present at your study centre for final documentation.</li>
                         </ol>
                     </div>
                 </div>
@@ -188,9 +189,9 @@ export const DashboardMain = ({
                   <span className="text-2xl font-bold text-primary">{formFeeDisplay}</span>
                 </div>
                 {user && (
-                  <PaymentButton 
-                    email={user.email || ''} 
-                    amount={formFee} 
+                  <PaymentButton
+                    email={user.email || ''}
+                    amount={formFee}
                     userId={user.id}
                     applicationId={application?.id}
                     paymentType="form_fee"

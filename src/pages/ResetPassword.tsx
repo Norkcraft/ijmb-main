@@ -1,5 +1,7 @@
+'use client';
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from "next/navigation";
 import { supabase } from '@/lib/supabaseClient';
 import SEOHead from '@/components/SEOHead';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -15,7 +17,7 @@ const ResetPassword = () => {
   const [confirm, setConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const { toast } = useToast();
 
   useEffect(() => {
@@ -69,7 +71,7 @@ const ResetPassword = () => {
     } else {
       toast({ title: 'Password updated successfully!' });
       await supabase.auth.signOut();
-      navigate('/login');
+      router.push('/login');
     }
     setLoading(false);
   };

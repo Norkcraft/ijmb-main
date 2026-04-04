@@ -1,9 +1,11 @@
+'use client';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, Circle, Download, Loader2, Upload, User, FileText, Home, CreditCard } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import Link from "next/link";
+import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from '@/lib/utils';
 
 interface Step {
@@ -65,21 +67,24 @@ export const DashboardSidebar = ({
   onDownloadAdmissionLetter,
   className
 }: DashboardSidebarProps) => {
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const currentTab = searchParams.get('tab') || 'dashboard';
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const currentTab = searchParams?.get('tab') || 'dashboard';
 
   return (
     <div className={cn("space-y-6", className)}>
-        
+
         {/* Navigation Menu - SaaS Style */}
         <Card>
             <CardContent className="p-2">
                 <nav className="space-y-1">
                     {navItems.map((item) => {
-                        const isActive = (currentTab === 'dashboard' && item.href === '/dashboard') || location.search.includes(item.href.split('?')[1] || 'xyz');
+                        const itemTab = item.href.split('?tab=')[1];
+                        const isActive = itemTab
+                          ? currentTab === itemTab
+                          : currentTab === 'dashboard';
                         return (
-                            <Link key={item.label} to={item.href}>
+                            <Link key={item.label} href={item.href}>
                                 <button className={cn(
                                     "w-full flex items-center gap-3 px-3 py-2 text-sm font-medium rounded-md transition-colors",
                                     isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -171,7 +176,7 @@ export const DashboardSidebar = ({
              <Badge className={`w-fit text-sm px-3 py-1 ${STATUS_COLORS[application?.status] || 'bg-muted text-muted-foreground'}`}>
                 {STATUS_LABELS[application?.status] || 'Not Started'}
              </Badge>
-             
+
              {hasAdmissionLetter && (
                 <Button onClick={onDownloadAdmissionLetter} className="w-full bg-green-600 hover:bg-green-700">
                   <Download size={16} className="mr-2" /> Admission Letter

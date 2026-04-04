@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import Link from "next/link";
 import { Calendar, User, ArrowRight, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -53,7 +55,7 @@ const Blog = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredPosts.map((post) => (
                 <article key={post.id} className="bg-background rounded-xl overflow-hidden shadow-sm border hover:shadow-md transition-shadow flex flex-col h-full">
-                  <Link to={`/blog/${post.slug}`} className="block aspect-video overflow-hidden">
+                  <Link href={`/blog/${post.slug}`} className="block aspect-video overflow-hidden">
                     <img
                       src={post.image}
                       alt={post.title}
@@ -69,7 +71,7 @@ const Blog = () => {
                         </Badge>
                       ))}
                     </div>
-                    <Link to={`/blog/${post.slug}`} className="group">
+                    <Link href={`/blog/${post.slug}`} className="group">
                       <h2 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
                         {post.title}
                       </h2>
@@ -77,7 +79,7 @@ const Blog = () => {
                     <p className="text-muted-foreground text-sm mb-4 line-clamp-3 flex-1">
                       {post.excerpt}
                     </p>
-                    
+
                     <div className="flex items-center justify-between pt-4 border-t text-xs text-muted-foreground mt-auto">
                       <div className="flex items-center gap-4">
                         <span className="flex items-center gap-1">
@@ -88,9 +90,9 @@ const Blog = () => {
                         </span>
                       </div>
                     </div>
-                    
+
                     <Button asChild variant="ghost" className="w-full mt-4 justify-between group">
-                      <Link to={`/blog/${post.slug}`}>
+                      <Link href={`/blog/${post.slug}`}>
                         Read Article <ArrowRight size={16} className="ml-2 group-hover:translate-x-1 transition-transform" />
                       </Link>
                     </Button>

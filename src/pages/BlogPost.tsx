@@ -1,4 +1,7 @@
-import { useParams, Link } from 'react-router-dom';
+'use client';
+
+import { useParams } from "next/navigation";
+import Link from "next/link";
 import { ArrowLeft, User, Calendar, Tag, Share2, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -7,8 +10,9 @@ import { blogPosts } from '@/data/blogPosts';
 import NotFound from '@/pages/NotFound';
 import { toast } from 'sonner';
 
-const BlogPost = () => {
-  const { slug } = useParams();
+const BlogPost = ({ slug: slugProp }: { slug?: string }) => {
+  const params = useParams();
+  const slug = slugProp || (params?.slug as string);
   const post = blogPosts.find(p => p.slug === slug);
 
   if (!post) {
@@ -74,7 +78,7 @@ const BlogPost = () => {
             className="w-full h-full object-cover absolute inset-0 z-0"
           />
           <div className="relative z-20 max-w-4xl mx-auto px-4 h-full flex flex-col justify-end pb-12 text-white">
-            <Link to="/blog" className="inline-flex items-center text-sm mb-6 hover:text-primary transition-colors">
+            <Link href="/blog" className="inline-flex items-center text-sm mb-6 hover:text-primary transition-colors">
               <ArrowLeft size={16} className="mr-2" /> Back to Blog
             </Link>
             <div className="flex flex-wrap gap-2 mb-4">
@@ -128,7 +132,7 @@ const BlogPost = () => {
                 Join thousands of students securing 200-level admission into Nigerian universities through IJMB.
               </p>
               <Button asChild className="w-full cta-gradient font-bold text-lg h-12">
-                <Link to="/ijmb-registration">Register Now</Link>
+                <Link href="/ijmb-registration">Register Now</Link>
               </Button>
               <p className="text-xs text-center mt-3 text-muted-foreground">
                 Registration for 2024/2025 session is ongoing.
@@ -143,11 +147,11 @@ const BlogPost = () => {
                 </h3>
                 <div className="space-y-4">
                   {relatedPosts.map(rp => (
-                    <Link key={rp.id} to={`/blog/${rp.slug}`} className="block group">
+                    <Link key={rp.id} href={`/blog/${rp.slug}`} className="block group">
                       <div className="flex gap-4 items-start">
-                        <img 
-                          src={rp.image} 
-                          alt={rp.title} 
+                        <img
+                          src={rp.image}
+                          alt={rp.title}
                           className="w-20 h-20 object-cover rounded-md flex-shrink-0 group-hover:opacity-80 transition-opacity"
                         />
                         <div>

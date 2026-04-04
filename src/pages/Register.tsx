@@ -1,5 +1,7 @@
+'use client';
+
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from "next/link";
 import { supabase } from '@/lib/supabaseClient';
 import SEOHead from '@/components/SEOHead';
 import Breadcrumbs from '@/components/Breadcrumbs';
@@ -18,7 +20,6 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
-  const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -49,6 +50,19 @@ const Register = () => {
         full_name: fullName,
         phone: fullPhone,
       });
+
+      // Send welcome email (fire-and-forget, don't block UI)
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '',
+        },
+        body: JSON.stringify({
+          type: 'welcome',
+          data: { fullName, email },
+        }),
+      }).catch(() => {}); // silent fail — email is non-critical
     }
 
     setSent(true);
@@ -70,7 +84,7 @@ const Register = () => {
               <CardDescription>We've sent a verification link to <strong>{email}</strong>. Click the link to verify your account, then log in.</CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Link to="/login">
+              <Link href="/login">
                 <Button variant="outline" className="mt-2">Go to Login</Button>
               </Link>
             </CardContent>
@@ -102,7 +116,7 @@ const Register = () => {
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
                 <div className="flex gap-2">
-                  <select 
+                  <select
                     className="flex h-10 w-24 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     value={countryCode}
                     onChange={(e) => setCountryCode(e.target.value)}
@@ -112,13 +126,13 @@ const Register = () => {
                     <option value="+44">🇬🇧 +44</option>
                     <option value="+1">🇺🇸 +1</option>
                   </select>
-                  <Input 
-                    id="phone" 
-                    value={phone} 
-                    onChange={e => setPhone(e.target.value)} 
-                    placeholder="8012345678" 
+                  <Input
+                    id="phone"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="8012345678"
                     className="flex-1"
-                    required 
+                    required
                   />
                 </div>
               </div>
@@ -134,7 +148,7 @@ const Register = () => {
                 {loading ? <><Loader2 className="animate-spin mr-2" size={16} /> Creating Account...</> : 'Create Account'}
               </Button>
               <p className="text-center text-sm text-muted-foreground">
-                Already have an account? <Link to="/login" className="text-primary hover:underline">Login</Link>
+                Already have an account? <Link href="/login" className="text-primary hover:underline">Login</Link>
               </p>
             </form>
           </CardContent>

@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
@@ -38,7 +40,7 @@ const Centres = () => (
                 IJMB Study Centres in Nigeria – Official Accredited List 2026/2027
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-                <strong>IJMB study centres in Nigeria</strong> are strategically located across the country to provide accessible quality education for students seeking direct entry admission into 200 level. 
+                <strong>IJMB study centres in Nigeria</strong> are strategically located across the country to provide accessible quality education for students seeking direct entry admission into 200 level.
                 Whether you are in the North, South, East, or West, there is an approved IJMB centre near you ready to help you achieve your university dreams.
               </p>
 
@@ -47,10 +49,10 @@ const Centres = () => (
                    <CheckCircle className="text-primary" /> Why Register at an Accredited Centre?
                  </h2>
                  <p className="text-muted-foreground mb-4">
-                   Registering at an accredited centre ensures your results are recognized by the Joint Admissions and Matriculation Board (JAMB) and the National Universities Commission (NUC). 
+                   Registering at an accredited centre ensures your results are recognized by the Joint Admissions and Matriculation Board (JAMB) and the National Universities Commission (NUC).
                    Our platform connects you ONLY with fully accredited centres moderated by Ahmadu Bello University (ABU), Zaria.
                  </p>
-                 <Link to="/register" className="text-primary font-bold hover:underline">
+                 <Link href="/register" className="text-primary font-bold hover:underline">
                    Start your registration now →
                  </Link>
               </div>
@@ -59,16 +61,16 @@ const Centres = () => (
               <p className="text-muted-foreground mb-6">
                 Select your preferred city below to view details about the IJMB programme in that location, including fees, address, and available subject combinations.
               </p>
-              
+
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 mb-10">
                 {cities.map((city) => (
                   <Link
                     key={city}
-                    to={`/ijmb-in-${city.toLowerCase().replace(/ /g, "-")}`}
+                    href={`/ijmb-in-${city.toLowerCase().replace(/ /g, "-")}`}
                     className="group flex items-center justify-between px-5 py-4 bg-white border rounded-xl hover:border-primary hover:shadow-md transition-all"
                   >
                     <span className="font-medium flex items-center gap-2">
-                      <MapPin size={18} className="text-muted-foreground group-hover:text-primary transition-colors" /> 
+                      <MapPin size={18} className="text-muted-foreground group-hover:text-primary transition-colors" />
                       {city}
                     </span>
                     <Search size={16} className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -80,7 +82,7 @@ const Centres = () => (
               <p className="text-muted-foreground leading-relaxed mb-6">
                 Choosing the right IJMB study centre is a critical decision that can influence your exam success. Consider these key factors when selecting your centre:
               </p>
-              
+
               <div className="space-y-6 mb-10">
                  <div className="flex gap-4">
                     <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center flex-shrink-0 font-bold text-primary">1</div>
@@ -116,7 +118,7 @@ const Centres = () => (
               <p className="text-muted-foreground leading-relaxed mb-6">
                 Fees vary depending on the location and facilities of the centre. Generally, centres in major cities like Lagos, Abuja, and Port Harcourt may have higher fees due to the cost of living and operations.
               </p>
-              
+
               <div className="overflow-x-auto">
                 <table className="w-full border text-sm">
                    <thead className="bg-muted">
@@ -158,19 +160,19 @@ const Centres = () => (
                     </CardTitle>
                  </CardHeader>
                  <CardContent className="space-y-4">
-                    <Link to="/ijmb-in-ilorin" className="block p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Link href="/ijmb-in-ilorin" className="block p-3 rounded-lg hover:bg-muted transition-colors">
                        <h4 className="font-bold text-primary">Ilorin Centre</h4>
                        <p className="text-xs text-muted-foreground">Kwara State • Excellent Science Labs</p>
                     </Link>
-                    <Link to="/ijmb-in-lagos" className="block p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Link href="/ijmb-in-lagos" className="block p-3 rounded-lg hover:bg-muted transition-colors">
                        <h4 className="font-bold text-primary">Lagos Centre</h4>
                        <p className="text-xs text-muted-foreground">Ikeja/Palm Grove • Modern Facilities</p>
                     </Link>
-                    <Link to="/ijmb-in-abuja" className="block p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Link href="/ijmb-in-abuja" className="block p-3 rounded-lg hover:bg-muted transition-colors">
                        <h4 className="font-bold text-primary">Abuja Centre</h4>
                        <p className="text-xs text-muted-foreground">Gwagwalada • Serene Environment</p>
                     </Link>
-                    <Link to="/ijmb-in-ibadan" className="block p-3 rounded-lg hover:bg-muted transition-colors">
+                    <Link href="/ijmb-in-ibadan" className="block p-3 rounded-lg hover:bg-muted transition-colors">
                        <h4 className="font-bold text-primary">Ibadan Centre</h4>
                        <p className="text-xs text-muted-foreground">Oyo State • Affordable Fees</p>
                     </Link>
@@ -182,7 +184,7 @@ const Centres = () => (
                  <p className="text-muted-foreground text-sm mb-4">
                     Our admission officers can help you select the best centre based on your location, budget, and intended course of study.
                  </p>
-                 <Link to="/contact" className="block w-full py-3 text-center bg-white border border-input rounded-lg font-bold hover:bg-gray-50 transition-colors">
+                 <Link href="/contact" className="block w-full py-3 text-center bg-white border border-input rounded-lg font-bold hover:bg-gray-50 transition-colors">
                     Contact Support
                  </Link>
               </div>

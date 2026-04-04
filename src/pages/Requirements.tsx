@@ -1,3 +1,5 @@
+'use client';
+
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
@@ -25,7 +27,7 @@ const Requirements = () => (
       <div className="container-narrow">
         <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB Admission Requirements 2026/2027</h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-          Understanding the IJMB requirements is the first step to gaining direct entry admission into 200 level. 
+          Understanding the IJMB requirements is the first step to gaining direct entry admission into 200 level.
           The requirements for the IJMB programme are straightforward and accessible to most Nigerian students who have completed their secondary education.
         </p>
 
@@ -65,7 +67,7 @@ const Requirements = () => (
 
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">IJMB Subject Combinations</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          Candidates are required to choose 3 A-Level subjects for the IJMB programme. Your subject combination should align 
+          Candidates are required to choose 3 A-Level subjects for the IJMB programme. Your subject combination should align
           with your intended course of study at the university. Common IJMB subject combinations include:
         </p>
         <div className="grid sm:grid-cols-2 gap-4 mb-8">

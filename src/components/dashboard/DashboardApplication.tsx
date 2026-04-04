@@ -12,7 +12,7 @@ interface DashboardApplicationProps {
   appSubmitted: boolean;
   uploading: string | null;
   onFileUpload: (type: 'passport' | 'olevel') => void;
-  onSave: (data: any, submit?: boolean) => void;
+  onSave: (data: any, submit?: boolean, silent?: boolean) => any;
 }
 
 export const DashboardApplication = ({

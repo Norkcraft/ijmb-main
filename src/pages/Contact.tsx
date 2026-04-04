@@ -1,4 +1,6 @@
-import { Link } from "react-router-dom";
+'use client';
+
+import Link from "next/link";
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CTASection from "@/components/CTASection";
@@ -21,7 +23,7 @@ const Contact = () => (
           <div>
             <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">Contact Our Admission Support Team</h1>
             <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-              Do you have questions about the IJMB programme, registration process, or study centres? 
+              Do you have questions about the IJMB programme, registration process, or study centres?
               Our dedicated admission officers are available to guide you through every step of your journey into 200 Level.
             </p>
 
@@ -69,7 +71,7 @@ const Contact = () => (
                  <MessageSquare size={20} /> Quick Tip
                </h3>
                <p className="text-blue-800 text-sm">
-                 Most questions are answered in our <Link to="/ijmb-faq" className="underline font-bold">Frequently Asked Questions</Link> section. 
+                 Most questions are answered in our <Link href="/ijmb-faq" className="underline font-bold">Frequently Asked Questions</Link> section.
                  Check it out for instant answers about fees, centres, and requirements.
                </p>
             </div>
@@ -88,7 +90,7 @@ const Contact = () => (
                   <input type="text" className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Doe" />
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Email Address</label>
                 <input type="email" className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="john@example.com" />
@@ -120,7 +122,7 @@ const Contact = () => (
             </form>
           </div>
         </div>
-        
+
         <InternalLinks />
       </div>
     </section>
