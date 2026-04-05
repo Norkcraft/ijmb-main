@@ -226,28 +226,23 @@ const Index = () => {
       </section>
 
       {/* Trust Bar */}
-      <section className="border-y border-border bg-muted/30 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <CheckCircle size={16} className="text-primary flex-shrink-0" />
-              Administered by ABU Zaria
-            </div>
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <CheckCircle size={16} className="text-primary flex-shrink-0" />
-              Federal Government Recognised
-            </div>
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <CheckCircle size={16} className="text-primary flex-shrink-0" />
-              Accepted by 200+ Universities
-            </div>
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <CheckCircle size={16} className="text-primary flex-shrink-0" />
-              50,000+ Students Enrolled
-            </div>
-            <div className="flex items-center gap-2 font-medium text-foreground">
-              <CheckCircle size={16} className="text-primary flex-shrink-0" />
-              All 36 States Covered
+      <section className="border-y border-border bg-muted/30 py-5">
+        <div className="max-w-7xl mx-auto">
+          {/* Mobile: horizontal scroll. sm+: centered wrap */}
+          <div className="overflow-x-auto scrollbar-none">
+            <div className="flex items-center gap-x-6 sm:flex-wrap sm:justify-center sm:gap-x-10 sm:gap-y-3 px-4 sm:px-6 lg:px-8 text-sm text-muted-foreground w-max sm:w-auto">
+              {[
+                "Administered by ABU Zaria",
+                "Federal Government Recognised",
+                "Accepted by 200+ Universities",
+                "50,000+ Students Enrolled",
+                "All 36 States Covered",
+              ].map((label) => (
+                <div key={label} className="flex items-center gap-2 font-medium text-foreground whitespace-nowrap">
+                  <CheckCircle size={15} className="text-primary flex-shrink-0" />
+                  {label}
+                </div>
+              ))}
             </div>
           </div>
         </div>
