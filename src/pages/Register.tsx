@@ -54,10 +54,7 @@ const Register = () => {
       // Send welcome email (fire-and-forget, don't block UI)
       fetch('/api/send-email', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: 'welcome',
           data: { fullName, email },

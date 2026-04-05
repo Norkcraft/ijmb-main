@@ -23,7 +23,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     .update(JSON.stringify(req.body))
     .digest('hex');
 
-  if (hash !== req.headers['x-paystack-signature']) {
+  const signature = req.headers['x-paystack-signature'] as string || '';
+  // Timing-safe comparison prevents timing attacks
+  let signaturesMatch = false;
+  try {
+    signaturesMatch = crypto.timingSafeEqual(
+      Buffer.from(hash, 'hex'),
+      Buffer.from(signature, 'hex')
+    );
+  } catch {
+    signaturesMatch = false;
+  }
+  if (!signaturesMatch) {
     return res.status(401).json({ message: 'Invalid Signature' });
   }
 

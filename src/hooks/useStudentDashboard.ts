@@ -208,21 +208,19 @@ export const useStudentDashboard = () => {
   };
 
   const handleFileUpload = async (type: 'passport' | 'olevel') => {
-    let appId = application?.id;
+    if (!user) return;
 
-    if (!appId) {
-      if (!user) return;
+    // Ensure application exists before upload
+    if (!application?.id) {
       const { data, error } = await supabase.from('applications').insert({
         user_id: user.id,
         status: 'draft',
       }).select().single();
-      
       if (error || !data) {
         toast({ title: 'Error', description: 'Could not initialize application. Please try saving the form first.', variant: 'destructive' });
         return;
       }
       queryClient.setQueryData(['dashboard-user', user.id], (old: any) => ({ ...old, application: data }));
-      appId = data.id;
     }
 
     const input = document.createElement('input');
@@ -230,42 +228,36 @@ export const useStudentDashboard = () => {
     input.accept = '.jpg,.jpeg,.png,.pdf';
     input.onchange = async (e: any) => {
       const file = e.target.files?.[0];
-      if (!file || !user) return;
+      if (!file) return;
+
       if (file.size > 5 * 1024 * 1024) {
         toast({ title: 'File too large', description: 'Max 5MB allowed', variant: 'destructive' });
         return;
       }
-      setUploading(type);
-      const ext = file.name.split('.').pop();
-      const path = `${user.id}/${type}.${ext}`;
 
-      // 1. Upload file
-      const { error: uploadError } = await supabase.storage.from('student-documents').upload(path, file, { upsert: true });
-      if (uploadError) {
-        toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
+      const allowed = ['image/jpeg', 'image/png', 'application/pdf'];
+      if (!allowed.includes(file.type)) {
+        toast({ title: 'Invalid file type', description: 'Only JPG, PNG, and PDF are allowed', variant: 'destructive' });
+        return;
+      }
+
+      setUploading(type);
+
+      // Send to secure server-side upload endpoint (validates magic bytes)
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('type', type);
+
+      const res = await fetch('/api/upload-document', { method: 'POST', body: formData });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        toast({ title: 'Upload failed', description: err.message || 'Please try again', variant: 'destructive' });
         setUploading(null);
         return;
       }
 
-      // 2. Update application record
-      const column = type === 'passport' ? 'passport_path' : 'olevel_path';
-      const statusColumn = type === 'passport' ? 'passport_status' : 'olevel_status';
-      const msgColumn = type === 'passport' ? 'passport_msg' : 'olevel_msg';
-      
-      if (appId) {
-        await supabase.from('applications').update({ 
-          [column]: path, 
-          [statusColumn]: 'pending',
-          [msgColumn]: null,
-          updated_at: new Date().toISOString() 
-        }).eq('id', appId);
-        
-        // Optimistic update
-        queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
-        
-        toast({ title: `${type === 'passport' ? 'Passport photo' : 'O-Level result'} uploaded!` });
-      }
-      
+      queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
+      toast({ title: `${type === 'passport' ? 'Passport photo' : 'O-Level result'} uploaded!` });
       setUploading(null);
     };
     input.click();
