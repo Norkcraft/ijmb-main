@@ -1,10 +1,9 @@
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabaseClient";
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
@@ -12,24 +11,12 @@ import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
 import studentsGroup from "@/assets/students-group.jpeg";
 import studentAnkara from "@/assets/student-ankara.jpeg";
-import { ArrowRight, CheckCircle, MapPin, Phone, Clock, Star } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-
-interface StaticCentre {
-  name: string;
-  location: string;
-  phone: string;
-  tuition: string;
-  hostel: string;
-  features: string[];
-}
+import { ArrowRight, CheckCircle, MapPin, Star, GraduationCap } from "lucide-react";
 
 interface CityInfo {
   state: string;
   desc: string;
   highlights: string[];
-  centres: StaticCentre[];
   universities: string[];
   tip: string;
   region: string;
@@ -42,11 +29,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Lagos",
     desc: "Nigeria's commercial capital and largest city",
     highlights: ["Largest study network in Nigeria", "Multiple centre options across the state", "Close proximity to UNILAG, LASU & LASPOTECH"],
-    centres: [
-      { name: "IJMB Lagos Mainland Centre", location: "Yaba, Lagos Mainland", phone: "08012345601", tuition: "₦95,000", hostel: "₦50,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB Lagos Island Centre", location: "Surulere, Lagos Island", phone: "08012345602", tuition: "₦100,000", hostel: "₦55,000", features: ["Computer Lab", "24/7 Security", "Hostel Available"] },
-      { name: "IJMB Ikeja Study Centre", location: "Ikeja, Lagos State", phone: "08012345603", tuition: "₦90,000", hostel: "N/A", features: ["Science Labs", "Experienced Tutors", "Day Students Only"] },
-    ],
     universities: ["University of Lagos (UNILAG)", "Lagos State University (LASU)", "Pan-Atlantic University", "Lagos State University of Science & Technology (LASUSTECH)"],
     tip: "Lagos IJMB centres fill up fast — register as early as possible and specify whether you prefer a Mainland or Island centre to avoid a long daily commute. Registration closes once a centre reaches capacity.",
     region: "South-West",
@@ -57,10 +39,6 @@ const cityData: Record<string, CityInfo> = {
     state: "FCT - Abuja",
     desc: "Nigeria's capital city and administrative centre",
     highlights: ["Serene learning environment", "Close to ABU Zaria headquarters", "Multiple universities in the FCT"],
-    centres: [
-      { name: "IJMB Abuja Central Centre", location: "Gwagwalada, FCT Abuja", phone: "08012345611", tuition: "₦90,000", hostel: "₦48,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB Garki Study Centre", location: "Garki, Abuja", phone: "08012345612", tuition: "₦95,000", hostel: "₦50,000", features: ["Computer Lab", "Modern Facilities", "Hostel Available"] },
-    ],
     universities: ["University of Abuja (UNIABUJA)", "Baze University", "Nile University of Nigeria", "African University of Science & Technology (AUST)"],
     tip: "Abuja centres are in high demand among FCT students — secure your spot before the first month of each intake. The proximity to ABU Zaria (the IJMB examining body) also makes administrative follow-ups easier for Abuja-based students.",
     region: "North-Central / FCT",
@@ -71,10 +49,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Oyo",
     desc: "one of the largest cities in West Africa",
     highlights: ["Home to University of Ibadan", "Rich academic culture", "Affordable cost of living for students"],
-    centres: [
-      { name: "IJMB Ibadan Main Centre", location: "Bodija, Ibadan", phone: "08012345621", tuition: "₦85,000", hostel: "₦45,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB UI Road Centre", location: "UI Road, Ibadan", phone: "08012345622", tuition: "₦88,000", hostel: "₦46,000", features: ["Experienced Tutors", "Hostel Available", "Near University of Ibadan"] },
-    ],
     universities: ["University of Ibadan (UI)", "Ladoke Akintola University of Technology (LAUTECH)", "The Polytechnic Ibadan", "Bowen University"],
     tip: "Ibadan is home to the oldest university in Nigeria — IJMB students targeting UI should aim for 12 points or above in their A-Level examinations, as UI's direct entry cut-off is highly competitive. Start preparing past questions early and choose a centre known for strong Science or Arts tutoring.",
     region: "South-West",
@@ -85,10 +59,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Kwara",
     desc: "a major educational hub in North-Central Nigeria",
     highlights: ["Home to University of Ilorin", "Affordable and student-friendly city", "Excellent IJMB pass rate history"],
-    centres: [
-      { name: "IJMB Ilorin Central Centre", location: "GRA, Ilorin", phone: "08012345631", tuition: "₦80,000", hostel: "₦42,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB Unilorin Road Centre", location: "Unity Road, Ilorin", phone: "08012345632", tuition: "₦82,000", hostel: "₦44,000", features: ["Qualified Lecturers", "Hostel Available", "Near UNILORIN"] },
-    ],
     universities: ["University of Ilorin (UNILORIN)", "Kwara State University (KWASU)", "Al-Hikmah University", "Landmark University"],
     tip: "UNILORIN is regarded as one of the most IJMB-friendly universities in Nigeria, with a well-structured direct entry process. Choose your three A-Level subjects specifically to match your intended UNILORIN faculty — the Medicine and Law faculties require particularly high IJMB scores.",
     region: "North-Central",
@@ -99,10 +69,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Rivers",
     desc: "the oil capital of Nigeria",
     highlights: ["Gateway to South-South universities", "Close to UNIPORT and RSUST", "Strong science and engineering tradition"],
-    centres: [
-      { name: "IJMB Port Harcourt Centre", location: "Rumuola, Port Harcourt", phone: "08012345641", tuition: "₦90,000", hostel: "₦48,000", features: ["Science Labs", "Hostel Available", "Experienced Faculty"] },
-      { name: "IJMB Eleme Centre", location: "GRA Phase 2, Port Harcourt", phone: "08012345642", tuition: "₦92,000", hostel: "₦50,000", features: ["Computer Lab", "Library", "Hostel Available"] },
-    ],
     universities: ["University of Port Harcourt (UNIPORT)", "Rivers State University (RSU)", "Ignatius Ajuru University of Education", "Ken Saro-Wiwa Polytechnic"],
     tip: "Port Harcourt's strong engineering and petroleum culture means most IJMB students here opt for Physics, Chemistry, and Mathematics. Choose a centre with functional science laboratories — this is critical for practical preparation for UNIPORT's demanding direct entry requirements.",
     region: "South-South",
@@ -113,10 +79,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Edo",
     desc: "a historic city and educational centre",
     highlights: ["Home to University of Benin (UNIBEN)", "Vibrant student community", "Strong arts and social science tradition"],
-    centres: [
-      { name: "IJMB Benin City Centre", location: "Ugbowo, Benin City", phone: "08012345651", tuition: "₦83,000", hostel: "₦44,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB Sapele Road Centre", location: "Sapele Road, Benin City", phone: "08012345652", tuition: "₦85,000", hostel: "₦45,000", features: ["Qualified Lecturers", "Hostel Available", "Near UNIBEN"] },
-    ],
     universities: ["University of Benin (UNIBEN)", "Benson Idahosa University", "Ambrose Alli University", "Wellspring University"],
     tip: "UNIBEN is one of Nigeria's most sought-after universities for direct entry admission — IJMB students targeting UNIBEN for Medicine, Law, or Engineering must score 12 points or above in their A-Level examinations. Register early at a centre with experienced science tutors to maximise your score.",
     region: "South-South",
@@ -127,10 +89,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Kano",
     desc: "the largest city in Northern Nigeria",
     highlights: ["Largest northern city study network", "Home to Bayero University Kano (BUK)", "Strong business and commercial studies tradition"],
-    centres: [
-      { name: "IJMB Kano Main Centre", location: "Bompai, Kano", phone: "08012345661", tuition: "₦80,000", hostel: "₦42,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB BUK Road Centre", location: "Zaria Road, Kano", phone: "08012345662", tuition: "₦82,000", hostel: "₦43,000", features: ["Experienced Faculty", "Hostel Available", "Near Bayero University"] },
-    ],
     universities: ["Bayero University Kano (BUK)", "Northwest University Kano", "Yusuf Maitama Sule University (YMSU)", "Kano University of Science & Technology (KUST)"],
     tip: "Bayero University Kano (BUK) has a dedicated direct entry quota for IJMB candidates and is one of the most accessible federal universities in the North-West for direct entry. Register as early as possible — Kano IJMB centres are among the busiest in Northern Nigeria.",
     region: "North-West",
@@ -141,10 +99,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Kaduna",
     desc: "a key educational and industrial centre",
     highlights: ["Home to Kaduna State University", "Central location in Northern Nigeria", "Established academic tradition"],
-    centres: [
-      { name: "IJMB Kaduna Central Centre", location: "Ungwan Rimi, Kaduna", phone: "08012345671", tuition: "₦80,000", hostel: "₦42,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB Barnawa Centre", location: "Barnawa, Kaduna", phone: "08012345672", tuition: "₦82,000", hostel: "₦44,000", features: ["Qualified Lecturers", "Hostel Available"] },
-    ],
     universities: ["Ahmadu Bello University Zaria (ABU)", "Kaduna State University (KASU)", "Nigerian Defence Academy (NDA)", "Joseph Sarwuan Tarka University"],
     tip: "Kaduna and Zaria host ABU — the very institution that administers IJMB examinations. Studying here gives you unmatched proximity to the national IJMB office and ABU direct entry, which has one of the largest IJMB direct entry intakes in Nigeria.",
     region: "North-West",
@@ -155,10 +109,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Plateau",
     desc: "known for its cool climate and quality education",
     highlights: ["Home to University of Jos (UNIJOS)", "Serene cool climate ideal for study", "Strong science programme history"],
-    centres: [
-      { name: "IJMB Jos Main Centre", location: "Rayfield, Jos", phone: "08012345681", tuition: "₦80,000", hostel: "₦42,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB Unijos Road Centre", location: "Bauchi Road, Jos", phone: "08012345682", tuition: "₦82,000", hostel: "₦43,000", features: ["Experienced Tutors", "Hostel Available", "Near UNIJOS"] },
-    ],
     universities: ["University of Jos (UNIJOS)", "Plateau State University (PLASU)", "Bingham University", "University of Mkar"],
     tip: "UNIJOS accepts IJMB for nearly all faculties and is the primary direct entry destination for Jos-based students. The University's direct entry process is well-structured — ensure you meet the faculty-specific IJMB point requirements before finalising your subject combination.",
     region: "North-Central",
@@ -169,10 +119,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Enugu",
     desc: "the Coal City and eastern educational hub",
     highlights: ["Home to UNN and ESUT", "Major academic city in South-East", "Excellent arts and humanities tradition"],
-    centres: [
-      { name: "IJMB Enugu Main Centre", location: "Independence Layout, Enugu", phone: "08012345691", tuition: "₦82,000", hostel: "₦44,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB Trans-Ekulu Centre", location: "Trans-Ekulu, Enugu", phone: "08012345692", tuition: "₦83,000", hostel: "₦44,000", features: ["Qualified Faculty", "Hostel Available"] },
-    ],
     universities: ["University of Nigeria Nsukka (UNN)", "Enugu State University of Science & Technology (ESUT)", "Godfrey Okoye University", "Caritas University"],
     tip: "UNN Nsukka is one of the South-East's most popular universities for IJMB direct entry — it accepts students across sciences, arts, law, and social sciences. Enugu centres with strong academic reputations tend to produce higher A-Level scores; ask about a centre's recent pass rate before registering.",
     region: "South-East",
@@ -183,10 +129,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Imo",
     desc: "a vibrant city in South-East Nigeria",
     highlights: ["Home to FUTO and Imo State University", "Fast-growing educational hub", "Vibrant student community"],
-    centres: [
-      { name: "IJMB Owerri Central Centre", location: "World Bank, Owerri", phone: "08012345701", tuition: "₦82,000", hostel: "₦44,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB FUTO Road Centre", location: "Ihiagwa, Owerri", phone: "08012345702", tuition: "₦84,000", hostel: "₦45,000", features: ["Modern Facilities", "Hostel Available", "Near FUTO"] },
-    ],
     universities: ["Federal University of Technology Owerri (FUTO)", "Imo State University (IMSU)", "Afe Babalola University (ABUAD)", "Eastern Palm University"],
     tip: "FUTO is one of Nigeria's leading technology universities and actively accepts IJMB for direct entry into Engineering, Computer Science, and Science programmes. IJMB students targeting FUTO must score 12+ points in relevant science subjects — choose an Owerri centre with strong physics, maths, and chemistry tutoring.",
     region: "South-East",
@@ -197,9 +139,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Abia",
     desc: "a major commercial hub in South-East Nigeria",
     highlights: ["Growing academic centre in Abia State", "Close to Abia State University", "Affordable study environment"],
-    centres: [
-      { name: "IJMB Aba Study Centre", location: "Ogbor Hill, Aba", phone: "08012345711", tuition: "₦80,000", hostel: "₦42,000", features: ["Science Labs", "Library", "Hostel Available"] },
-    ],
     universities: ["Abia State University (ABSU)", "Michael Okpara University of Agriculture (MOUAU)", "Federal University of Technology Owerri (FUTO)", "Gregory University Uturu"],
     tip: "ABSU and MOUAU are the two most popular IJMB direct entry destinations for students from Aba. Choose your A-Level combination based on your target university and faculty — agriculture students should take Biology, Chemistry, and Agricultural Science for MOUAU.",
     region: "South-East",
@@ -210,10 +149,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Akwa Ibom",
     desc: "a rapidly developing South-South city",
     highlights: ["Home to University of Uyo (UNIUYO)", "Modern facilities and infrastructure", "Peaceful learning environment"],
-    centres: [
-      { name: "IJMB Uyo Main Centre", location: "Ewet Housing, Uyo", phone: "08012345721", tuition: "₦82,000", hostel: "₦44,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB UNIUYO Road Centre", location: "Nwaniba Road, Uyo", phone: "08012345722", tuition: "₦83,000", hostel: "₦45,000", features: ["Experienced Tutors", "Hostel Available", "Near UNIUYO"] },
-    ],
     universities: ["University of Uyo (UNIUYO)", "Akwa Ibom State University (AKSU)", "Pan-Atlantic University", "Ritman University"],
     tip: "UNIUYO is the primary IJMB direct entry destination for students from Uyo and Akwa Ibom State. The university has a structured direct entry process — ensure your IJMB subject combination aligns with your chosen UNIUYO faculty before completing your registration.",
     region: "South-South",
@@ -224,10 +159,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Ondo",
     desc: "the Sunshine State capital",
     highlights: ["Home to FUTA (Federal University of Technology)", "Strong science and technology tradition", "Growing educational sector"],
-    centres: [
-      { name: "IJMB Akure Central Centre", location: "OSSC Road, Akure", phone: "08012345731", tuition: "₦80,000", hostel: "₦42,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB FUTA Road Centre", location: "Alagbaka, Akure", phone: "08012345732", tuition: "₦82,000", hostel: "₦43,000", features: ["Tech Labs", "Hostel Available", "Near FUTA"] },
-    ],
     universities: ["Federal University of Technology Akure (FUTA)", "Ondo State University of Medical Sciences (OUMSCO)", "Joseph Ayo Babalola University (JABU)", "Elizade University"],
     tip: "FUTA is one of Nigeria's most competitive technology universities for direct entry — IJMB students targeting FUTA Engineering must aim for 12+ points in Mathematics, Physics, and Chemistry. Akure centres with science laboratory facilities are strongly recommended.",
     region: "South-West",
@@ -238,10 +169,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Ekiti",
     desc: "a major educational centre in the South-West",
     highlights: ["Land of Honour — home to Ekiti State University", "Strong academic culture", "Affordable and student-friendly"],
-    centres: [
-      { name: "IJMB Ado-Ekiti Main Centre", location: "Ajilosun, Ado-Ekiti", phone: "08012345741", tuition: "₦78,000", hostel: "₦40,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB EKSU Road Centre", location: "Iworoko Road, Ado-Ekiti", phone: "08012345742", tuition: "₦80,000", hostel: "₦42,000", features: ["Qualified Lecturers", "Hostel Available", "Near EKSU"] },
-    ],
     universities: ["Ekiti State University (EKSU)", "Afe Babalola University (ABUAD)", "Federal University Oye-Ekiti (FUOYE)", "Crown Hill University"],
     tip: "Ado-Ekiti has three major universities within reach — EKSU, ABUAD, and FUOYE — all of which accept IJMB for direct entry. ABUAD in particular has a strong track record of IJMB intake and a structured admissions process; ensure your subject combination matches the faculty requirements.",
     region: "South-West",
@@ -252,10 +179,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Ogun",
     desc: "a historic city near Lagos",
     highlights: ["Home to Federal University of Agriculture Abeokuta (FUNAAB)", "Near Lagos, easy access", "Strong agriculture and science tradition"],
-    centres: [
-      { name: "IJMB Abeokuta Centre", location: "Oke-Ilewo, Abeokuta", phone: "08012345751", tuition: "₦83,000", hostel: "₦44,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB FUNAAB Road Centre", location: "Alabata Road, Abeokuta", phone: "08012345752", tuition: "₦85,000", hostel: "₦45,000", features: ["Agric Labs", "Hostel Available", "Near FUNAAB"] },
-    ],
     universities: ["Federal University of Agriculture Abeokuta (FUNAAB)", "Moshood Abiola University of Science & Technology (MAUTECH)", "Bells University of Technology", "Crescent University"],
     tip: "FUNAAB is Nigeria's leading agricultural university and accepts IJMB candidates every session — the recommended subject combination for FUNAAB-bound students is Biology, Chemistry, and Agricultural Science. Register early as FUNAAB-bound IJMB students from Abeokuta fill up quickly.",
     region: "South-West",
@@ -266,9 +189,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Osun",
     desc: "a cultural and educational centre in Yorubaland",
     highlights: ["Home to Osun State University", "Culturally rich study environment", "Affordable fees"],
-    centres: [
-      { name: "IJMB Osogbo Main Centre", location: "Station Road, Osogbo", phone: "08012345761", tuition: "₦78,000", hostel: "₦40,000", features: ["Science Labs", "Library", "Hostel Available"] },
-    ],
     universities: ["Osun State University (UNIOSUN)", "Obafemi Awolowo University Ile-Ife (OAU)", "Redeemer's University", "Bowen University"],
     tip: "OAU Ile-Ife is one of Nigeria's most prestigious universities and is within reach for IJMB students in Osogbo — however, OAU's direct entry cut-off is extremely competitive and requires 12+ IJMB points. Osogbo's calm environment is ideal for the focused preparation needed to hit that target.",
     region: "South-West",
@@ -279,10 +199,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Niger",
     desc: "the capital of Nigeria's largest state by landmass",
     highlights: ["Home to Federal University of Technology Minna (FUT Minna)", "Expanding academic community", "Affordable living costs"],
-    centres: [
-      { name: "IJMB Minna Study Centre", location: "Bosso, Minna", phone: "08012345771", tuition: "₦78,000", hostel: "₦40,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB FUT Road Centre", location: "Gidan Kwano, Minna", phone: "08012345772", tuition: "₦80,000", hostel: "₦42,000", features: ["Tech Labs", "Hostel Available", "Near FUT Minna"] },
-    ],
     universities: ["Federal University of Technology Minna (FUT Minna)", "Ibrahim Badamasi Babangida University (IBBU)", "Niger State Polytechnic", "Confluence University of Science & Technology"],
     tip: "FUT Minna has strong IJMB direct entry intake for Engineering, Computing, and Sciences — students must take Mathematics, Physics, and Chemistry for most FUT Minna engineering programmes. Choose an IJMB centre in Minna with functional science laboratories to maximise your examination score.",
     region: "North-Central",
@@ -293,9 +209,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Kogi",
     desc: "the confluence city where Rivers Niger and Benue meet",
     highlights: ["Home to Kogi State University", "Strategic location in North-Central Nigeria", "Growing educational infrastructure"],
-    centres: [
-      { name: "IJMB Lokoja Centre", location: "Adankolo, Lokoja", phone: "08012345781", tuition: "₦78,000", hostel: "₦40,000", features: ["Science Labs", "Library", "Hostel Available"] },
-    ],
     universities: ["Federal University Lokoja (FULOKOJA)", "Kogi State University (KSU)", "Prince Abubakar Audu University (PAAU)", "Salem University"],
     tip: "Lokoja's central location in Nigeria makes it accessible to students from Kogi, Benue, Anambra, and Niger states — multiple universities across these states accept IJMB for direct entry. Check each university's specific cut-off points and ensure your subject combination is aligned before finalising registration.",
     region: "North-Central",
@@ -306,10 +219,6 @@ const cityData: Record<string, CityInfo> = {
     state: "Benue",
     desc: "the Food Basket of the Nation's capital",
     highlights: ["Home to Benue State University and Federal University of Agriculture", "Peaceful academic environment", "Affordable cost of living"],
-    centres: [
-      { name: "IJMB Makurdi Main Centre", location: "High Level, Makurdi", phone: "08012345791", tuition: "₦78,000", hostel: "₦40,000", features: ["Science Labs", "Library", "Hostel Available"] },
-      { name: "IJMB BSU Road Centre", location: "Otukpo Road, Makurdi", phone: "08012345792", tuition: "₦80,000", hostel: "₦42,000", features: ["Qualified Lecturers", "Hostel Available", "Near BSU"] },
-    ],
     universities: ["Benue State University (BSU)", "Joseph Sarwuan Tarka University Makurdi (JOSTUM)", "Federal University of Agriculture Makurdi (FUAM)", "University of Mkar"],
     tip: "FUAM is one of Nigeria's leading agricultural universities and consistently accepts IJMB candidates for direct entry — Biology, Chemistry, and Agricultural Science is the recommended subject combination for FUAM-bound students. BSU is also a strong option with an active IJMB direct entry quota.",
     region: "North-Central",
@@ -331,29 +240,10 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
 
   const data = cityData[slug];
 
-  // Live centres from Supabase (override static data when available)
-  const [liveCentres, setLiveCentres] = useState<any[]>([]);
-  const [loadingLive, setLoadingLive] = useState(true);
-
   const cityName = slug
     .split("-")
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
-
-  useEffect(() => {
-    const fetchCentres = async () => {
-      if (!data) return;
-      setLoadingLive(true);
-      const { data: res } = await supabase
-        .from('centres')
-        .select('*')
-        .eq('active', true)
-        .ilike('state', `%${data.state}%`);
-      setLiveCentres(res || []);
-      setLoadingLive(false);
-    };
-    fetchCentres();
-  }, [data]);
 
   if (!data) {
     return (
@@ -370,11 +260,11 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
   const faqs = [
     {
       question: `Is there an IJMB centre in ${cityName}?`,
-      answer: `Yes. There are ${data.centres.length} approved IJMB study centres in ${cityName}, ${data.state} listed on this page. Students from ${cityName} and surrounding areas can register and attend classes locally.`
+      answer: `Yes. There are accredited IJMB study centres in ${cityName}, ${data.state} available for the 2026/2027 session. Students from ${cityName} and surrounding areas can register and attend classes locally. Contact us to confirm current availability and get assigned to a centre near you.`
     },
     {
       question: `How much is IJMB in ${cityName}?`,
-      answer: `IJMB tuition fees in ${cityName} range from ${data.centres[0]?.tuition} to ${data.centres[data.centres.length - 1]?.tuition} per session. Hostel accommodation (optional) starts from ${data.centres[0]?.hostel}. The IJMB registration form fee is ₦5,500 nationwide.`
+      answer: `The IJMB registration form fee is ₦5,500 nationwide. Tuition fees vary by centre but are generally affordable — contact us after registering for a full breakdown of costs for your assigned centre in ${cityName}, ${data.state}.`
     },
     {
       question: `Which universities near ${cityName} accept IJMB?`,
@@ -386,7 +276,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
     },
     {
       question: `What subjects should I take for IJMB in ${cityName}?`,
-      answer: `Your subject combination depends on your intended university course. Science students (targeting ${data.universities[0]}) typically take Biology, Chemistry, and Physics or Mathematics. Arts students take Literature, Government, and CRS or Economics. Our team can advise on the best combination for your target university.`
+      answer: `Your subject combination depends on your intended university course. Science students targeting ${data.universities[0]} typically take Biology, Chemistry, and Physics or Mathematics. Arts students take Literature, Government, and CRS or Economics. Our admissions team can advise on the best combination for your target university once you register.`
     },
   ];
 
@@ -434,7 +324,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
 
       <SEOHead
         title={`IJMB in ${cityName} 2026/2027 – Accredited Study Centres & Registration`}
-        description={`Find ${data.centres.length} accredited IJMB study centres in ${cityName}, ${data.state}. Register for IJMB 2026/2027, gain direct entry into 200 level without UTME. Fees from ${data.centres[0]?.tuition}.`}
+        description={`Register for IJMB in ${cityName}, ${data.state}. Accredited study centres for 2026/2027 session. Gain direct entry into 200 level without UTME. Universities near ${cityName} accepting IJMB include ${data.universities[0]}.`}
         canonical={`https://www.ijmb.info/ijmb-in-${slug}`}
         keywords={`IJMB in ${cityName}, IJMB centre ${cityName}, IJMB registration ${cityName}, IJMB programme ${cityName}, direct entry ${cityName}`}
       />
@@ -475,7 +365,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                 <h2 className="text-2xl font-heading font-bold mb-4">Why Study IJMB in {cityName}?</h2>
                 <p className="text-muted-foreground leading-relaxed mb-4">{data.uniqueIntro}</p>
                 <p className="text-muted-foreground leading-relaxed mb-6">
-                  {cityName} currently has <strong className="text-foreground">{data.centres.length} accredited IJMB centre{data.centres.length > 1 ? 's' : ''}</strong> serving students from {data.state} State and the wider {data.region} region. With {data.universities.length} universities nearby that accept IJMB for direct entry, candidates in {cityName} have some of the best university options available after completing their A-Levels.
+                  {cityName} has accredited IJMB study centres serving students from {data.state} State and the wider {data.region} region. With {data.universities.length} universities nearby that accept IJMB for direct entry, candidates in {cityName} have some of the best university options available after completing their A-Levels.
                 </p>
 
                 {/* Stat row */}
@@ -493,99 +383,68 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                     <p className="font-bold text-sm text-foreground leading-tight">{data.universities.length}+ accepting IJMB</p>
                   </div>
                   <div className="p-4 bg-primary/5 border border-primary/15 rounded-xl text-center">
-                    <p className="text-xs text-muted-foreground mb-1">IJMB Centres</p>
-                    <p className="font-bold text-sm text-foreground leading-tight">{data.centres.length} in {cityName}</p>
+                    <p className="text-xs text-muted-foreground mb-1">Programme</p>
+                    <p className="font-bold text-sm text-foreground leading-tight">9 Months A-Level</p>
                   </div>
                 </div>
               </div>
 
-              {/* Centres List */}
+              {/* Option A: University Entry Requirements */}
               <div>
                 <h2 className="text-2xl font-heading font-bold mb-2">
-                  Accredited IJMB Study Centres in {cityName}
+                  Universities Near {cityName} That Accept IJMB
                 </h2>
                 <p className="text-muted-foreground mb-6">
-                  The following are approved IJMB study centres currently accepting students in {cityName}, {data.state} for the 2026/2027 session:
+                  After completing your IJMB A-Levels, you can apply for direct entry into 200 level at any of these universities near {cityName} — no UTME required.
                 </p>
 
-                {/* Show live Supabase data if available */}
-                {!loadingLive && liveCentres.length > 0 ? (
-                  <div className="grid gap-4">
-                    {liveCentres.map(centre => (
-                      <Card key={centre.id} className="border-l-4 border-l-primary hover:shadow-md transition-shadow">
-                        <CardHeader className="py-3 pb-1">
-                          <CardTitle className="text-lg">{centre.name}</CardTitle>
-                        </CardHeader>
-                        <CardContent className="pb-4 text-sm text-muted-foreground">
-                          <p className="mb-3"><MapPin size={13} className="inline mr-1" /> {centre.location}</p>
-                          <div className="flex flex-wrap gap-3">
-                            <span className="bg-muted px-3 py-1 rounded-md text-xs"><strong>Tuition:</strong> ₦{(centre.tuition_fee || 0).toLocaleString()}</span>
-                            <span className="bg-muted px-3 py-1 rounded-md text-xs"><strong>Hostel:</strong> ₦{(centre.hostel_fee || 0).toLocaleString()}</span>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                ) : (
-                  /* Static hardcoded centre data */
-                  <div className="grid gap-5">
-                    {data.centres.map((centre, i) => (
-                      <Card key={i} className="border-l-4 border-l-primary hover:shadow-md transition-shadow">
-                        <CardHeader className="py-4 pb-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <CardTitle className="text-lg leading-snug">{centre.name}</CardTitle>
-                            <Badge variant="outline" className="text-xs shrink-0 text-green-700 border-green-300 bg-green-50">Accepting Students</Badge>
-                          </div>
-                        </CardHeader>
-                        <CardContent className="pb-5 space-y-3 text-sm">
-                          <p className="flex items-center gap-2 text-muted-foreground">
-                            <MapPin size={14} className="text-primary shrink-0" /> {centre.location}
-                          </p>
-                          <p className="flex items-center gap-2 text-muted-foreground">
-                            <Phone size={14} className="text-primary shrink-0" /> {centre.phone}
-                          </p>
-                          <div className="flex flex-wrap gap-3 pt-1">
-                            <span className="bg-primary/5 border border-primary/20 px-3 py-1 rounded-md text-xs font-medium">
-                              Tuition: {centre.tuition}
-                            </span>
-                            {centre.hostel !== "N/A" && (
-                              <span className="bg-primary/5 border border-primary/20 px-3 py-1 rounded-md text-xs font-medium">
-                                Hostel: {centre.hostel}
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex flex-wrap gap-2 pt-1">
-                            {centre.features.map((f, fi) => (
-                              <span key={fi} className="flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                                <CheckCircle size={11} className="text-primary" /> {f}
-                              </span>
-                            ))}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
-                  </div>
-                )}
-
-                <div className="mt-6 p-4 bg-muted/40 rounded-xl border text-sm text-muted-foreground flex items-start gap-3">
-                  <Clock size={16} className="text-primary mt-0.5 shrink-0" />
-                  <p>Centre details are updated regularly. To confirm availability for the 2026/2027 session or to speak with an admission officer, <Link href="/contact" className="text-primary font-medium hover:underline">contact us here</Link>.</p>
-                </div>
-              </div>
-
-              {/* Universities Near {cityName} Accepting IJMB */}
-              <div>
-                <h2 className="text-2xl font-heading font-bold mb-4">Universities Near {cityName} Accepting IJMB</h2>
-                <ul className="space-y-3 mb-4">
+                <div className="space-y-3 mb-6">
                   {data.universities.map((uni, i) => (
-                    <li key={i} className="flex items-center gap-3 p-3 bg-card border rounded-xl text-sm text-foreground">
-                      <CheckCircle size={16} className="text-primary shrink-0" />
-                      <span className="font-medium">{uni}</span>
-                    </li>
+                    <div key={i} className="flex items-center gap-3 p-4 bg-card border rounded-xl hover:border-primary/30 transition-colors">
+                      <GraduationCap size={18} className="text-primary shrink-0" />
+                      <span className="font-medium text-sm text-foreground">{uni}</span>
+                    </div>
                   ))}
-                </ul>
-                <p className="text-sm text-muted-foreground bg-muted/40 border rounded-xl p-4">
-                  All Nigerian federal and state universities that offer Direct Entry accept a valid IJMB result. The universities listed above are particularly close to {cityName} or in {data.state} State.
+                </div>
+
+                {/* IJMB Points requirement table */}
+                <h3 className="text-lg font-heading font-bold mb-3">IJMB Points Required by Course</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  IJMB is graded A–E across 3 subjects (max 15 points). The table below shows the minimum points typically required at the universities listed above:
+                </p>
+                <div className="border rounded-xl overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-primary/5 border-b">
+                        <th className="text-left p-3 font-semibold text-foreground">Course / Faculty</th>
+                        <th className="text-center p-3 font-semibold text-foreground whitespace-nowrap">Min. Points</th>
+                        <th className="text-left p-3 font-semibold text-foreground hidden sm:table-cell">Recommended Subjects</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {[
+                        { course: "Medicine, Dentistry & Pharmacy", points: "15", subjects: "Biology · Chemistry · Physics" },
+                        { course: "Law", points: "12", subjects: "Literature · Government · Economics" },
+                        { course: "Engineering & Technology", points: "12", subjects: "Maths · Physics · Chemistry" },
+                        { course: "Computer Science & IT", points: "10", subjects: "Maths · Physics · Chemistry" },
+                        { course: "Sciences (Biology, Chemistry, etc.)", points: "9", subjects: "Any 3 relevant science subjects" },
+                        { course: "Agriculture & Vet Medicine", points: "9", subjects: "Biology · Chemistry · Agric Science" },
+                        { course: "Accounting & Business Admin", points: "9", subjects: "Accounting · Economics · Commerce" },
+                        { course: "Arts, Education & Humanities", points: "9", subjects: "Literature · Government · CRS/History" },
+                      ].map((row, i) => (
+                        <tr key={i} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
+                          <td className="p-3 font-medium text-foreground">{row.course}</td>
+                          <td className="p-3 text-center">
+                            <span className="inline-block bg-primary/10 text-primary font-bold text-xs px-2 py-1 rounded-full">{row.points} pts</span>
+                          </td>
+                          <td className="p-3 text-muted-foreground hidden sm:table-cell">{row.subjects}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <p className="text-xs text-muted-foreground mt-3 bg-muted/40 border rounded-xl p-3">
+                  Points are indicative. Exact cut-offs vary by university and year. Our admissions team will advise on the right subject combination for your specific target university in {cityName} when you register.
                 </p>
               </div>
 
@@ -703,8 +562,8 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                   </p>
                   <div className="space-y-2 text-sm opacity-80 mb-5">
                     <p className="flex items-center gap-2"><CheckCircle size={14} /> Form fee: ₦5,500</p>
-                    <p className="flex items-center gap-2"><CheckCircle size={14} /> Tuition from {data.centres[0]?.tuition}</p>
-                    <p className="flex items-center gap-2"><CheckCircle size={14} /> {data.centres.length} centre{data.centres.length > 1 ? 's' : ''} in {cityName}</p>
+                    <p className="flex items-center gap-2"><CheckCircle size={14} /> Accredited centres in {cityName}</p>
+                    <p className="flex items-center gap-2"><CheckCircle size={14} /> {data.universities.length}+ universities accepting IJMB</p>
                   </div>
                   <Link
                     href="/register"
@@ -729,8 +588,8 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                   <div className="space-y-2 text-sm text-muted-foreground">
                     <p className="flex justify-between"><span>State</span><span className="font-medium text-foreground">{data.state}</span></p>
                     <p className="flex justify-between"><span>Region</span><span className="font-medium text-foreground">{data.region}</span></p>
-                    <p className="flex justify-between"><span>Centres Available</span><span className="font-medium text-foreground">{data.centres.length}</span></p>
-                    <p className="flex justify-between"><span>Tuition Range</span><span className="font-medium text-foreground">{data.centres[0]?.tuition}+</span></p>
+                    <p className="flex justify-between"><span>Nearby Universities</span><span className="font-medium text-foreground">{data.universities.length}+</span></p>
+                    <p className="flex justify-between"><span>Form Fee</span><span className="font-medium text-foreground">₦5,500</span></p>
                     <p className="flex justify-between"><span>Programme Duration</span><span className="font-medium text-foreground">9 Months</span></p>
                     <p className="flex justify-between"><span>Session</span><span className="font-medium text-foreground">2026/2027</span></p>
                   </div>
