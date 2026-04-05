@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Download, Eye, Printer, FileText } from 'lucide-react';
+import { Loader2, Download, Eye, Printer, FileText, CheckCircle, Clock, Star, MessageCircle, ChevronRight, User, BookOpen, CreditCard, GraduationCap, AlertCircle, ArrowRight, Bell, LogOut } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import SEOHead from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,154 @@ import { DashboardPayments } from '@/components/dashboard/DashboardPayments';
 import { ApplicationForm } from '@/components/application/ApplicationForm';
 import { useSearchParams } from "next/navigation";
 
+// ── Status helpers ────────────────────────────────────────────────────────────
+const STATUS_MAP: Record<string, { label: string; color: string; bg: string; border: string; icon: React.ReactNode }> = {
+  draft:           { label: 'Draft',            color: 'text-gray-600',   bg: 'bg-gray-50',   border: 'border-gray-200',  icon: <FileText size={16} /> },
+  payment_pending: { label: 'Payment Pending',  color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200', icon: <CreditCard size={16} /> },
+  submitted:       { label: 'Under Review',     color: 'text-blue-700',   bg: 'bg-blue-50',   border: 'border-blue-200',  icon: <Clock size={16} /> },
+  review:          { label: 'Under Review',     color: 'text-blue-700',   bg: 'bg-blue-50',   border: 'border-blue-200',  icon: <Clock size={16} /> },
+  admitted:        { label: 'Admitted!',         color: 'text-green-700',  bg: 'bg-green-50',  border: 'border-green-200', icon: <Star size={16} /> },
+  fees_pending:    { label: 'Fees Pending',     color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200', icon: <CreditCard size={16} /> },
+  active:          { label: 'Active Student',   color: 'text-emerald-700',bg: 'bg-emerald-50',border: 'border-emerald-200',icon: <GraduationCap size={16} /> },
+  rejected:        { label: 'Not Admitted',     color: 'text-red-700',    bg: 'bg-red-50',    border: 'border-red-200',   icon: <AlertCircle size={16} /> },
+};
+
+// ── Journey steps ─────────────────────────────────────────────────────────────
+const STEPS = [
+  { key: 'apply',    label: 'Apply',        icon: <FileText size={14} /> },
+  { key: 'pay',      label: 'Pay Fee',      icon: <CreditCard size={14} /> },
+  { key: 'review',   label: 'Review',       icon: <Clock size={14} /> },
+  { key: 'admitted', label: 'Admitted',     icon: <Star size={14} /> },
+  { key: 'accept',   label: 'Accept',       icon: <CheckCircle size={14} /> },
+  { key: 'active',   label: 'Active',       icon: <GraduationCap size={14} /> },
+];
+
+function getStepIndex(status: string | undefined) {
+  switch (status) {
+    case 'draft':            return 0;
+    case 'payment_pending':  return 1;
+    case 'submitted':
+    case 'review':           return 2;
+    case 'admitted':         return 3;
+    case 'fees_pending':     return 4;
+    case 'active':           return 5;
+    default:                 return 0;
+  }
+}
+
+function ProgressTracker({ status }: { status: string | undefined }) {
+  const current = getStepIndex(status);
+  return (
+    <div className="w-full">
+      <div className="flex items-center justify-between gap-1">
+        {STEPS.map((step, i) => {
+          const done = i < current;
+          const active = i === current;
+          return (
+            <div key={step.key} className="flex-1 flex flex-col items-center gap-1.5">
+              {/* connector line before */}
+              <div className="w-full flex items-center">
+                {i > 0 && (
+                  <div className={`flex-1 h-0.5 ${i <= current ? 'bg-primary' : 'bg-border'}`} />
+                )}
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs transition-all
+                  ${done ? 'bg-primary text-white' : active ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-muted text-muted-foreground border border-border'}`}>
+                  {done ? <CheckCircle size={14} /> : step.icon}
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div className={`flex-1 h-0.5 ${i < current ? 'bg-primary' : 'bg-border'}`} />
+                )}
+              </div>
+              <span className={`text-[10px] sm:text-xs font-medium text-center leading-tight
+                ${active ? 'text-primary' : done ? 'text-foreground' : 'text-muted-foreground'}`}>
+                {step.label}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── What To Do Next card ───────────────────────────────────────────────────────
+function WhatNextCard({
+  status, isAdmitted, hasPaidAcceptanceFee, formFeePaid,
+  onPayAcceptance, onDownloadLetter,
+}: {
+  status?: string;
+  isAdmitted: boolean;
+  hasPaidAcceptanceFee: boolean;
+  formFeePaid: boolean;
+  onPayAcceptance: () => void;
+  onDownloadLetter: () => void;
+}) {
+  const cards: Record<string, { icon: React.ReactNode; headline: string; sub: string; cta?: { label: string; action: () => void }; color: string }> = {
+    submitted: {
+      icon: <Clock size={24} className="text-blue-600" />,
+      headline: 'Your application is under review',
+      sub: 'Our admissions team is reviewing your details. You will be notified once a decision is made — this typically takes 1–3 business days.',
+      color: 'bg-blue-50 border-blue-200',
+    },
+    review: {
+      icon: <Clock size={24} className="text-blue-600" />,
+      headline: 'Your application is under review',
+      sub: 'Our admissions team is reviewing your details. You will be notified once a decision is made — this typically takes 1–3 business days.',
+      color: 'bg-blue-50 border-blue-200',
+    },
+    admitted: {
+      icon: <Star size={24} className="text-green-600" />,
+      headline: 'Congratulations — you have been admitted!',
+      sub: 'Pay your acceptance fee to unlock your admission letter and confirm your place.',
+      cta: { label: 'Pay Acceptance Fee', action: onPayAcceptance },
+      color: 'bg-green-50 border-green-200',
+    },
+    fees_pending: {
+      icon: <CheckCircle size={24} className="text-emerald-600" />,
+      headline: 'Admission confirmed — download your letter',
+      sub: 'Your acceptance fee has been received. Download your official admission letter below.',
+      cta: { label: 'Download Admission Letter', action: onDownloadLetter },
+      color: 'bg-emerald-50 border-emerald-200',
+    },
+    active: {
+      icon: <GraduationCap size={24} className="text-emerald-600" />,
+      headline: "You're an active IJMB student!",
+      sub: 'Your registration is complete. Attend your assigned centre and prepare for your A-Level examinations.',
+      color: 'bg-emerald-50 border-emerald-200',
+    },
+    rejected: {
+      icon: <AlertCircle size={24} className="text-red-600" />,
+      headline: 'Application not successful',
+      sub: 'Unfortunately your application was not approved this time. Contact us on WhatsApp and we will help you understand the next steps.',
+      cta: { label: 'Chat on WhatsApp', action: () => window.open('https://wa.link/udcjk0', '_blank') },
+      color: 'bg-red-50 border-red-200',
+    },
+  };
+
+  const card = cards[status || 'submitted'] || cards.submitted;
+
+  return (
+    <div className={`rounded-2xl border p-5 sm:p-6 ${card.color}`}>
+      <div className="flex items-start gap-4">
+        <div className="shrink-0 mt-0.5">{card.icon}</div>
+        <div className="flex-1 min-w-0">
+          <p className="font-bold text-foreground text-base sm:text-lg mb-1">{card.headline}</p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{card.sub}</p>
+          {card.cta && (
+            <button
+              onClick={card.cta.action}
+              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              {card.cta.label} <ArrowRight size={15} />
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Main Dashboard component ──────────────────────────────────────────────────
 const Dashboard = () => {
   const {
     user,
@@ -33,16 +181,14 @@ const Dashboard = () => {
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get('tab') || 'dashboard';
 
-  // Step calculation
   const formFeePaid = application?.form_fee_paid || false;
-
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application.status);
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
-  const hasAdmissionLetter = isAdmitted && application?.admission_letter_path;
   const isPaymentPending = application?.status === 'payment_pending';
   const isDraft = !application || application.status === 'draft' || !application.status;
 
-  const formFeeDisplay = `₦${formFee.toLocaleString()}`;
+  const statusInfo = STATUS_MAP[application?.status || 'draft'] || STATUS_MAP.submitted;
+  const firstName = (profile?.full_name?.split(' ')[0]) || application?.first_name || user?.email?.split('@')[0] || 'Student';
 
   const downloadAdmissionLetter = async () => {
     if (!application?.admission_letter_path) return;
@@ -53,29 +199,21 @@ const Dashboard = () => {
   const handleDownloadApplicationForm = async (action: 'download' | 'preview' | 'print') => {
     if (application?.application_form_url) {
       if (action === 'print') {
-        // Open in new tab and trigger print
         const printWindow = window.open(application.application_form_url, '_blank');
-        printWindow?.addEventListener('load', () => {
-          printWindow.print();
-        });
+        printWindow?.addEventListener('load', () => { printWindow.print(); });
       } else {
-         window.open(application.application_form_url, action === 'preview' ? '_blank' : '_self');
+        window.open(application.application_form_url, action === 'preview' ? '_blank' : '_self');
       }
     } else if (application?.id) {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
-
         const response = await fetch(`/api/application/${application.id}/download`, {
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`
-          }
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
         });
-
         if (response.ok) {
           const blob = await response.blob();
           const url = window.URL.createObjectURL(blob);
-
           if (action === 'download') {
             const a = document.createElement('a');
             a.href = url;
@@ -84,21 +222,16 @@ const Dashboard = () => {
             a.click();
             document.body.removeChild(a);
           } else {
-             const newWindow = window.open(url, '_blank');
-             if (action === 'print' && newWindow) {
-                newWindow.addEventListener('load', () => newWindow.print());
-             }
+            const newWindow = window.open(url, '_blank');
+            if (action === 'print' && newWindow) {
+              newWindow.addEventListener('load', () => newWindow.print());
+            }
           }
-
-          // Cleanup
           setTimeout(() => window.URL.revokeObjectURL(url), 1000);
         } else {
-          // If 404 or other error, fallback to browser print
-          console.warn('PDF not found via API, falling back to browser print');
           window.print();
         }
-      } catch (err) {
-        console.error('Error handling PDF:', err);
+      } catch {
         window.print();
       }
     } else {
@@ -106,28 +239,36 @@ const Dashboard = () => {
     }
   };
 
+  // ── Loading ──────────────────────────────────────────────────────────────────
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-muted/20">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 to-background">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-          <p className="text-muted-foreground animate-pulse">Loading dashboard...</p>
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Loader2 size={28} className="animate-spin text-primary" />
+          </div>
+          <div className="text-center">
+            <p className="font-semibold text-foreground">Loading your dashboard</p>
+            <p className="text-sm text-muted-foreground mt-1">Just a moment…</p>
+          </div>
         </div>
       </div>
     );
   }
 
-  // 1. Application Form Stage
+  // ── Stage 1: Fill Application ─────────────────────────────────────────────
   if (isDraft) {
     return (
       <>
         <SEOHead title="Complete Application – IJMB" description="Complete your IJMB application." />
-        <div className="min-h-screen bg-muted/20 pb-20">
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
           <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
           <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            <div className="text-center space-y-2 mb-8">
-              <h1 className="text-3xl font-bold tracking-tight">Complete Your IJMB Application</h1>
-              <p className="text-muted-foreground">Please fill in all required information to proceed with your application.</p>
+            {/* Welcome banner */}
+            <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
+              <p className="text-sm font-medium opacity-80 mb-1">Welcome, {firstName}</p>
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Complete Your Application</h1>
+              <p className="opacity-80 text-sm">Fill in the form below to submit your IJMB 2026/2027 application.</p>
             </div>
             <ApplicationForm
               application={application}
@@ -146,25 +287,34 @@ const Dashboard = () => {
     );
   }
 
-  // 2. Payment Stage (Form Fee)
+  // ── Stage 2: Pay Form Fee ─────────────────────────────────────────────────
   if (isPaymentPending && !formFeePaid) {
     return (
       <>
         <SEOHead title="Payment – IJMB" description="Pay your IJMB registration fee." />
-        <div className="min-h-screen bg-muted/20 pb-20">
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
           <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
-          <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-             <div className="text-center space-y-2 mb-8">
-              <h1 className="text-3xl font-bold tracking-tight">Application Submitted Successfully</h1>
-              <p className="text-muted-foreground">Please pay the registration form fee to complete the process and send your application for review.</p>
+          <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            {/* Success + next step banner */}
+            <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
+              <div className="flex items-center gap-3 mb-3">
+                <CheckCircle size={24} className="opacity-90" />
+                <p className="font-bold text-lg">Application Submitted!</p>
+              </div>
+              <p className="opacity-80 text-sm">One final step — pay the ₦5,500 registration fee to send your application for review.</p>
             </div>
+
+            {/* Progress */}
+            <div className="bg-white rounded-2xl border p-5 sm:p-6">
+              <p className="text-sm font-semibold text-muted-foreground mb-5">Your Journey</p>
+              <ProgressTracker status="payment_pending" />
+            </div>
+
             <DashboardPayments
               user={user}
               application={application}
               onFeePaymentSuccess={async (feeName) => {
-                if (feeName === 'form_fee') {
-                  await handlePaymentSuccess();
-                }
+                if (feeName === 'form_fee') await handlePaymentSuccess();
               }}
             />
           </main>
@@ -173,65 +323,59 @@ const Dashboard = () => {
     );
   }
 
-  // 3. Submitted Dashboard Stage
+  // ── Stage 3: Payments tab ─────────────────────────────────────────────────
   if (currentTab === 'payments') {
     return (
       <>
         <SEOHead title="Payments – IJMB" description="Pay your IJMB fees." />
-        <div className="min-h-screen bg-muted/20 pb-20">
+        <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
           <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
-          <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            <div className="flex items-center gap-4 mb-6">
-               <Button variant="ghost" onClick={() => window.location.href = '/dashboard'}>
-                 &larr; Back to Dashboard
-               </Button>
-               <h1 className="text-2xl font-bold tracking-tight">Payments</h1>
+          <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+            <div className="flex items-center gap-3 mb-2">
+              <button onClick={() => window.location.href = '/dashboard'} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors">
+                ← Back
+              </button>
+              <ChevronRight size={14} className="text-muted-foreground" />
+              <span className="text-sm font-medium">Payments</span>
             </div>
 
-            <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-md border border-blue-200">
-               <h3 className="font-semibold mb-1 flex items-center gap-2">
-                 <Loader2 size={16} /> Payment Instructions
-               </h3>
-               <p className="text-sm">
-                 After your admission is granted, you will be required to pay the Acceptance Fee to download your admission letter.
-                 Subsequent payments (Tuition, Hostel) will be enabled after acceptance.
-               </p>
+            <div className="bg-white rounded-2xl border p-5 sm:p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <CreditCard size={20} className="text-primary" />
+                <h1 className="text-xl font-bold">Payments</h1>
+              </div>
+              <div className="p-4 bg-blue-50 text-blue-800 rounded-xl border border-blue-200 text-sm mb-6">
+                After your admission is granted, pay the Acceptance Fee to download your admission letter. Tuition and Hostel fees become available after acceptance.
+              </div>
+              <DashboardPayments
+                user={user}
+                application={application}
+                onFeePaymentSuccess={async (feeName) => {
+                  if (feeName === 'form_fee') {
+                    await handlePaymentSuccess();
+                  } else if (application?.id) {
+                    if (feeName === 'acceptance_fee' && application.status === 'admitted') {
+                      await supabase.from('applications').update({ status: 'fees_pending', updated_at: new Date().toISOString() }).eq('id', application.id);
+                    }
+                    if (feeName === 'tuition_fee' && ['admitted', 'fees_pending'].includes(application.status)) {
+                      await supabase.from('applications').update({ status: 'active', updated_at: new Date().toISOString() }).eq('id', application.id);
+                    }
+                  }
+                  await fetchData();
+                }}
+              />
             </div>
-
-            <DashboardPayments
-              user={user}
-              application={application}
-              onFeePaymentSuccess={async (feeName) => {
-                if (feeName === 'form_fee') {
-                  await handlePaymentSuccess();
-                } else if (application?.id) {
-                  if (feeName === 'acceptance_fee' && application.status === 'admitted') {
-                    await supabase.from('applications').update({
-                      status: 'fees_pending',
-                      updated_at: new Date().toISOString(),
-                    }).eq('id', application.id);
-                  }
-                  if (feeName === 'tuition_fee' && ['admitted', 'fees_pending'].includes(application.status)) {
-                    await supabase.from('applications').update({
-                      status: 'active',
-                      updated_at: new Date().toISOString(),
-                    }).eq('id', application.id);
-                  }
-                }
-                await fetchData();
-              }}
-            />
           </main>
         </div>
       </>
     );
   }
 
+  // ── Stage 4: Main Dashboard (submitted / reviewed / admitted / active) ─────
   return (
     <>
       <SEOHead title="Student Dashboard – IJMB" description="Manage your IJMB application." canonical="https://www.ijmb.info/dashboard" />
 
-      {/* Print-only section for PDF generation */}
       <DashboardPrintView
         application={application}
         profile={profile}
@@ -243,129 +387,198 @@ const Dashboard = () => {
         formFee={formFee}
       />
 
-      <div className="min-h-screen bg-muted/20 pb-20 print:hidden">
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-24 print:hidden">
         <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-1">
-              <div className="bg-white p-6 rounded-lg shadow-sm border space-y-6">
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground mb-1">Application Status</h3>
-                  <div className="font-medium text-lg capitalize">{application?.status === 'submitted' ? 'Submitted' : application?.status}</div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground mb-1">Payment Status</h3>
-                  <div className="font-medium text-lg text-green-600">Paid</div>
-                </div>
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground mb-1">Review Status</h3>
-                  <div className="font-medium text-lg">
-                    {application?.status === 'submitted' ? 'Under Review' :
-                     application?.status === 'review' ? 'Under Review' :
-                     application?.status === 'admitted' ? 'Approved' :
-                     application?.status === 'rejected' ? 'Rejected' : 'Under Review'}
-                  </div>
-                </div>
+        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-5">
 
-                <div className="pt-4 border-t space-y-3">
-                  {isAdmitted && !hasPaidAcceptanceFee && (
-                    <Button className="w-full justify-start" onClick={() => window.location.href = '?tab=payments'}>
-                      Pay Acceptance Fee
-                    </Button>
-                  )}
-                  {isAdmitted && hasPaidAcceptanceFee && (
-                    <Button className="w-full justify-start" onClick={downloadAdmissionLetter}>
-                      Download Admission Letter
-                    </Button>
-                  )}
-                </div>
+          {/* ── Hero greeting + status ── */}
+          <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
+            <div className="flex items-start justify-between gap-4 flex-wrap">
+              <div>
+                <p className="text-sm font-medium opacity-75 mb-1">Welcome back</p>
+                <h1 className="text-2xl sm:text-3xl font-bold">{firstName}</h1>
+                <p className="opacity-75 text-sm mt-1">IJMB 2026/2027 Applicant</p>
+              </div>
+              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${statusInfo.bg} ${statusInfo.color} ${statusInfo.border} border`}>
+                {statusInfo.icon}
+                {statusInfo.label}
               </div>
             </div>
 
-            <div className="md:col-span-2 space-y-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h2 className="text-xl font-bold mb-4">Application Details</h2>
-
-                {!isAdmitted && application?.status !== 'rejected' && (
-                  <div className="mb-6 p-4 bg-blue-50 text-blue-800 rounded-md border border-blue-200">
-                    <p>Your application is currently under review. You will be notified once a decision has been made.</p>
-                  </div>
-                )}
-
-                {isAdmitted && !hasPaidAcceptanceFee && (
-                  <div className="mb-6 p-4 bg-yellow-50 text-yellow-800 rounded-md border border-yellow-200">
-                    <h3 className="font-bold text-lg mb-1">Admission Approved!</h3>
-                    <p>Congratulations! You have been offered admission. Please pay your acceptance fee to unlock your admission letter.</p>
-                  </div>
-                )}
-
-                {isAdmitted && hasPaidAcceptanceFee && (
-                  <div className="mb-6 p-4 bg-green-50 text-green-800 rounded-md border border-green-200">
-                    <h3 className="font-bold text-lg mb-1">Congratulations!</h3>
-                    <p>Your admission is fully confirmed. You can now download your admission letter.</p>
-                  </div>
-                )}
-
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4 text-sm">
-                    <div>
-                      <span className="text-muted-foreground block">Full Name</span>
-                      <span className="font-medium">{application?.surname} {application?.first_name} {application?.middle_name}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground block">Application ID</span>
-                      <span className="font-medium">{application?.id?.split('-')[0].toUpperCase()}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground block">Preferred Centre</span>
-                      <span className="font-medium">{centres.find(c => c.id === application?.preferred_centre_id)?.name}</span>
-                    </div>
-                    <div>
-                      <span className="text-muted-foreground block">Course of Choice</span>
-                      <span className="font-medium">{application?.intended_course}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Application Documents Section */}
-              {formFeePaid && (
-                <div className="bg-white p-6 rounded-lg shadow-sm border mt-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <FileText className="text-primary" />
-                    <h2 className="text-xl font-bold">Application Documents</h2>
-                  </div>
-
-                  <div className="border rounded-md p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                    <div>
-                      <h3 className="font-semibold text-base">Your Application Form</h3>
-                      <p className="text-sm text-muted-foreground">ID: {application?.application_number || application?.id?.split('-')[0].toUpperCase()}</p>
-                    </div>
-
-                    {!application?.application_form_url ? (
-                       <div className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-100 flex items-center gap-2">
-                         <Loader2 className="animate-spin h-4 w-4" />
-                         Your form is being generated, please check back shortly.
-                       </div>
-                    ) : (
-                      <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                        <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('preview')} className="flex-1 sm:flex-none">
-                          <Eye className="mr-2 h-4 w-4" /> Preview
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('print')} className="flex-1 sm:flex-none">
-                          <Printer className="mr-2 h-4 w-4" /> Print
-                        </Button>
-                        <Button size="sm" onClick={() => handleDownloadApplicationForm('download')} className="flex-1 sm:flex-none w-full sm:w-auto mt-2 sm:mt-0">
-                          <Download className="mr-2 h-4 w-4" /> Download PDF
-                        </Button>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+            {/* Quick info row */}
+            <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5 pt-5 border-t border-white/20 text-sm">
+              <span className="opacity-80">
+                <span className="opacity-60 mr-1.5">App ID:</span>
+                <span className="font-semibold">{application?.application_number || application?.id?.split('-')[0].toUpperCase()}</span>
+              </span>
+              <span className="opacity-80">
+                <span className="opacity-60 mr-1.5">Course:</span>
+                <span className="font-semibold">{application?.intended_course || '—'}</span>
+              </span>
+              <span className="opacity-80">
+                <span className="opacity-60 mr-1.5">Session:</span>
+                <span className="font-semibold">2026/2027</span>
+              </span>
             </div>
           </div>
+
+          {/* ── Progress tracker ── */}
+          <div className="bg-white rounded-2xl border p-5 sm:p-6">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-5">Your Journey</p>
+            <ProgressTracker status={application?.status} />
+          </div>
+
+          {/* ── What To Do Next ── */}
+          <WhatNextCard
+            status={application?.status}
+            isAdmitted={!!isAdmitted}
+            hasPaidAcceptanceFee={!!hasPaidAcceptanceFee}
+            formFeePaid={formFeePaid}
+            onPayAcceptance={() => window.location.href = '?tab=payments'}
+            onDownloadLetter={downloadAdmissionLetter}
+          />
+
+          {/* ── Application details + documents grid ── */}
+          <div className="grid sm:grid-cols-2 gap-5">
+
+            {/* Application Details */}
+            <div className="bg-white rounded-2xl border p-5 sm:p-6 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <User size={16} className="text-primary" />
+                <h2 className="font-bold text-base">Application Details</h2>
+              </div>
+              <dl className="space-y-3 text-sm">
+                {[
+                  { label: 'Full Name', value: `${application?.surname || ''} ${application?.first_name || ''} ${application?.middle_name || ''}`.trim() || '—' },
+                  { label: 'Application ID', value: application?.application_number || application?.id?.split('-')[0].toUpperCase() || '—' },
+                  { label: 'Preferred Centre', value: centres.find(c => c.id === application?.preferred_centre_id)?.name || '—' },
+                  { label: 'Course of Choice', value: application?.intended_course || '—' },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex justify-between gap-3">
+                    <dt className="text-muted-foreground shrink-0">{label}</dt>
+                    <dd className="font-medium text-right text-foreground">{value}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+
+            {/* Payments Quick View */}
+            <div className="bg-white rounded-2xl border p-5 sm:p-6 space-y-4">
+              <div className="flex items-center gap-2 mb-1">
+                <CreditCard size={16} className="text-primary" />
+                <h2 className="font-bold text-base">Payments</h2>
+              </div>
+              <div className="space-y-3 text-sm">
+                {[
+                  { label: 'Registration Form Fee', paid: formFeePaid, amount: '₦5,500' },
+                  { label: 'Acceptance Fee', paid: !!hasPaidAcceptanceFee, amount: 'See payments' },
+                  { label: 'Tuition Fee', paid: application?.status === 'active', amount: 'See payments' },
+                ].map(({ label, paid, amount }) => (
+                  <div key={label} className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <div className={`w-2 h-2 rounded-full ${paid ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
+                      <span className={paid ? 'text-foreground' : 'text-muted-foreground'}>{label}</span>
+                    </div>
+                    <span className={`text-xs font-medium ${paid ? 'text-green-600' : 'text-muted-foreground'}`}>
+                      {paid ? '✓ Paid' : amount}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => window.location.href = '?tab=payments'}
+                className="mt-2 w-full text-center text-xs font-semibold text-primary border border-primary/30 rounded-lg py-2.5 hover:bg-primary/5 transition-colors"
+              >
+                View All Payments →
+              </button>
+            </div>
+          </div>
+
+          {/* ── Documents ── */}
+          {formFeePaid && (
+            <div className="bg-white rounded-2xl border p-5 sm:p-6">
+              <div className="flex items-center gap-2 mb-5">
+                <FileText size={16} className="text-primary" />
+                <h2 className="font-bold text-base">Documents</h2>
+              </div>
+
+              <div className="space-y-3">
+                {/* Application form */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-muted/30 rounded-xl border">
+                  <div>
+                    <p className="font-semibold text-sm">Application Form</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {application?.application_number || application?.id?.split('-')[0].toUpperCase()}
+                    </p>
+                  </div>
+                  {!application?.application_form_url ? (
+                    <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+                      <Loader2 size={13} className="animate-spin" />
+                      Generating — check back shortly
+                    </div>
+                  ) : (
+                    <div className="flex gap-2 flex-wrap">
+                      <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('preview')}>
+                        <Eye size={14} className="mr-1.5" /> Preview
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('print')}>
+                        <Printer size={14} className="mr-1.5" /> Print
+                      </Button>
+                      <Button size="sm" onClick={() => handleDownloadApplicationForm('download')}>
+                        <Download size={14} className="mr-1.5" /> Download PDF
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {/* Admission letter */}
+                {isAdmitted && (
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
+                    <div>
+                      <p className="font-semibold text-sm text-green-800">Admission Letter</p>
+                      <p className="text-xs text-green-700 mt-0.5">Official IJMB Admission Letter 2026/2027</p>
+                    </div>
+                    {hasPaidAcceptanceFee ? (
+                      <Button size="sm" onClick={downloadAdmissionLetter} className="bg-green-700 hover:bg-green-800 text-white">
+                        <Download size={14} className="mr-1.5" /> Download
+                      </Button>
+                    ) : (
+                      <span className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
+                        Pay acceptance fee to unlock
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ── Support ── */}
+          <div className="rounded-2xl border p-5 sm:p-6 bg-[#f0fdf4] border-[#bbf7d0]">
+            <div className="flex items-start gap-4">
+              <div className="w-11 h-11 rounded-2xl bg-[#25D366] flex items-center justify-center shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-6 h-6 fill-white">
+                  <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16.004c0 3.5 1.129 6.744 3.047 9.379L1.054 31.27l6.1-1.957a15.9 15.9 0 008.85 2.691C24.826 32 32 24.826 32 16.004S24.826 0 16.004 0zm9.35 22.617c-.393 1.107-1.943 2.025-3.188 2.293-.852.182-1.963.326-5.705-1.227-4.787-1.986-7.867-6.834-8.107-7.152-.229-.318-1.928-2.568-1.928-4.895s1.221-3.473 1.654-3.947c.434-.475.947-.594 1.262-.594.316 0 .631.002.908.016.291.016.682-.111 1.068.814.393.947 1.34 3.264 1.457 3.502.119.238.197.514.039.83-.158.318-.236.514-.475.791-.236.277-.498.619-.711.83-.238.238-.486.496-.209.971.277.475 1.234 2.035 2.65 3.299 1.82 1.623 3.354 2.127 3.83 2.365.475.238.752.197 1.029-.119.277-.316 1.182-1.379 1.498-1.854.316-.475.633-.395 1.068-.238.434.158 2.752 1.299 3.225 1.535.475.238.791.355.908.553.119.197.119 1.145-.275 2.252z"/>
+                </svg>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-bold text-green-900 text-sm">Need help? Chat with us on WhatsApp</p>
+                <p className="text-xs text-green-800 mt-0.5 leading-relaxed">
+                  Our admissions team is available Monday–Saturday, 8am–6pm. We typically reply within minutes.
+                </p>
+                <a
+                  href="https://wa.link/udcjk0"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white text-xs font-semibold rounded-lg hover:bg-[#1da851] transition-colors"
+                >
+                  Open WhatsApp Chat <ArrowRight size={13} />
+                </a>
+              </div>
+            </div>
+          </div>
+
         </main>
       </div>
     </>
