@@ -57,18 +57,20 @@ export const useStudentDashboard = () => {
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
-  // Query: User Application Data
+  // Query: User Application Data (single query with joined O-level results)
   const { data: userData, isLoading: loadingUser } = useQuery({
     queryKey: ['dashboard-user', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data: appData } = await supabase.from('applications').select('*').eq('user_id', user.id).maybeSingle();
-      let olevels: any[] = [];
-      if (appData) {
-        const { data: olRes } = await supabase.from('olevel_results').select('*').eq('application_id', appData.id);
-        olevels = olRes || [];
-      }
-      return { application: appData, olevelResults: olevels };
+      const { data: appData } = await supabase
+        .from('applications')
+        .select('*, olevel_results(*)')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      return {
+        application: appData ? { ...appData, olevel_results: undefined } : null,
+        olevelResults: appData?.olevel_results || [],
+      };
     },
     enabled: !!user,
   });
