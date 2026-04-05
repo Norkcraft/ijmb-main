@@ -26,8 +26,26 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
 
-    const fullPhone = `${countryCode}${phone.replace(/^0+/, '')}`; // Remove leading zero if present
+    const fullPhone = `${countryCode}${phone.replace(/^0+/, '')}`;
 
+    // ── 1. Check phone uniqueness ─────────────────────────────────────────
+    const { data: existingPhone } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('phone', fullPhone)
+      .maybeSingle();
+
+    if (existingPhone) {
+      toast({
+        title: 'Phone number already registered',
+        description: 'An account with this phone number already exists. Please log in or use a different number.',
+        variant: 'destructive',
+      });
+      setLoading(false);
+      return;
+    }
+
+    // ── 2. Sign up with Supabase Auth (handles email uniqueness) ──────────
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -38,12 +56,29 @@ const Register = () => {
     });
 
     if (error) {
-      toast({ title: 'Registration failed', description: error.message, variant: 'destructive' });
+      // Map Supabase error codes to friendly messages
+      const msg =
+        error.message?.toLowerCase().includes('already registered') ||
+        error.message?.toLowerCase().includes('already been registered')
+          ? 'An account with this email already exists. Please log in instead.'
+          : error.message;
+      toast({ title: 'Registration failed', description: msg, variant: 'destructive' });
       setLoading(false);
       return;
     }
 
-    // Create profile row (role stored separately per security architecture)
+    // ── 3. Supabase silent duplicate — returns user with no identities ────
+    if (data.user && (!data.user.identities || data.user.identities.length === 0)) {
+      toast({
+        title: 'Email already registered',
+        description: 'An account with this email already exists. Please log in instead.',
+        variant: 'destructive',
+      });
+      setLoading(false);
+      return;
+    }
+
+    // ── 4. Create profile ─────────────────────────────────────────────────
     if (data.user) {
       await supabase.from('profiles').upsert({
         id: data.user.id,
@@ -51,7 +86,7 @@ const Register = () => {
         phone: fullPhone,
       });
 
-      // Send welcome email (fire-and-forget, don't block UI)
+      // Send welcome email (fire-and-forget)
       fetch('/api/send-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -59,7 +94,7 @@ const Register = () => {
           type: 'welcome',
           data: { fullName, email },
         }),
-      }).catch(() => {}); // silent fail — email is non-critical
+      }).catch(() => {});
     }
 
     setSent(true);
