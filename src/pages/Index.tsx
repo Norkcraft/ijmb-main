@@ -183,7 +183,7 @@ const Index = () => {
           <img src={studentsWalking.src} alt="IJMB students walking on campus in Nigeria" className="w-full h-full object-cover" />
           <div className="absolute inset-0 hero-overlay" />
         </div>
-        <div ref={heroRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+        <div ref={heroRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
           <div className="max-w-3xl">
             <span className="hero-badge inline-block px-4 py-1.5 text-sm font-medium bg-accent text-accent-foreground rounded-full mb-6">
               2026/2027 Registration Now Open
@@ -217,7 +217,7 @@ const Index = () => {
       {/* Stats with counter animation */}
       <section className="bg-primary text-primary-foreground py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8 text-center">
             {stats.map((s) => (
               <StatItem key={s.label} {...s} />
             ))}
@@ -281,7 +281,7 @@ const Index = () => {
               <img
                 src={studentsLaptop.src}
                 alt="IJMB students studying A-Level subjects at an accredited study centre in Nigeria"
-                className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700"
+                className="w-full h-[220px] sm:h-[320px] lg:h-[400px] object-cover hover:scale-105 transition-transform duration-700"
                 loading="lazy"
               />
             </div>
@@ -364,7 +364,7 @@ const Index = () => {
             <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
               <div
                 key={activeIdx}
-                className={`p-10 md:p-14 transition-all duration-350 ${
+                className={`p-6 sm:p-10 md:p-14 transition-all duration-350 ${
                   animating
                     ? direction === 'right'
                       ? 'opacity-0 translate-x-8'
@@ -405,14 +405,14 @@ const Index = () => {
             {/* Prev / Next buttons */}
             <button
               onClick={prev}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+              className="absolute left-2 top-1/2 -translate-y-1/2 sm:left-0 sm:-translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
               aria-label="Previous testimonial"
             >
               <ChevronLeft size={18} />
             </button>
             <button
               onClick={next}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 sm:right-0 sm:translate-x-5 w-10 h-10 rounded-full bg-background border border-border shadow-md flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary transition-colors"
               aria-label="Next testimonial"
             >
               <ChevronRight size={18} />
@@ -445,7 +445,7 @@ const Index = () => {
               <img
                 src={studentsGroup.src}
                 alt="IJMB students at a study centre in Nigeria"
-                className="w-full h-[400px] object-cover hover:scale-105 transition-transform duration-700"
+                className="w-full h-[220px] sm:h-[320px] lg:h-[400px] object-cover hover:scale-105 transition-transform duration-700"
                 loading="lazy"
               />
             </div>
