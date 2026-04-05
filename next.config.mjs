@@ -1,5 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async rewrites() {
+    return [
+      {
+        // Rewrite /ijmb-in-lagos → /ijmb-city/lagos so the dynamic [city]
+        // param is a clean single-segment value ('lagos', not 'ijmb-in-lagos')
+        source: '/ijmb-in-:city',
+        destination: '/ijmb-city/:city',
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       {

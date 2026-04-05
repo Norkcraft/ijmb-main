@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import LocationPage from '@/pages/LocationPage';
 
-// Allow any city slug beyond the pre-built list to render on demand (no 404)
 export const dynamicParams = true;
 
 const cities = [
@@ -25,6 +24,7 @@ export async function generateMetadata({ params }: { params: { city: string } })
     title: `IJMB in ${cityName} 2026/2027 – Accredited Study Centres & Registration`,
     description: `Find accredited IJMB study centres in ${cityName}. Register for IJMB 2026/2027, gain direct entry into 200 level without UTME. Fees, requirements and how to apply in ${cityName}.`,
     keywords: [`IJMB in ${cityName}`, `IJMB centres in ${cityName}`, `IJMB ${cityName}`, `register IJMB ${cityName}`, `IJMB 2026 ${cityName}`, `direct entry ${cityName}`],
+    // Canonical always points to the user-facing /ijmb-in-{city} URL
     alternates: { canonical: `https://www.ijmb.info/ijmb-in-${params.city}` },
     robots: { index: true, follow: true },
     openGraph: {
@@ -42,12 +42,7 @@ export async function generateMetadata({ params }: { params: { city: string } })
   };
 }
 
-// All valid city slugs — must match LocationPage's cityData keys
-const validCities = new Set([
-  'lagos', 'abuja', 'ibadan', 'ilorin', 'port-harcourt', 'benin', 'kano',
-  'kaduna', 'jos', 'enugu', 'owerri', 'aba', 'uyo', 'akure', 'ado-ekiti',
-  'abeokuta', 'osogbo', 'minna', 'lokoja', 'makurdi',
-]);
+const validCities = new Set(cities);
 
 export default function CityLocationPage({ params }: { params: { city: string } }) {
   const city = (params.city ?? '').toLowerCase();
