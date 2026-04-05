@@ -1,17 +1,18 @@
 'use client';
 
-import { Button } from "@/components/ui/button";
-import { Menu, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign, FileText, Users, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 const sidebarItems = [
-  { icon: LayoutDashboard, label: "Overview", href: "/portal-admin", id: 'overview' },
-  { icon: CreditCard, label: "Payments", href: "/portal-admin?tab=payments", id: 'payments' },
-  { icon: MapPin, label: "Centres", href: "/portal-admin?tab=centres", id: 'centres' },
-  { icon: BookOpen, label: "Subjects", href: "/portal-admin?tab=subjects", id: 'subjects' },
-  { icon: Calendar, label: "Sessions", href: "/portal-admin?tab=sessions", id: 'sessions' },
-  { icon: DollarSign, label: "Fees", href: "/portal-admin?tab=fees", id: 'fees' },
+  { icon: LayoutDashboard, label: "Overview",     href: "/portal-admin",                    id: 'overview' },
+  { icon: FileText,        label: "Applications", href: "/portal-admin?tab=applications",   id: 'applications' },
+  { icon: Users,           label: "Students",     href: "/portal-admin?tab=students",       id: 'students' },
+  { icon: CreditCard,      label: "Payments",     href: "/portal-admin?tab=payments",       id: 'payments' },
+  { icon: MapPin,          label: "Centres",      href: "/portal-admin?tab=centres",        id: 'centres' },
+  { icon: BookOpen,        label: "Subjects",     href: "/portal-admin?tab=subjects",       id: 'subjects' },
+  { icon: Calendar,        label: "Sessions",     href: "/portal-admin?tab=sessions",       id: 'sessions' },
+  { icon: DollarSign,      label: "Fees",         href: "/portal-admin?tab=fees",           id: 'fees' },
 ];
 
 interface AdminMobileHeaderProps {
@@ -32,44 +33,54 @@ export const AdminMobileHeader = ({
 
   return (
     <>
-      <header className="lg:hidden bg-white border-b p-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">A</div>
-          <span className="font-heading font-bold text-lg">IJMB Admin</span>
+      {/* Top bar */}
+      <header className="lg:hidden border-b flex items-center justify-between px-4 py-3"
+        style={{ background: 'hsl(145, 63%, 12%)' }}>
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-white/15 flex items-center justify-center">
+            <span className="text-white font-bold text-xs">IJ</span>
+          </div>
+          <span className="text-white font-bold text-base">IJMB Admin</span>
         </div>
-        <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
-          <Menu size={24} />
-        </Button>
+        <button
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="w-9 h-9 rounded-lg bg-white/10 flex items-center justify-center text-white hover:bg-white/20 transition-colors"
+        >
+          {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+        </button>
       </header>
 
+      {/* Slide-down menu */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden absolute inset-0 z-50 bg-background border-b shadow-lg p-4 space-y-2 h-fit">
-          <div className="flex justify-between items-center mb-4">
-            <span className="font-bold">Menu</span>
-            <Button variant="ghost" size="sm" onClick={() => setIsMobileMenuOpen(false)}>Close</Button>
-          </div>
-          {sidebarItems.map((item) => {
-            const isActive = item.id === currentTab;
-            return (
-              <Link key={item.id} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
-                <button
-                  className={`w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md ${
-                    isActive ? 'bg-primary/10 text-primary' : 'hover:bg-muted'
-                  }`}
-                >
-                  <item.icon size={18} />
-                  {item.label}
-                  {item.id === 'payments' && newNotifications && (
-                    <span className="ml-auto h-2 w-2 rounded-full bg-red-600 animate-pulse" />
-                  )}
-                </button>
-              </Link>
-            );
-          })}
-          <div className="pt-4 mt-4 border-t">
-            <Button variant="outline" className="w-full justify-start text-red-600" onClick={signOut}>
-              <LogOut size={16} className="mr-2" /> Logout
-            </Button>
+        <div className="lg:hidden absolute inset-x-0 top-[52px] z-50 shadow-2xl border-b"
+          style={{ background: 'hsl(145, 63%, 10%)' }}>
+          <nav className="px-3 py-3 space-y-0.5">
+            {sidebarItems.map((item) => {
+              const isActive = item.id === currentTab;
+              return (
+                <Link key={item.id} href={item.href} onClick={() => setIsMobileMenuOpen(false)}>
+                  <div className={`flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all ${
+                    isActive ? 'bg-white/15 text-white' : 'text-white/60 hover:bg-white/10 hover:text-white'
+                  }`}>
+                    <item.icon size={16} />
+                    <span className="flex-1">{item.label}</span>
+                    {item.id === 'payments' && newNotifications && (
+                      <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+                    )}
+                    {isActive && <ChevronRight size={13} className="text-white/40" />}
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
+          <div className="px-3 pb-4 border-t border-white/10 pt-3">
+            <button
+              onClick={signOut}
+              className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all"
+            >
+              <LogOut size={16} />
+              Sign Out
+            </button>
           </div>
         </div>
       )}

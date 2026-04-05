@@ -59,7 +59,7 @@ const AdminDashboard = () => {
     <>
       <SEOHead title="Admin Dashboard – IJMB Portal" description="IJMB admin dashboard for managing applications." canonical="https://www.ijmb.info/portal-admin" />
 
-      <div className="flex h-screen bg-muted/20">
+      <div className="flex h-screen bg-muted/20 overflow-hidden">
         {/* Sidebar (Desktop) */}
         <AdminSidebar
             user={user}
@@ -77,16 +77,20 @@ const AdminDashboard = () => {
           />
 
           {/* Main Content Area */}
-          <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-            <div className="max-w-6xl mx-auto">
-              <div className="mb-6">
-                <h1 className="text-2xl font-heading font-bold text-foreground capitalize">
-                  {currentTab}
-                </h1>
-                <p className="text-muted-foreground text-sm">Manage your platform settings and data.</p>
-              </div>
+          <main className="flex-1 overflow-y-auto bg-muted/20">
+            <div className="max-w-6xl mx-auto px-4 lg:px-8 py-6">
 
-              <div className="bg-card rounded-xl border shadow-sm p-1">
+              {/* Page title bar */}
+              {currentTab !== 'overview' && (
+                <div className="mb-5 flex items-center justify-between">
+                  <div>
+                    <h1 className="text-xl font-heading font-bold text-foreground capitalize">{currentTab}</h1>
+                    <p className="text-muted-foreground text-xs mt-0.5">IJMB Admin Portal · {currentTab}</p>
+                  </div>
+                </div>
+              )}
+
+              <div className={currentTab !== 'overview' ? "bg-white rounded-2xl border shadow-sm overflow-hidden" : ""}>
                 {currentTab === 'overview' && <AdminDashboardOverview />}
                 {currentTab === 'applications' && <AdminApplications />}
                 {currentTab === 'payments' && <AdminPayments />}
