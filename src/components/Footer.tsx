@@ -51,7 +51,6 @@ const Footer = () => (
       </div>
       <div className="mt-12 pt-8 border-t border-primary-foreground/20 text-center text-sm opacity-70">
         <p>© {new Date().getFullYear()} IJMB Info. All rights reserved. | <Link href="/contact" className="underline">Contact Us</Link></p>
-        <p className="mt-1">This is an informational website. Always verify details with official IJMB/JAMB sources.</p>
       </div>
     </div>
   </footer>
