@@ -13,6 +13,7 @@ import AdminSubjects from '@/components/admin/AdminSubjects';
 import AdminSessions from '@/components/admin/AdminSessions';
 import AdminPayments from '@/components/admin/AdminPayments';
 import AdminFees from '@/components/admin/AdminFees';
+import AdminStudents from '@/components/admin/AdminStudents';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminMobileHeader } from '@/components/admin/AdminMobileHeader';
 
@@ -98,6 +99,7 @@ const AdminDashboard = () => {
                 {currentTab === 'subjects' && <AdminSubjects />}
                 {currentTab === 'sessions' && <AdminSessions />}
                 {currentTab === 'fees' && <AdminFees />}
+                {currentTab === 'students' && <AdminStudents />}
               </div>
             </div>
           </main>
