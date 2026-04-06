@@ -48,7 +48,7 @@ const Login = () => {
       .eq('id', data.user.id)
       .single();
 
-    if (profile?.role === 'admin') {
+    if (profile?.role === 'super_admin' || profile?.role === 'coordinator') {
       router.push('/portal-admin');
     } else {
       router.push('/dashboard');
