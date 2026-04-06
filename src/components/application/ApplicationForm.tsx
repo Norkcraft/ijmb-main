@@ -159,8 +159,12 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
         // If submitting, we might want to ensure we don't trigger validation errors again
         // But the form submission already validated.
       }
-    } catch (error) {
-      toast({ title: "Error Saving", description: "Could not save progress.", variant: "destructive" });
+    } catch (error: any) {
+      // Don't show a generic error if the mutation already showed a specific one
+      const knownErrors = ['Passport required', 'O-Level result required', 'Application locked'];
+      if (!knownErrors.includes(error?.message)) {
+        toast({ title: "Submission failed", description: error?.message || "Something went wrong. Please try again.", variant: "destructive" });
+      }
     } finally {
       setSaving(false);
     }

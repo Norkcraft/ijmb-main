@@ -95,11 +95,18 @@ export const useStudentDashboard = () => {
       }
   
       if (submit) {
-        if (!application?.passport_path) {
+        // Re-fetch fresh application data from DB to avoid stale cache issues
+        const { data: freshApp } = await supabase
+          .from('applications')
+          .select('passport_path, olevel_path')
+          .eq('user_id', user.id)
+          .maybeSingle();
+
+        if (!freshApp?.passport_path) {
           toast({ title: 'Passport required', description: 'Please upload your passport photo before submitting.', variant: 'destructive' });
           throw new Error('Passport required');
         }
-        if (!data.olevel_awaiting && !application?.olevel_path) {
+        if (!data.olevel_awaiting && !freshApp?.olevel_path) {
           toast({ title: 'O-Level result required', description: 'Please upload your O-Level result before submitting.', variant: 'destructive' });
           throw new Error('O-Level result required');
         }
