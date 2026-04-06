@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js';
 
 // Allowed MIME types and their magic bytes (first bytes of file)
 const ALLOWED_TYPES: Record<string, { mime: string; magic: number[] | null }> = {
@@ -36,20 +35,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Too many requests' }, { status: 429 });
   }
 
-  // Auth check
-  const cookieStore = cookies();
-  const supabase = createServerClient(
+  // Auth check — read token from Authorization header
+  const authHeader = request.headers.get('authorization');
+  const token = authHeader?.replace('Bearer ', '');
+  if (!token) {
+    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+  }
+
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll() {},
-      },
-    }
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser(token);
   if (!user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }

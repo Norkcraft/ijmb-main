@@ -258,7 +258,12 @@ export const useStudentDashboard = () => {
       formData.append('file', file);
       formData.append('type', type);
 
-      const res = await fetch('/api/upload-document', { method: 'POST', body: formData });
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch('/api/upload-document', {
+        method: 'POST',
+        body: formData,
+        headers: session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {},
+      });
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         toast({ title: 'Upload failed', description: err.message || 'Please try again', variant: 'destructive' });
