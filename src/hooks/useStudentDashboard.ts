@@ -196,15 +196,17 @@ export const useStudentDashboard = () => {
       }
     },
     onError: (error: any, variables) => {
-        if (!variables.silent) {
+        // Always show error if there's no existing application (first save) — silent failures here leave users stuck
+        const isFirstSave = !variables.data?.id;
+        if (!variables.silent || isFirstSave) {
             console.error('Save error:', error);
-            toast({ title: 'Error', description: error.message || 'Failed to save application', variant: 'destructive' });
+            toast({ title: 'Error saving', description: error.message || 'Failed to save application. Please try again.', variant: 'destructive' });
         }
     }
   });
 
   const saveApplication = async (data: any, submit = false, silent = false) => {
-    saveMutation.mutate({ data, submit, silent });
+    await saveMutation.mutateAsync({ data, submit, silent });
   };
 
   const handleFileUpload = async (type: 'passport' | 'olevel') => {
