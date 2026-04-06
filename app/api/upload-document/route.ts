@@ -29,7 +29,12 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+export async function GET() {
+  return NextResponse.json({ message: 'Method not allowed' }, { status: 405 });
+}
+
 export async function POST(request: NextRequest) {
+  try {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ message: 'Too many requests' }, { status: 429 });
@@ -127,4 +132,8 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json({ message: 'Upload successful', path });
+  } catch (err: any) {
+    console.error('[upload-document] Unhandled error:', err);
+    return NextResponse.json({ message: err?.message || 'Internal server error' }, { status: 500 });
+  }
 }
