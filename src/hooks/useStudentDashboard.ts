@@ -253,26 +253,32 @@ export const useStudentDashboard = () => {
 
       setUploading(type);
 
-      // Send to secure server-side upload endpoint (validates magic bytes)
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('type', type);
+      // Upload directly from browser to Supabase Storage (session already available in browser client)
+      const ext = file.type === 'image/jpeg' ? 'jpg' : file.type === 'image/png' ? 'png' : 'pdf';
+      const path = `${user.id}/${type}.${ext}`;
 
-      const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch('/api/upload-document', {
-        method: 'POST',
-        body: formData,
-        headers: session?.access_token ? { 'Authorization': `Bearer ${session.access_token}` } : {},
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        toast({ title: 'Upload failed', description: err.message || 'Please try again', variant: 'destructive' });
+      const { error: uploadError } = await supabase.storage
+        .from('student-documents')
+        .upload(path, file, { contentType: file.type, upsert: true });
+
+      if (uploadError) {
+        toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
         setUploading(null);
         return;
       }
 
+      // Update the application record with the file path
+      const appId = application?.id || (await supabase.from('applications').select('id').eq('user_id', user.id).maybeSingle()).data?.id;
+      if (appId) {
+        const column = type === 'passport' ? 'passport_path' : 'olevel_path';
+        await supabase.from('applications').update({
+          [column]: path,
+          updated_at: new Date().toISOString(),
+        }).eq('id', appId);
+      }
+
       queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
-      toast({ title: `${type === 'passport' ? 'Passport photo' : 'O-Level result'} uploaded!` });
+      toast({ title: `${type === 'passport' ? 'Passport photo' : 'O-Level result'} uploaded successfully!` });
       setUploading(null);
     };
     input.click();
