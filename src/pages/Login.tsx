@@ -20,6 +20,14 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { user, profile } = useAuth();
+
+  // Redirect already-logged-in users to their dashboard
+  if (user) {
+    const isAdmin = profile?.role === 'super_admin' || profile?.role === 'coordinator';
+    router.replace(isAdmin ? '/portal-admin' : '/dashboard');
+    return null;
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

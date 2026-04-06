@@ -774,7 +774,7 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
 
               <div className="flex gap-2">
                 {!readOnly && step < 4 && (
-                  <Button type="button" variant="ghost" onClick={() => form.handleSubmit((data) => onSave({ ...data, olevelResults: olevels, intended_course: intendedCourse }, false))()} disabled={saving}>
+                  <Button type="button" variant="ghost" onClick={handleAutoSave} disabled={saving}>
                     {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} className="mr-2" />} Save Draft
                   </Button>
                 )}

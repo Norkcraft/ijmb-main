@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from "next/link";
 import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 import SEOHead from '@/components/SEOHead';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import { Button } from '@/components/ui/button';
@@ -21,6 +23,14 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
+  const router = useRouter();
+
+  // Redirect already-logged-in users to dashboard
+  if (user) {
+    router.replace('/dashboard');
+    return null;
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,7 +60,7 @@ const Register = () => {
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
         data: { full_name: fullName, phone: fullPhone },
       },
     });

@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2, Download, Eye, Printer, FileText, CheckCircle, Clock, Star, MessageCircle, ChevronRight, User, BookOpen, CreditCard, GraduationCap, AlertCircle, ArrowRight, Bell, LogOut } from 'lucide-react';
+import { Loader2, Download, Eye, Printer, FileText, CheckCircle, Clock, Star, MessageCircle, ChevronRight, User, BookOpen, CreditCard, GraduationCap, AlertCircle, ArrowRight, Bell, LogOut, KeyRound, Mail, Phone, Pencil } from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import SEOHead from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
@@ -9,7 +9,202 @@ import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardPrintView } from '@/components/dashboard/DashboardPrintView';
 import { DashboardPayments } from '@/components/dashboard/DashboardPayments';
 import { ApplicationForm } from '@/components/application/ApplicationForm';
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+
+// ── Profile Tab ───────────────────────────────────────────────────────────────
+function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPhone, updateProfile, handleSignOut }: any) {
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [newEmail, setNewEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
+  const { toast } = useToast();
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true);
+    await updateProfile();
+    setSavingProfile(false);
+  };
+
+  const handleChangeEmail = async () => {
+    if (!newEmail) return;
+    setSavingEmail(true);
+    const { error } = await supabase.auth.updateUser({ email: newEmail });
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Confirmation sent', description: `A verification link has been sent to ${newEmail}. Click it to confirm the change.` });
+      setNewEmail('');
+    }
+    setSavingEmail(false);
+  };
+
+  const handleChangePassword = async () => {
+    if (!newPassword) return;
+    if (newPassword !== confirmPassword) {
+      toast({ title: 'Passwords do not match', variant: 'destructive' });
+      return;
+    }
+    if (newPassword.length < 6) {
+      toast({ title: 'Password too short', description: 'Must be at least 6 characters', variant: 'destructive' });
+      return;
+    }
+    setSavingPassword(true);
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Password updated successfully' });
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+    setSavingPassword(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
+      <header className="bg-white border-b sticky top-0 z-20">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => window.location.href = '/dashboard'} className="text-sm text-muted-foreground hover:text-foreground transition-colors">← Back</button>
+            <ChevronRight size={14} className="text-muted-foreground" />
+            <span className="text-sm font-semibold">My Profile</span>
+          </div>
+          <button onClick={handleSignOut} className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 font-medium transition-colors">
+            <LogOut size={16} /> Sign Out
+          </button>
+        </div>
+      </header>
+
+      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-5">
+
+        {/* Account info */}
+        <div className="bg-white rounded-2xl border p-6 space-y-5">
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <User size={18} className="text-primary" />
+            <h2 className="font-bold text-base">Account Information</h2>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-1.5">Full Name</label>
+              <div className="flex gap-2">
+                <input
+                  value={editName}
+                  onChange={e => setEditName(e.target.value)}
+                  className="flex-1 h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  placeholder="Your full name"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-1.5">Phone Number</label>
+              <input
+                value={editPhone}
+                onChange={e => setEditPhone(e.target.value)}
+                className="w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                placeholder="Phone number"
+              />
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-1.5">Current Email</label>
+              <input
+                value={user?.email || ''}
+                disabled
+                className="w-full h-10 px-3 rounded-lg border text-sm bg-muted text-muted-foreground cursor-not-allowed"
+              />
+            </div>
+            <button
+              onClick={handleSaveProfile}
+              disabled={savingProfile}
+              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-60 transition-colors"
+            >
+              {savingProfile ? <Loader2 size={15} className="animate-spin" /> : <Pencil size={15} />}
+              Save Changes
+            </button>
+          </div>
+        </div>
+
+        {/* Change email */}
+        <div className="bg-white rounded-2xl border p-6 space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <Mail size={18} className="text-primary" />
+            <h2 className="font-bold text-base">Change Email Address</h2>
+          </div>
+          <p className="text-sm text-muted-foreground">Enter your new email. We'll send a confirmation link — your email won't change until you click it.</p>
+          <div className="flex gap-2">
+            <input
+              type="email"
+              value={newEmail}
+              onChange={e => setNewEmail(e.target.value)}
+              placeholder="new@email.com"
+              className="flex-1 h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              onClick={handleChangeEmail}
+              disabled={savingEmail || !newEmail}
+              className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors whitespace-nowrap"
+            >
+              {savingEmail ? <Loader2 size={15} className="animate-spin" /> : 'Send Link'}
+            </button>
+          </div>
+        </div>
+
+        {/* Change password */}
+        <div className="bg-white rounded-2xl border p-6 space-y-4">
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <KeyRound size={18} className="text-primary" />
+            <h2 className="font-bold text-base">Change Password</h2>
+          </div>
+          <div className="space-y-3">
+            <input
+              type="password"
+              value={newPassword}
+              onChange={e => setNewPassword(e.target.value)}
+              placeholder="New password (min. 6 characters)"
+              className="w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <input
+              type="password"
+              value={confirmPassword}
+              onChange={e => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+              className="w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            />
+            <button
+              onClick={handleChangePassword}
+              disabled={savingPassword || !newPassword}
+              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+            >
+              {savingPassword ? <Loader2 size={15} className="animate-spin" /> : <KeyRound size={15} />}
+              Update Password
+            </button>
+          </div>
+        </div>
+
+        {/* Sign out */}
+        <div className="bg-white rounded-2xl border p-6">
+          <div className="flex items-center gap-2 pb-2 border-b mb-4">
+            <LogOut size={18} className="text-red-500" />
+            <h2 className="font-bold text-base">Sign Out</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">You will be signed out of your account on this device.</p>
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors"
+          >
+            <LogOut size={15} /> Sign Out
+          </button>
+        </div>
+
+      </main>
+    </div>
+  );
+}
 
 // ── Status helpers ────────────────────────────────────────────────────────────
 const STATUS_MAP: Record<string, { label: string; color: string; bg: string; border: string; icon: React.ReactNode }> = {
@@ -172,14 +367,26 @@ const Dashboard = () => {
     loading,
     saving,
     uploading,
+    editName,
+    setEditName,
+    editPhone,
+    setEditPhone,
+    updateProfile,
     saveApplication,
     handleFileUpload,
     handlePaymentSuccess,
     fetchData
   } = useStudentDashboard();
 
+  const { signOut } = useAuth();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get('tab') || 'dashboard';
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/');
+  };
 
   const formFeePaid = application?.form_fee_paid || false;
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application.status);
@@ -262,7 +469,7 @@ const Dashboard = () => {
       <>
         <SEOHead title="Complete Application – IJMB" description="Complete your IJMB application." />
         <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
-          <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
+          <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
           <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
             {/* Welcome banner */}
             <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
@@ -293,7 +500,7 @@ const Dashboard = () => {
       <>
         <SEOHead title="Payment – IJMB" description="Pay your IJMB registration fee." />
         <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
-          <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
+          <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
           <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
             {/* Success + next step banner */}
             <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
@@ -323,13 +530,27 @@ const Dashboard = () => {
     );
   }
 
+  // ── Profile tab ──────────────────────────────────────────────────────────
+  if (currentTab === 'profile') {
+    return <ProfileTab
+      user={user}
+      profile={profile}
+      editName={editName}
+      setEditName={setEditName}
+      editPhone={editPhone}
+      setEditPhone={setEditPhone}
+      updateProfile={updateProfile}
+      handleSignOut={handleSignOut}
+    />;
+  }
+
   // ── Stage 3: Payments tab ─────────────────────────────────────────────────
   if (currentTab === 'payments') {
     return (
       <>
         <SEOHead title="Payments – IJMB" description="Pay your IJMB fees." />
         <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
-          <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
+          <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
           <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
             <div className="flex items-center gap-3 mb-2">
               <button onClick={() => window.location.href = '/dashboard'} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors">
@@ -388,7 +609,7 @@ const Dashboard = () => {
       />
 
       <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-24 print:hidden">
-        <DashboardHeader profile={profile} user={user} signOut={async () => await supabase.auth.signOut()} />
+        <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
 
         <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-5">
 
