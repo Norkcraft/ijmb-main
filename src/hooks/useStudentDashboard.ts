@@ -155,8 +155,16 @@ export const useStudentDashboard = () => {
       }
 
       let res;
-      if (application?.id) {
-        res = await supabase.from('applications').update(payload).eq('id', application.id).select().single();
+      // Always check DB for existing application — cache may be stale
+      const existingId = application?.id || (await supabase
+        .from('applications')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle()
+      ).data?.id;
+
+      if (existingId) {
+        res = await supabase.from('applications').update(payload).eq('id', existingId).select().single();
       } else {
         res = await supabase.from('applications').insert(payload).select().single();
       }
