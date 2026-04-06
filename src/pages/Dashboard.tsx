@@ -404,47 +404,10 @@ const Dashboard = () => {
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   };
 
-  const handleDownloadApplicationForm = async (action: 'download' | 'preview' | 'print') => {
-    if (application?.application_form_url) {
-      if (action === 'print') {
-        const printWindow = window.open(application.application_form_url, '_blank');
-        printWindow?.addEventListener('load', () => { printWindow.print(); });
-      } else {
-        window.open(application.application_form_url, action === 'preview' ? '_blank' : '_self');
-      }
-    } else if (application?.id) {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) return;
-        const response = await fetch(`/api/application/${application.id}/download`, {
-          headers: { 'Authorization': `Bearer ${session.access_token}` }
-        });
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          if (action === 'download') {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `IJMB-Application-${application.application_number || application.id.substring(0,8)}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-          } else {
-            const newWindow = window.open(url, '_blank');
-            if (action === 'print' && newWindow) {
-              newWindow.addEventListener('load', () => newWindow.print());
-            }
-          }
-          setTimeout(() => window.URL.revokeObjectURL(url), 1000);
-        } else {
-          window.print();
-        }
-      } catch {
-        window.print();
-      }
-    } else {
-      window.print();
-    }
+  const handleDownloadApplicationForm = (action: 'download' | 'preview' | 'print') => {
+    // Use browser print — the DashboardPrintView renders a print-ready version
+    // Users can "Save as PDF" from the print dialog to download
+    window.print();
   };
 
   // ── Loading ──────────────────────────────────────────────────────────────────
@@ -749,24 +712,11 @@ const Dashboard = () => {
                       {application?.application_number || application?.id?.split('-')[0].toUpperCase()}
                     </p>
                   </div>
-                  {!application?.application_form_url ? (
-                    <div className="flex items-center gap-2 text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
-                      <Loader2 size={13} className="animate-spin" />
-                      Generating — check back shortly
-                    </div>
-                  ) : (
-                    <div className="flex gap-2 flex-wrap">
-                      <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('preview')}>
-                        <Eye size={14} className="mr-1.5" /> Preview
-                      </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('print')}>
-                        <Printer size={14} className="mr-1.5" /> Print
-                      </Button>
-                      <Button size="sm" onClick={() => handleDownloadApplicationForm('download')}>
-                        <Download size={14} className="mr-1.5" /> Download PDF
-                      </Button>
-                    </div>
-                  )}
+                  <div className="flex gap-2 flex-wrap">
+                    <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('print')}>
+                      <Printer size={14} className="mr-1.5" /> Print / Save as PDF
+                    </Button>
+                  </div>
                 </div>
 
                 {/* Admission letter */}
