@@ -42,15 +42,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
-  const supabase = createClient(
+  // Verify token using anon client
+  const anonClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-
-  const { data: { user } } = await supabase.auth.getUser(token);
+  const { data: { user } } = await anonClient.auth.getUser(token);
   if (!user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
+
+  // Use user's JWT for all storage/db operations so RLS policies work correctly
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${token}` } } }
+  );
 
   const formData = await request.formData();
   const file = formData.get('file') as File | null;
