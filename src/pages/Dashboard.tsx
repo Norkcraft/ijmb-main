@@ -404,10 +404,16 @@ const Dashboard = () => {
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   };
 
-  const handleDownloadApplicationForm = (action: 'download' | 'preview' | 'print') => {
-    // Use browser print — the DashboardPrintView renders a print-ready version
-    // Users can "Save as PDF" from the print dialog to download
-    window.print();
+  const handleDownloadApplicationForm = (_action: 'download' | 'preview' | 'print') => {
+    // Wait for all images to load before printing so passport shows correctly
+    const images = document.querySelectorAll('img');
+    const pending = Array.from(images).filter(img => !img.complete);
+    if (pending.length > 0) {
+      Promise.all(pending.map(img => new Promise(r => { img.onload = r; img.onerror = r; })))
+        .then(() => window.print());
+    } else {
+      window.print();
+    }
   };
 
   // ── Loading ──────────────────────────────────────────────────────────────────

@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import Image from 'next/image';
+import ijmbLogo from '@/assets/ijmb-logo.jpeg';
 
 interface DashboardPrintViewProps {
   application: any;
@@ -28,6 +30,8 @@ export const DashboardPrintView = ({
   const appDate = application?.created_at ? new Date(application.created_at).toLocaleDateString() : new Date().toLocaleDateString();
 
   const [passportUrl, setPassportUrl] = useState<string | null>(null);
+  const passportRef = useRef<HTMLImageElement>(null);
+
   useEffect(() => {
     if (application?.passport_path) {
       supabase.storage.from('student-documents').createSignedUrl(application.passport_path, 3600)
@@ -46,7 +50,7 @@ export const DashboardPrintView = ({
       {/* Header Section */}
       <div className="flex items-center justify-between border-b-2 border-black pb-6 mb-8">
         <div className="flex items-center gap-4">
-           <div className="h-16 w-16 bg-primary text-white rounded flex items-center justify-center font-bold text-2xl tracking-tighter">IJMB</div>
+           <Image src={ijmbLogo} alt="IJMB Logo" width={64} height={64} className="rounded-full object-cover" />
            <div>
              <h1 className="text-3xl font-bold uppercase tracking-tight text-gray-900">Official Application Record</h1>
              <p className="text-sm font-medium text-gray-600 uppercase tracking-wider">Direct Entry Admission Programme</p>

@@ -127,3 +127,12 @@
     border-top: 1px solid hsl(var(--border));
   }
 }
+
+@media print {
+  /* Hide everything except the print view */
+  nav, footer, header,
+  .sticky-mobile-cta,
+  [data-radix-toast-viewport] {
+    display: none !important;
+  }
+}
