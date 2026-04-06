@@ -47,6 +47,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
 
+    // Safety timeout — if auth hangs for 6s, unblock the UI anyway
+    const timeout = setTimeout(() => {
+      if (isMounted) setLoading(false);
+    }, 6000);
+
     // Single initialisation — getSession + fetchProfile in parallel
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!isMounted) return;
@@ -56,6 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         await fetchProfile(session.user.id);
       }
       setLoading(false);
+      clearTimeout(timeout);
     });
 
     // Auth state listener handles subsequent changes (login, logout, token refresh)
@@ -65,7 +71,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          // Only re-fetch profile on actual sign-in/sign-out events, not token refreshes
           if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
             await fetchProfile(session.user.id);
           }
@@ -73,11 +78,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setProfile(null);
         }
         setLoading(false);
+        clearTimeout(timeout);
       }
     );
 
     return () => {
       isMounted = false;
+      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, [fetchProfile]);
