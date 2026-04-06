@@ -365,6 +365,7 @@ const Dashboard = () => {
     combos,
     formFee,
     loading,
+    loadError,
     saving,
     uploading,
     editName,
@@ -458,6 +459,21 @@ const Dashboard = () => {
             <p className="font-semibold text-foreground">Loading your dashboard</p>
             <p className="text-sm text-muted-foreground mt-1">Just a moment…</p>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Load error — don't fall through to the form ──────────────────────────
+  if (loadError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl border p-8 max-w-sm w-full text-center space-y-4">
+          <AlertCircle size={36} className="text-red-500 mx-auto" />
+          <h2 className="font-bold text-lg">Could not load your dashboard</h2>
+          <p className="text-sm text-muted-foreground">There was a problem fetching your application data. Please try refreshing the page.</p>
+          <Button onClick={() => window.location.reload()} className="w-full">Refresh Page</Button>
+          <button onClick={handleSignOut} className="text-xs text-muted-foreground hover:text-red-600 transition-colors">Sign out and try again</button>
         </div>
       </div>
     );

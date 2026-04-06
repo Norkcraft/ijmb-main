@@ -58,25 +58,28 @@ export const useStudentDashboard = () => {
   });
 
   // Query: User Application Data (single query with joined O-level results)
-  const { data: userData, isLoading: loadingUser } = useQuery({
+  const { data: userData, isLoading: loadingUser, isError: userQueryError } = useQuery({
     queryKey: ['dashboard-user', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data: appData } = await supabase
+      const { data: appData, error } = await supabase
         .from('applications')
         .select('*, olevel_results(*)')
         .eq('user_id', user.id)
         .maybeSingle();
+      if (error) throw error;
       return {
         application: appData ? { ...appData, olevel_results: undefined } : null,
         olevelResults: appData?.olevel_results || [],
       };
     },
     enabled: !!user,
+    retry: 2,
   });
 
   const loading = loadingStatic || loadingUser;
-  const application = userData?.application || null;
+  // Only treat as null if query succeeded — errors should not fall through to the form
+  const application = userQueryError ? undefined : (userData?.application || null);
   const olevelResults = userData?.olevelResults || [];
   const sessions = staticData?.sessions || [];
   const centres = staticData?.centres || [];
@@ -331,6 +334,7 @@ export const useStudentDashboard = () => {
     combos,
     formFee,
     loading,
+    loadError: userQueryError,
     saving: saveMutation.isPending,
     uploading,
     editName,
