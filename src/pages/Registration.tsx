@@ -9,9 +9,12 @@ import InternalLinks from "@/components/InternalLinks";
 import studentLibrary from "@/assets/student-library.jpeg";
 import { CheckCircle, FileText, ArrowRight } from "lucide-react";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const faqs = [
   { question: "How do I register for IJMB online?", answer: "Visit our registration page, fill in your details including O-Level results, select your preferred subjects and study centre, make payment, and submit your application." },
-  { question: "When does IJMB registration open?", answer: "IJMB registration typically opens between January and September each year. The 2026/2027 session registration is currently open." },
+  { question: "When does IJMB registration open?", answer: `IJMB registration typically opens between January and September each year. The ${YEAR} session registration is currently open.` },
   { question: "Can I register for IJMB without JAMB?", answer: "Yes. You do not need a JAMB score or UTME result to register for the IJMB programme. However, you will need JAMB for direct entry processing after completing IJMB." },
   { question: "What documents do I need for IJMB registration?", answer: "You need your O-Level result (WAEC/NECO/NABTEB), passport photographs, birth certificate or age declaration, and a valid means of identification." },
   { question: "Is IJMB registration form free?", answer: "No. There is a registration fee that covers your application processing, study materials, and examination registration. See our fees page for current amounts." },
@@ -20,10 +23,10 @@ const faqs = [
 const Registration = () => (
   <>
     <SEOHead
-      title="IJMB Registration Form 2026/2027 – Apply Online Now"
+      title={`IJMB Registration Form ${YEAR} – Apply Online Now`}
       description="Complete your IJMB registration form online. Step-by-step guide to register for the IJMB programme and gain 200 level admission."
       canonical="https://www.ijmb.info/ijmb-registration"
-      keywords="IJMB registration form, IJMB registration 2026/2027, register for IJMB online"
+      keywords={`IJMB registration form, IJMB registration ${YEAR}, register for IJMB online`}
     />
     <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "IJMB Registration" }]} />
 
@@ -32,10 +35,10 @@ const Registration = () => (
         <div className="grid lg:grid-cols-5 gap-12">
           <div className="lg:col-span-3">
             <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">
-              IJMB Registration Form 2026/2027
+              IJMB Registration Form {YEAR}
             </h1>
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              The IJMB registration form for the 2026/2027 academic session is now available. Register today to secure your spot
+              The IJMB registration form for the {YEAR} academic session is now available. Register today to secure your spot
               in the Interim Joint Matriculation Board programme and gain direct entry admission into 200 level of any Nigerian university without writing UTME.
             </p>
 
@@ -120,7 +123,7 @@ const Registration = () => (
               <div className="bg-primary text-primary-foreground p-6 rounded-xl">
                 <h3 className="font-heading font-bold text-lg mb-3">Start Your Registration</h3>
                 <p className="text-sm opacity-90 mb-4">
-                  The 2026/2027 IJMB registration is open. Secure your spot now.
+                  The {YEAR} IJMB registration is open. Secure your spot now.
                 </p>
                 <Link
                   href="/register"

@@ -1,6 +1,9 @@
 import type { Metadata } from 'next';
 import Index from '@/pages/Index';
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const faqs = [
   { question: "What is IJMB?", answer: "IJMB stands for Interim Joint Matriculation Board. It is an Advanced Level (A-Level) programme administered by Ahmadu Bello University (ABU) Zaria that qualifies candidates for direct entry admission into 200 level of Nigerian universities without writing UTME." },
   { question: "Is IJMB recognised by Nigerian universities?", answer: "Yes. IJMB is recognised by the Federal Government of Nigeria and accepted by over 200 federal, state, and private universities for direct entry admission." },
@@ -56,7 +59,7 @@ const jsonLd = {
       "@type": "WebPage",
       "@id": "https://www.ijmb.info/#webpage",
       url: "https://www.ijmb.info",
-      name: "IJMB Registration 2026/2027 Nigeria – Direct Entry 200 Level Without UTME",
+      name: `IJMB Registration ${YEAR} Nigeria – Direct Entry 200 Level Without UTME`,
       description: "Register for the IJMB programme in Nigeria and gain direct entry admission into 200 level without UTME. Accepted by 200+ universities nationwide.",
       isPartOf: { "@id": "https://www.ijmb.info/#website" },
       about: { "@id": "https://www.ijmb.info/#organization" },
@@ -69,7 +72,7 @@ const jsonLd = {
     },
     {
       "@type": "Course",
-      name: "IJMB A-Level Programme 2026/2027",
+      name: `IJMB A-Level Programme ${YEAR}`,
       description: "The Interim Joint Matriculation Board (IJMB) is a 9-month Advanced Level programme run by Ahmadu Bello University Zaria. It qualifies students for direct entry into 200 level at over 200 Nigerian universities without UTME.",
       provider: {
         "@type": "EducationalOrganization",
@@ -107,9 +110,9 @@ const jsonLd = {
 };
 
 export const metadata: Metadata = {
-  title: "IJMB Registration 2026/2027 Nigeria | Direct Entry 200 Level Without UTME",
+  title: `IJMB Registration ${YEAR} Nigeria | Direct Entry 200 Level Without UTME`,
   description:
-    "Register for IJMB 2026/2027 in Nigeria. Gain direct entry admission into 200 level without UTME. Accepted by 200+ federal and state universities. Form fee ₦5,500. Apply now.",
+    `Register for IJMB ${YEAR} in Nigeria. Gain direct entry admission into 200 level without UTME. Accepted by 200+ federal and state universities. Form fee ₦5,500. Apply now.`,
   keywords: [
     "IJMB registration",
     "IJMB 2026",
@@ -143,9 +146,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_NG",
-    title: "IJMB Registration 2026/2027 Nigeria | 200 Level Without UTME",
+    title: `IJMB Registration ${YEAR} Nigeria | 200 Level Without UTME`,
     description:
-      "Nigeria's leading IJMB registration portal. Apply for the 2026/2027 session and gain direct entry into 200 level at 200+ universities. No UTME required.",
+      `Nigeria's leading IJMB registration portal. Apply for the ${YEAR} session and gain direct entry into 200 level at 200+ universities. No UTME required.`,
     url: "https://www.ijmb.info",
     siteName: "IJMB Info",
     images: [
@@ -153,13 +156,13 @@ export const metadata: Metadata = {
         url: "https://www.ijmb.info/ijmb-logo.jpeg",
         width: 400,
         height: 400,
-        alt: "IJMB Registration Portal Nigeria 2026/2027 – Direct Entry 200 Level",
+        alt: `IJMB Registration Portal Nigeria ${YEAR} – Direct Entry 200 Level`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "IJMB Registration 2026/2027 Nigeria | 200 Level Without UTME",
+    title: `IJMB Registration ${YEAR} Nigeria | 200 Level Without UTME`,
     description:
       "Register for IJMB and gain direct entry into 200 level without UTME. Accepted by 200+ Nigerian universities. Apply now.",
     images: ["https://www.ijmb.info/ijmb-logo.jpeg"],

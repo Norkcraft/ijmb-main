@@ -7,6 +7,9 @@ import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
 import { CheckCircle, XCircle } from "lucide-react";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const faqs = [
   { question: "What are the minimum O-Level credits for IJMB?", answer: "You need a minimum of 5 O-Level credits in relevant subjects including English Language and Mathematics from WAEC, NECO, or NABTEB." },
   { question: "Can I use awaiting result for IJMB?", answer: "Yes. Candidates who are awaiting their O-Level results can apply for the IJMB programme. However, you must provide your results before the IJMB examination." },
@@ -17,7 +20,7 @@ const faqs = [
 const Requirements = () => (
   <>
     <SEOHead
-      title="IJMB Requirements 2026/2027 – Admission Requirements"
+      title={`IJMB Requirements ${YEAR} – Admission Requirements`}
       description="Complete list of IJMB admission requirements. Learn what you need to register for the IJMB programme in Nigeria."
       canonical="https://www.ijmb.info/ijmb-admission-requirements"
     />
@@ -25,7 +28,7 @@ const Requirements = () => (
 
     <section className="section-padding">
       <div className="container-narrow">
-        <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB Admission Requirements 2026/2027</h1>
+        <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB Admission Requirements {YEAR}</h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-8">
           Understanding the IJMB requirements is the first step to gaining direct entry admission into 200 level.
           The requirements for the IJMB programme are straightforward and accessible to most Nigerian students who have completed their secondary education.

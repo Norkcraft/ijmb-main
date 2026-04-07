@@ -9,6 +9,9 @@ import InternalLinks from "@/components/InternalLinks";
 import { MapPin, CheckCircle, Search, School } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const cities = [
   "Lagos", "Abuja", "Ibadan", "Ilorin", "Port Harcourt", "Benin", "Kano", "Kaduna",
   "Jos", "Enugu", "Owerri", "Aba", "Uyo", "Akure", "Ado-Ekiti", "Abeokuta",
@@ -25,8 +28,8 @@ const faqs = [
 const Centres = () => (
   <>
     <SEOHead
-      title="IJMB Study Centres in Nigeria 2026/2027 – Official List of Accredited Centres"
-      description="Find the complete list of accredited IJMB study centres in Nigeria for 2026/2027. Locate approved centres in Lagos, Abuja, Ilorin, Port Harcourt and more."
+      title={`IJMB Study Centres in Nigeria ${YEAR} – Official List of Accredited Centres`}
+      description={`Find the complete list of accredited IJMB study centres in Nigeria for ${YEAR}. Locate approved centres in Lagos, Abuja, Ilorin, Port Harcourt and more.`}
       canonical="https://www.ijmb.info/ijmb-centres-in-nigeria"
       keywords="IJMB study centres in Nigeria, accredited IJMB centres, IJMB centres in Lagos, IJMB centres in Abuja, IJMB centres in Ilorin, official IJMB centres list"
     />
@@ -37,7 +40,7 @@ const Centres = () => (
         <div className="grid lg:grid-cols-12 gap-12">
            <div className="lg:col-span-8">
               <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">
-                IJMB Study Centres in Nigeria – Official Accredited List 2026/2027
+                IJMB Study Centres in Nigeria – Official Accredited List {YEAR}
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed mb-8">
                 <strong>IJMB study centres in Nigeria</strong> are strategically located across the country to provide accessible quality education for students seeking direct entry admission into 200 level.

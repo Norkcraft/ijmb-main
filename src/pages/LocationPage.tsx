@@ -13,6 +13,9 @@ import studentsGroup from "@/assets/students-group.jpeg";
 import studentAnkara from "@/assets/student-ankara.jpeg";
 import { ArrowRight, CheckCircle, MapPin, Star, GraduationCap } from "lucide-react";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 interface CityInfo {
   state: string;
   desc: string;
@@ -260,7 +263,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
   const faqs = [
     {
       question: `Is there an IJMB centre in ${cityName}?`,
-      answer: `Yes. There are accredited IJMB study centres in ${cityName}, ${data.state} available for the 2026/2027 session. Students from ${cityName} and surrounding areas can register and attend classes locally. Contact us to confirm current availability and get assigned to a centre near you.`
+      answer: `Yes. There are accredited IJMB study centres in ${cityName}, ${data.state} available for the ${YEAR} session. Students from ${cityName} and surrounding areas can register and attend classes locally. Contact us to confirm current availability and get assigned to a centre near you.`
     },
     {
       question: `How much is IJMB in ${cityName}?`,
@@ -307,7 +310,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
               {
                 "@type": "EducationalOrganization",
                 name: `IJMB Study Centres in ${cityName}`,
-                description: `Accredited IJMB study centres in ${cityName}, ${data.state}. Register for IJMB 2026/2027 and gain direct entry into 200 level without UTME.`,
+                description: `Accredited IJMB study centres in ${cityName}, ${data.state}. Register for IJMB ${YEAR} and gain direct entry into 200 level without UTME.`,
                 url: `https://www.ijmb.info/ijmb-in-${slug}`,
                 address: {
                   "@type": "PostalAddress",
@@ -323,8 +326,8 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
       />
 
       <SEOHead
-        title={`IJMB in ${cityName} 2026/2027 – Accredited Study Centres & Registration`}
-        description={`Register for IJMB in ${cityName}, ${data.state}. Accredited study centres for 2026/2027 session. Gain direct entry into 200 level without UTME. Universities near ${cityName} accepting IJMB include ${data.universities[0]}.`}
+        title={`IJMB in ${cityName} ${YEAR} – Accredited Study Centres & Registration`}
+        description={`Register for IJMB in ${cityName}, ${data.state}. Accredited study centres for ${YEAR} session. Gain direct entry into 200 level without UTME. Universities near ${cityName} accepting IJMB include ${data.universities[0]}.`}
         canonical={`https://www.ijmb.info/ijmb-in-${slug}`}
         keywords={`IJMB in ${cityName}, IJMB centre ${cityName}, IJMB registration ${cityName}, IJMB programme ${cityName}, direct entry ${cityName}`}
       />
@@ -346,10 +349,10 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                   <MapPin size={16} className="text-primary" /> {data.state} State &mdash; {data.region}
                 </div>
                 <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">
-                  IJMB in {cityName} — Study Centres & 2026/2027 Registration
+                  IJMB in {cityName} — Study Centres & {YEAR} Registration
                 </h1>
                 <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                  Looking for <strong className="text-foreground">IJMB in {cityName}</strong>? You are in the right place. This page lists all accredited IJMB study centres in {cityName}, {data.state} — {data.desc} — along with fees, admission requirements, and how to register for the <strong className="text-foreground">2026/2027 session</strong>.
+                  Looking for <strong className="text-foreground">IJMB in {cityName}</strong>? You are in the right place. This page lists all accredited IJMB study centres in {cityName}, {data.state} — {data.desc} — along with fees, admission requirements, and how to register for the <strong className="text-foreground">{YEAR} session</strong>.
                 </p>
                 <div className="flex flex-wrap gap-3 mt-4">
                   {data.highlights.map((h, i) => (
@@ -558,7 +561,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                 <div className="bg-primary text-primary-foreground p-6 rounded-xl">
                   <h3 className="font-heading font-bold text-lg mb-2">Register for IJMB in {cityName}</h3>
                   <p className="text-sm opacity-90 mb-4">
-                    2026/2027 registration is open. Gain direct entry into 200 level without UTME.
+                    {YEAR} registration is open. Gain direct entry into 200 level without UTME.
                   </p>
                   <div className="space-y-2 text-sm opacity-80 mb-5">
                     <p className="flex items-center gap-2"><CheckCircle size={14} /> Form fee: ₦5,500</p>
@@ -591,7 +594,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                     <p className="flex justify-between"><span>Nearby Universities</span><span className="font-medium text-foreground">{data.universities.length}+</span></p>
                     <p className="flex justify-between"><span>Form Fee</span><span className="font-medium text-foreground">₦5,500</span></p>
                     <p className="flex justify-between"><span>Programme Duration</span><span className="font-medium text-foreground">9 Months</span></p>
-                    <p className="flex justify-between"><span>Session</span><span className="font-medium text-foreground">2026/2027</span></p>
+                    <p className="flex justify-between"><span>Session</span><span className="font-medium text-foreground">{YEAR}</span></p>
                   </div>
                 </div>
               </div>

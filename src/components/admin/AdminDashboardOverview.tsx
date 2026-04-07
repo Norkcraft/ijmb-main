@@ -48,7 +48,7 @@ export default function AdminDashboardOverview() {
           .from('applications')
           .select('id, status, created_at, first_name, surname, intended_course, profiles(full_name)')
           .order('created_at', { ascending: false }),
-        supabase.from('payments').select('amount, created_at').eq('status', 'completed'),
+        supabase.from('payments').select('amount, created_at').eq('status', 'success'),
       ]);
 
       const apps = appRes.data || [];

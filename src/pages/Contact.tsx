@@ -7,11 +7,14 @@ import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
 import { Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const Contact = () => (
   <>
     <SEOHead
-      title="Contact IJMB Official Support – 2026/2027 Admission Enquiries"
-      description="Need help with IJMB registration? Contact our official admission support team. Call, email or visit our head office for 2026/2027 admission guidance."
+      title={`Contact IJMB Official Support – ${YEAR} Admission Enquiries`}
+      description={`Need help with IJMB registration? Contact our official admission support team. Call, email or visit our head office for ${YEAR} admission guidance.`}
       canonical="https://www.ijmb.info/contact-us"
       keywords="Contact IJMB, IJMB support, IJMB admission office, IJMB helpline, IJMB office address"
     />

@@ -1,21 +1,24 @@
 import type { Metadata } from 'next';
 import FAQPage from '@/pages/FAQPage';
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 export const metadata: Metadata = {
-  title: 'IJMB FAQ 2026/2027 – Frequently Asked Questions About IJMB',
+  title: `IJMB FAQ ${YEAR} – Frequently Asked Questions About IJMB`,
   description: 'Answers to all common questions about IJMB registration, fees, requirements, subject combinations, and direct entry admission into Nigerian universities.',
   keywords: ['IJMB FAQ', 'IJMB frequently asked questions', 'how does IJMB work', 'IJMB questions and answers', 'IJMB 2026 FAQ', 'is IJMB legit'],
   alternates: { canonical: 'https://www.ijmb.info/faq' },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large' } },
   openGraph: {
-    title: 'IJMB FAQ 2026/2027 – Frequently Asked Questions',
+    title: `IJMB FAQ ${YEAR} – Frequently Asked Questions`,
     description: 'Everything you need to know about IJMB. Registration, fees, requirements, subject combinations and more — answered.',
     url: 'https://www.ijmb.info/faq',
     images: [{ url: 'https://www.ijmb.info/ijmb-logo.jpeg', width: 400, height: 400, alt: 'IJMB FAQ' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'IJMB FAQ 2026/2027',
+    title: `IJMB FAQ ${YEAR}`,
     description: 'All your IJMB questions answered. Registration, fees, requirements, universities.',
     images: ['https://www.ijmb.info/ijmb-logo.jpeg'],
   },

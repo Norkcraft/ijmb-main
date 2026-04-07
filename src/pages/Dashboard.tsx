@@ -1,20 +1,691 @@
 'use client';
 
-import { Loader2, Download, Eye, Printer, FileText, CheckCircle, Clock, Star, MessageCircle, ChevronRight, User, BookOpen, CreditCard, GraduationCap, AlertCircle, ArrowRight, Bell, LogOut, KeyRound, Mail, Phone, Pencil } from 'lucide-react';
+import {
+  Loader2, Download, Printer, FileText, CheckCircle, Clock, Star,
+  User, CreditCard, GraduationCap, AlertCircle, ArrowRight, LogOut,
+  KeyRound, Mail, Pencil, Home, FolderOpen, Menu, X, BookOpen,
+  ChevronRight, MessageCircle, Wallet, BadgeCheck, TrendingUp
+} from 'lucide-react';
 import { supabase } from '@/lib/supabaseClient';
 import SEOHead from '@/components/SEOHead';
 import { Button } from '@/components/ui/button';
 import { useStudentDashboard } from '@/hooks/useStudentDashboard';
-import { DashboardHeader } from '@/components/dashboard/DashboardHeader';
 import { DashboardPrintView } from '@/components/dashboard/DashboardPrintView';
 import { DashboardPayments } from '@/components/dashboard/DashboardPayments';
 import { ApplicationForm } from '@/components/application/ApplicationForm';
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 
-// ── Profile Tab ───────────────────────────────────────────────────────────────
+// ── Status config ─────────────────────────────────────────────────────────────
+const STATUS_MAP: Record<string, { label: string; color: string; bg: string; dot: string; icon: React.ReactNode }> = {
+  draft:           { label: 'Draft',           color: 'text-slate-600',  bg: 'bg-slate-100',   dot: 'bg-slate-400',   icon: <FileText size={14} /> },
+  payment_pending: { label: 'Awaiting Payment',color: 'text-amber-700',  bg: 'bg-amber-100',   dot: 'bg-amber-500',   icon: <CreditCard size={14} /> },
+  submitted:       { label: 'Under Review',    color: 'text-blue-700',   bg: 'bg-blue-100',    dot: 'bg-blue-500',    icon: <Clock size={14} /> },
+  review:          { label: 'Under Review',    color: 'text-blue-700',   bg: 'bg-blue-100',    dot: 'bg-blue-500',    icon: <Clock size={14} /> },
+  admitted:        { label: 'Admitted!',        color: 'text-green-700',  bg: 'bg-green-100',   dot: 'bg-green-500',   icon: <Star size={14} /> },
+  fees_pending:    { label: 'Fees Pending',    color: 'text-amber-700',  bg: 'bg-amber-100',   dot: 'bg-amber-500',   icon: <CreditCard size={14} /> },
+  active:          { label: 'Active Student',  color: 'text-emerald-700',bg: 'bg-emerald-100', dot: 'bg-emerald-500', icon: <GraduationCap size={14} /> },
+  rejected:        { label: 'Not Admitted',    color: 'text-red-700',    bg: 'bg-red-100',     dot: 'bg-red-500',     icon: <AlertCircle size={14} /> },
+};
+
+const STEPS = [
+  { key: 'apply',   label: 'Apply',    icon: <FileText size={13} /> },
+  { key: 'pay',     label: 'Pay Fee',  icon: <CreditCard size={13} /> },
+  { key: 'review',  label: 'Review',   icon: <Clock size={13} /> },
+  { key: 'admitted',label: 'Admitted', icon: <Star size={13} /> },
+  { key: 'accept',  label: 'Accept',   icon: <CheckCircle size={13} /> },
+  { key: 'active',  label: 'Active',   icon: <GraduationCap size={13} /> },
+];
+
+function getStepIndex(status?: string) {
+  switch (status) {
+    case 'draft':            return 0;
+    case 'payment_pending':  return 1;
+    case 'submitted':
+    case 'review':           return 2;
+    case 'admitted':         return 3;
+    case 'fees_pending':     return 4;
+    case 'active':           return 5;
+    default:                 return 0;
+  }
+}
+
+// ── Progress tracker ──────────────────────────────────────────────────────────
+function ProgressTracker({ status }: { status?: string }) {
+  const current = getStepIndex(status);
+  return (
+    <div className="flex items-start justify-between gap-1 sm:gap-2">
+      {STEPS.map((step, i) => {
+        const done = i < current;
+        const active = i === current;
+        return (
+          <div key={step.key} className="flex-1 flex flex-col items-center gap-1.5 min-w-0">
+            <div className="w-full flex items-center">
+              {i > 0 && <div className={`flex-1 h-0.5 transition-colors ${i <= current ? 'bg-primary' : 'bg-border'}`} />}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs transition-all
+                ${done ? 'bg-primary text-white shadow-sm' : active ? 'bg-primary text-white ring-4 ring-primary/20 shadow-md' : 'bg-muted text-muted-foreground border border-border'}`}>
+                {done ? <CheckCircle size={14} /> : step.icon}
+              </div>
+              {i < STEPS.length - 1 && <div className={`flex-1 h-0.5 transition-colors ${i < current ? 'bg-primary' : 'bg-border'}`} />}
+            </div>
+            <span className={`text-[9px] sm:text-[11px] font-semibold text-center leading-tight truncate w-full text-center
+              ${active ? 'text-primary' : done ? 'text-foreground' : 'text-muted-foreground'}`}>
+              {step.label}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
+function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid, status }: {
+  currentTab: string;
+  onNavigate: (tab: string) => void;
+  profile: any; user: any;
+  onSignOut: () => void;
+  formFeePaid: boolean;
+  status?: string;
+}) {
+  const statusInfo = STATUS_MAP[status || 'draft'] || STATUS_MAP.draft;
+  const firstName = profile?.full_name?.split(' ')[0] || 'Student';
+  const initials = (profile?.full_name || 'S').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+
+  const navItems = [
+    { key: 'dashboard', icon: <Home size={18} />, label: 'Overview' },
+    { key: 'application', icon: <BookOpen size={18} />, label: 'Application' },
+    { key: 'payments', icon: <Wallet size={18} />, label: 'Payments' },
+    { key: 'documents', icon: <FolderOpen size={18} />, label: 'Documents' },
+    { key: 'profile', icon: <User size={18} />, label: 'My Account' },
+  ];
+
+  return (
+    <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-[hsl(145,63%,18%)] text-white fixed left-0 top-0 bottom-0 z-30">
+      {/* Logo */}
+      <div className="px-6 py-6 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center font-black text-lg">S</div>
+          <div>
+            <p className="font-black text-base leading-tight">Student Portal</p>
+            <p className="text-xs text-white/60 leading-tight">IJMB Programme</p>
+          </div>
+        </div>
+      </div>
+
+      {/* User card */}
+      <div className="px-4 py-4 border-b border-white/10">
+        <div className="flex items-center gap-3 px-2 py-3 rounded-xl bg-white/10">
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm shrink-0">
+            {initials}
+          </div>
+          <div className="min-w-0">
+            <p className="font-semibold text-sm truncate leading-tight">{firstName}</p>
+            <p className="text-xs text-white/60 truncate">{user?.email}</p>
+          </div>
+        </div>
+        <div className={`mt-2 mx-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${statusInfo.bg} ${statusInfo.color}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
+          {statusInfo.label}
+        </div>
+      </div>
+
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+        {navItems.map(item => {
+          const active = currentTab === item.key;
+          return (
+            <button
+              key={item.key}
+              onClick={() => onNavigate(item.key)}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+                ${active
+                  ? 'bg-white text-[hsl(145,63%,18%)] shadow-sm font-semibold'
+                  : 'text-white/75 hover:bg-white/10 hover:text-white'}`}
+            >
+              <span className={active ? 'text-primary' : ''}>{item.icon}</span>
+              {item.label}
+              {active && <ChevronRight size={14} className="ml-auto text-primary" />}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Sign out */}
+      <div className="px-3 py-4 border-t border-white/10">
+        <button
+          onClick={onSignOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all"
+        >
+          <LogOut size={18} />
+          Sign Out
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+// ── Mobile top bar ────────────────────────────────────────────────────────────
+function MobileHeader({ profile, currentTab, onMenuOpen }: { profile: any; currentTab: string; onMenuOpen: () => void }) {
+  const tabLabels: Record<string, string> = {
+    dashboard: 'Overview', application: 'Application',
+    payments: 'Payments', documents: 'Documents', profile: 'My Account',
+  };
+  return (
+    <header className="lg:hidden sticky top-0 z-30 bg-[hsl(145,63%,18%)] text-white px-4 h-14 flex items-center justify-between shadow-md">
+      <div className="flex items-center gap-2.5">
+        <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center font-bold text-sm">S</div>
+        <span className="font-bold text-sm">{tabLabels[currentTab] || 'Dashboard'}</span>
+      </div>
+      <button onClick={onMenuOpen} className="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors">
+        <Menu size={18} />
+      </button>
+    </header>
+  );
+}
+
+// ── Mobile bottom nav ─────────────────────────────────────────────────────────
+function MobileBottomNav({ currentTab, onNavigate }: { currentTab: string; onNavigate: (tab: string) => void }) {
+  const items = [
+    { key: 'dashboard', icon: <Home size={20} />, label: 'Home' },
+    { key: 'application', icon: <BookOpen size={20} />, label: 'Apply' },
+    { key: 'payments', icon: <Wallet size={20} />, label: 'Payments' },
+    { key: 'documents', icon: <FolderOpen size={20} />, label: 'Docs' },
+    { key: 'profile', icon: <User size={20} />, label: 'Account' },
+  ];
+  return (
+    <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-30 bg-white border-t shadow-lg safe-area-pb">
+      <div className="flex">
+        {items.map(item => {
+          const active = currentTab === item.key;
+          return (
+            <button
+              key={item.key}
+              onClick={() => onNavigate(item.key)}
+              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 transition-colors
+                ${active ? 'text-primary' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              {item.icon}
+              <span className={`text-[10px] font-semibold ${active ? 'text-primary' : ''}`}>{item.label}</span>
+              {active && <div className="absolute bottom-0 w-8 h-0.5 bg-primary rounded-t-full" />}
+            </button>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
+
+// ── Mobile drawer ─────────────────────────────────────────────────────────────
+function MobileDrawer({ open, onClose, profile, user, currentTab, onNavigate, onSignOut, status }: any) {
+  const statusInfo = STATUS_MAP[status || 'draft'] || STATUS_MAP.draft;
+  const firstName = profile?.full_name?.split(' ')[0] || 'Student';
+  const initials = (profile?.full_name || 'S').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+  const navItems = [
+    { key: 'dashboard', icon: <Home size={18} />, label: 'Overview' },
+    { key: 'application', icon: <BookOpen size={18} />, label: 'Application' },
+    { key: 'payments', icon: <Wallet size={18} />, label: 'Payments' },
+    { key: 'documents', icon: <FolderOpen size={18} />, label: 'Documents' },
+    { key: 'profile', icon: <User size={18} />, label: 'My Account' },
+  ];
+  if (!open) return null;
+  return (
+    <>
+      <div className="fixed inset-0 z-40 bg-black/50" onClick={onClose} />
+      <div className="fixed inset-y-0 left-0 z-50 w-72 bg-[hsl(145,63%,18%)] text-white flex flex-col shadow-2xl">
+        <div className="px-5 py-5 flex items-center justify-between border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center font-bold text-sm">{initials}</div>
+            <div>
+              <p className="font-bold text-sm">{firstName}</p>
+              <p className="text-xs text-white/60">{user?.email}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center"><X size={16} /></button>
+        </div>
+        <div className="px-3 py-3">
+          <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${statusInfo.bg} ${statusInfo.color}`}>
+            <span className={`w-1.5 h-1.5 rounded-full ${statusInfo.dot}`} />
+            {statusInfo.label}
+          </div>
+        </div>
+        <nav className="flex-1 px-3 space-y-0.5">
+          {navItems.map(item => {
+            const active = currentTab === item.key;
+            return (
+              <button key={item.key} onClick={() => { onNavigate(item.key); onClose(); }}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all
+                  ${active ? 'bg-white text-[hsl(145,63%,18%)] font-semibold' : 'text-white/75 hover:bg-white/10 hover:text-white'}`}>
+                {item.icon}{item.label}
+              </button>
+            );
+          })}
+        </nav>
+        <div className="px-3 py-4 border-t border-white/10">
+          <button onClick={onSignOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all">
+            <LogOut size={18} />Sign Out
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── Overview tab ──────────────────────────────────────────────────────────────
+function OverviewTab({ application, profile, user, centres, combos, formFee, sessions, onNavigate }: any) {
+  const status = application?.status;
+  const statusInfo = STATUS_MAP[status || 'draft'] || STATUS_MAP.draft;
+  const firstName = profile?.full_name?.split(' ')[0] || application?.first_name || 'Student';
+  const formFeePaid = application?.form_fee_paid || false;
+  const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(status);
+  const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(status);
+  // Use session from DB, fall back to current academic year
+  const session = sessions?.find((s: any) => s.id === application?.session_id) || sessions?.[0];
+  const sessionName = session?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`;
+  const centre = centres?.find((c: any) => c.id === application?.preferred_centre_id);
+  const assignedCentre = centres?.find((c: any) => c.id === application?.assigned_centre_id);
+  const combo = combos?.find((c: any) => c.id === application?.subject_combination_id);
+
+  const downloadLetter = async () => {
+    if (!application?.admission_letter_path) return;
+    const { data } = await supabase.storage.from('student-documents').createSignedUrl(application.admission_letter_path, 300);
+    if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+  };
+
+  const stats = [
+    {
+      label: 'Application ID',
+      value: application?.application_number || application?.id?.split('-')[0].toUpperCase() || '—',
+      icon: <BadgeCheck size={18} className="text-primary" />,
+      bg: 'bg-primary/10',
+    },
+    {
+      label: 'Academic Session',
+      value: sessionName,
+      icon: <TrendingUp size={18} className="text-blue-600" />,
+      bg: 'bg-blue-50',
+    },
+    {
+      label: 'Registration Fee',
+      value: formFeePaid ? 'Paid ✓' : `₦${(formFee || 5500).toLocaleString()}`,
+      icon: <CreditCard size={18} className={formFeePaid ? 'text-green-600' : 'text-amber-600'} />,
+      bg: formFeePaid ? 'bg-green-50' : 'bg-amber-50',
+      valueColor: formFeePaid ? 'text-green-700' : 'text-amber-700',
+    },
+    {
+      label: 'Preferred Centre',
+      value: centre?.name || '—',
+      icon: <GraduationCap size={18} className="text-purple-600" />,
+      bg: 'bg-purple-50',
+    },
+  ];
+
+  // What to do next
+  const nextAction = (() => {
+    switch (status) {
+      case 'submitted':
+      case 'review':
+        return {
+          icon: <Clock size={22} className="text-blue-600" />,
+          headline: 'Your application is under review',
+          sub: 'Our admissions team is reviewing your details. You will be notified of a decision — this typically takes 1–3 business days. No action needed from you right now.',
+          gradient: 'from-blue-50 to-sky-50',
+          border: 'border-blue-200',
+        };
+      case 'admitted':
+        return {
+          icon: <Star size={22} className="text-amber-500" />,
+          headline: 'Congratulations — you have been admitted!',
+          sub: 'Pay your acceptance fee to confirm your place and unlock your official admission letter.',
+          gradient: 'from-green-50 to-emerald-50',
+          border: 'border-green-200',
+          cta: { label: 'Pay Acceptance Fee', action: () => onNavigate('payments') },
+        };
+      case 'fees_pending':
+        return {
+          icon: <CheckCircle size={22} className="text-emerald-600" />,
+          headline: 'Acceptance confirmed — download your letter',
+          sub: 'Your acceptance fee has been received. Download your official admission letter and present it at your assigned centre.',
+          gradient: 'from-emerald-50 to-teal-50',
+          border: 'border-emerald-200',
+          cta: { label: 'Download Admission Letter', action: downloadLetter },
+        };
+      case 'active':
+        return {
+          icon: <GraduationCap size={22} className="text-emerald-600" />,
+          headline: "You're an active IJMB student!",
+          sub: 'Your registration is fully complete. Attend your assigned study centre and prepare for your A-Level examinations.',
+          gradient: 'from-emerald-50 to-green-50',
+          border: 'border-emerald-200',
+        };
+      case 'rejected':
+        return {
+          icon: <AlertCircle size={22} className="text-red-500" />,
+          headline: 'Application not successful',
+          sub: 'Unfortunately your application was not approved. Contact us on WhatsApp and we will help you understand the next steps.',
+          gradient: 'from-red-50 to-rose-50',
+          border: 'border-red-200',
+          cta: { label: 'Chat on WhatsApp', action: () => window.open('https://wa.link/udcjk0', '_blank') },
+        };
+      default:
+        return null;
+    }
+  })();
+
+  return (
+    <div className="space-y-5">
+      {/* Hero card */}
+      <div className="relative overflow-hidden rounded-2xl bg-[hsl(145,63%,18%)] text-white p-6 sm:p-8">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/4" />
+        <div className="relative">
+          <div className="flex items-start justify-between gap-4 flex-wrap mb-5">
+            <div>
+              <p className="text-sm font-medium text-white/70 mb-0.5">Welcome back</p>
+              <h1 className="text-2xl sm:text-3xl font-black leading-tight">{firstName}</h1>
+              <p className="text-sm text-white/60 mt-1">{application?.intended_course || 'IJMB Applicant'} · {sessionName}</p>
+            </div>
+            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold ${statusInfo.bg} ${statusInfo.color} shrink-0`}>
+              <span className={`w-2 h-2 rounded-full ${statusInfo.dot}`} />
+              {statusInfo.label}
+            </div>
+          </div>
+          <ProgressTracker status={status} />
+        </div>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 xl:grid-cols-4 gap-3">
+        {stats.map((s, i) => (
+          <div key={i} className="bg-white rounded-2xl border p-4 hover:shadow-md transition-shadow">
+            <div className={`w-9 h-9 rounded-xl ${s.bg} flex items-center justify-center mb-3`}>
+              {s.icon}
+            </div>
+            <p className={`text-sm font-bold truncate ${(s as any).valueColor || 'text-foreground'}`}>{s.value}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{s.label}</p>
+          </div>
+        ))}
+      </div>
+
+      {/* What to do next */}
+      {nextAction && (
+        <div className={`rounded-2xl border bg-gradient-to-br ${nextAction.gradient} ${nextAction.border} p-5 sm:p-6`}>
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-2xl bg-white/80 flex items-center justify-center shrink-0 shadow-sm">
+              {nextAction.icon}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-foreground text-base mb-1">{nextAction.headline}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{nextAction.sub}</p>
+              {(nextAction as any).cta && (
+                <button
+                  onClick={(nextAction as any).cta.action}
+                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-sm"
+                >
+                  {(nextAction as any).cta.label} <ArrowRight size={14} />
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Post-registration summary — shown after submission */}
+      {['submitted', 'review', 'admitted', 'fees_pending', 'active'].includes(status) && (
+        <div className="bg-white rounded-2xl border p-5 space-y-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 border-b pb-3">
+            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+              <FileText size={15} className="text-primary" />
+            </div>
+            <h2 className="font-bold text-sm">Registration Summary</h2>
+            <span className={`ml-auto inline-flex items-center gap-1 text-xs font-semibold px-2 py-0.5 rounded-full ${statusInfo.bg} ${statusInfo.color}`}>
+              {statusInfo.icon} {statusInfo.label}
+            </span>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground">Full Name</p>
+              <p className="font-semibold">{[application?.surname, application?.first_name, application?.middle_name].filter(Boolean).join(' ') || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Application Number</p>
+              <p className="font-semibold font-mono">{application?.application_number || application?.id?.split('-')[0].toUpperCase() || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Intended Course</p>
+              <p className="font-semibold">{application?.intended_course || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Subject Combination</p>
+              <p className="font-semibold">{combo?.name || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Preferred Centre</p>
+              <p className="font-semibold">{centre?.name || '—'}{centre?.state ? `, ${centre.state}` : ''}</p>
+            </div>
+            {assignedCentre && (
+              <div>
+                <p className="text-xs text-muted-foreground">Assigned Centre</p>
+                <p className="font-semibold text-green-700">{assignedCentre.name}, {assignedCentre.state}</p>
+              </div>
+            )}
+            <div>
+              <p className="text-xs text-muted-foreground">Passport Photo</p>
+              <p className={`font-semibold flex items-center gap-1 ${application?.passport_path ? 'text-green-700' : 'text-amber-600'}`}>
+                {application?.passport_path ? <><CheckCircle size={12} /> Uploaded</> : <><Clock size={12} /> Not uploaded</>}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">O-Level Result</p>
+              <p className={`font-semibold flex items-center gap-1 ${application?.olevel_path || application?.olevel_status === 'awaiting' ? 'text-green-700' : 'text-amber-600'}`}>
+                {application?.olevel_status === 'awaiting'
+                  ? <><Clock size={12} /> Awaiting result</>
+                  : application?.olevel_path
+                    ? <><CheckCircle size={12} /> Uploaded</>
+                    : <><Clock size={12} /> Not uploaded</>}
+              </p>
+            </div>
+          </div>
+          <div className="pt-2 border-t flex flex-wrap gap-2">
+            <button onClick={() => onNavigate('documents')}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-primary border border-primary/30 rounded-xl hover:bg-primary/5 transition-colors">
+              <FileText size={12} /> Print Application Form
+            </button>
+            <button onClick={() => onNavigate('payments')}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-muted-foreground border rounded-xl hover:bg-muted/50 transition-colors">
+              <CreditCard size={12} /> View Payments
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Quick actions grid */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        {/* Application details */}
+        <div className="bg-white rounded-2xl border p-5 space-y-3 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                <FileText size={15} className="text-primary" />
+              </div>
+              <h2 className="font-bold text-sm">Application Details</h2>
+            </div>
+            <button onClick={() => onNavigate('application')} className="text-xs text-primary font-semibold hover:underline">Edit →</button>
+          </div>
+          <dl className="space-y-2.5">
+            {[
+              { label: 'Full Name', value: `${application?.surname || ''} ${application?.first_name || ''}`.trim() || '—' },
+              { label: 'Combination', value: application?.subject_combination_id ? 'Selected' : '—' },
+              { label: 'Intended Course', value: application?.intended_course || '—' },
+              { label: 'Date Applied', value: application?.created_at ? new Date(application.created_at).toLocaleDateString() : '—' },
+            ].map(({ label, value }) => (
+              <div key={label} className="flex justify-between gap-3 text-sm">
+                <dt className="text-muted-foreground shrink-0">{label}</dt>
+                <dd className="font-medium text-right truncate max-w-[140px]">{value}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        {/* Payment summary */}
+        <div className="bg-white rounded-2xl border p-5 space-y-3 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-xl bg-green-100 flex items-center justify-center">
+                <Wallet size={15} className="text-green-600" />
+              </div>
+              <h2 className="font-bold text-sm">Payments</h2>
+            </div>
+            <button onClick={() => onNavigate('payments')} className="text-xs text-primary font-semibold hover:underline">View all →</button>
+          </div>
+          <div className="space-y-2">
+            {[
+              { label: 'Registration Fee', paid: formFeePaid, amount: `₦${formFee?.toLocaleString()}` },
+              { label: 'Acceptance Fee', paid: !!hasPaidAcceptanceFee, amount: '₦15,000' },
+              { label: 'Tuition Fee', paid: status === 'active', amount: '—' },
+            ].map(({ label, paid, amount }) => (
+              <div key={label} className="flex items-center justify-between text-sm">
+                <div className="flex items-center gap-2">
+                  <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${paid ? 'bg-green-100' : 'bg-muted'}`}>
+                    {paid ? <CheckCircle size={11} className="text-green-600" /> : <Clock size={11} className="text-muted-foreground" />}
+                  </div>
+                  <span className={paid ? 'text-foreground' : 'text-muted-foreground'}>{label}</span>
+                </div>
+                <span className={`text-xs font-semibold ${paid ? 'text-green-600' : 'text-muted-foreground'}`}>
+                  {paid ? 'Paid ✓' : amount}
+                </span>
+              </div>
+            ))}
+          </div>
+          {!formFeePaid && application && (
+            <button
+              onClick={() => onNavigate('payments')}
+              className="w-full mt-1 py-2.5 text-xs font-bold text-white bg-primary rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              Pay Registration Fee
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* WhatsApp support */}
+      <div className="rounded-2xl border bg-gradient-to-r from-[#f0fdf4] to-[#dcfce7] border-[#bbf7d0] p-5">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#25D366] flex items-center justify-center shrink-0 shadow-md">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-7 h-7 fill-white">
+              <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16.004c0 3.5 1.129 6.744 3.047 9.379L1.054 31.27l6.1-1.957a15.9 15.9 0 008.85 2.691C24.826 32 32 24.826 32 16.004S24.826 0 16.004 0zm9.35 22.617c-.393 1.107-1.943 2.025-3.188 2.293-.852.182-1.963.326-5.705-1.227-4.787-1.986-7.867-6.834-8.107-7.152-.229-.318-1.928-2.568-1.928-4.895s1.221-3.473 1.654-3.947c.434-.475.947-.594 1.262-.594.316 0 .631.002.908.016.291.016.682-.111 1.068.814.393.947 1.34 3.264 1.457 3.502.119.238.197.514.039.83-.158.318-.236.514-.475.791-.236.277-.498.619-.711.83-.238.238-.486.496-.209.971.277.475 1.234 2.035 2.65 3.299 1.82 1.623 3.354 2.127 3.83 2.365.475.238.752.197 1.029-.119.277-.316 1.182-1.379 1.498-1.854.316-.475.633-.395 1.068-.238.434.158 2.752 1.299 3.225 1.535.475.238.791.355.908.553.119.197.119 1.145-.275 2.252z" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-green-900 text-sm">Need help? Chat with us on WhatsApp</p>
+            <p className="text-xs text-green-800 mt-0.5">Mon–Sat, 8am–6pm · We reply within minutes</p>
+          </div>
+          <a href="https://wa.link/udcjk0" target="_blank" rel="noopener noreferrer"
+            className="shrink-0 px-4 py-2 bg-[#25D366] text-white text-xs font-bold rounded-xl hover:bg-[#1da851] transition-colors shadow-sm">
+            Chat Now
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Documents tab ─────────────────────────────────────────────────────────────
+function DocumentsTab({ application, onPrint }: { application: any; onPrint: () => void }) {
+  const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application?.status);
+  const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application?.status);
+  const formFeePaid = application?.form_fee_paid;
+
+  const downloadLetter = async () => {
+    if (!application?.admission_letter_path) return;
+    const { data } = await supabase.storage.from('student-documents').createSignedUrl(application.admission_letter_path, 300);
+    if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+  };
+
+  const docs = [
+    {
+      title: 'Application Form',
+      desc: 'Official registration form with your application details',
+      icon: <FileText size={20} className="text-primary" />,
+      bg: 'bg-primary/8',
+      available: !!formFeePaid,
+      lockedMsg: 'Pay registration fee to unlock',
+      action: onPrint,
+      actionLabel: 'Print / Save PDF',
+      actionIcon: <Printer size={14} />,
+      style: 'primary',
+    },
+    {
+      title: 'Admission Letter',
+      desc: 'Official IJMB admission letter for your session',
+      icon: <BadgeCheck size={20} className="text-green-600" />,
+      bg: 'bg-green-50',
+      available: !!hasPaidAcceptanceFee && !!application?.admission_letter_path,
+      lockedMsg: isAdmitted ? 'Pay acceptance fee to unlock' : 'Available after admission is granted',
+      action: downloadLetter,
+      actionLabel: 'Download Letter',
+      actionIcon: <Download size={14} />,
+      style: 'green',
+    },
+  ];
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-lg font-bold">Documents</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">Your official IJMB documents</p>
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-4">
+        {docs.map((doc) => (
+          <div key={doc.title} className={`bg-white rounded-2xl border p-5 space-y-4 transition-shadow hover:shadow-md ${!doc.available ? 'opacity-80' : ''}`}>
+            <div className="flex items-start gap-3">
+              <div className={`w-11 h-11 rounded-2xl ${doc.bg} flex items-center justify-center shrink-0`}>
+                {doc.icon}
+              </div>
+              <div>
+                <h3 className="font-bold text-sm">{doc.title}</h3>
+                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{doc.desc}</p>
+              </div>
+            </div>
+
+            {doc.available ? (
+              <button
+                onClick={doc.action}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-colors
+                  ${doc.style === 'green'
+                    ? 'bg-green-600 hover:bg-green-700 text-white'
+                    : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
+              >
+                {doc.actionIcon}{doc.actionLabel}
+              </button>
+            ) : (
+              <div className="flex items-center gap-2 py-2.5 px-4 bg-muted/50 rounded-xl border border-dashed border-muted-foreground/30">
+                <div className="w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center shrink-0">
+                  <Clock size={10} className="text-muted-foreground" />
+                </div>
+                <span className="text-xs text-muted-foreground font-medium">{doc.lockedMsg}</span>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-800">
+        <p className="font-semibold mb-1">Document availability</p>
+        <ul className="space-y-1 text-xs text-blue-700 list-disc list-inside">
+          <li>Application form is available after paying the registration fee</li>
+          <li>Admission letter is available after paying the acceptance fee</li>
+          <li>Tuition receipt is generated automatically after payment</li>
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+// ── Profile tab ───────────────────────────────────────────────────────────────
 function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPhone, updateProfile, handleSignOut }: any) {
   const [savingProfile, setSavingProfile] = useState(false);
   const [newEmail, setNewEmail] = useState('');
@@ -37,7 +708,7 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Confirmation sent', description: `A verification link has been sent to ${newEmail}. Click it to confirm the change.` });
+      toast({ title: 'Confirmation sent', description: `A verification link has been sent to ${newEmail}.` });
       setNewEmail('');
     }
     setSavingEmail(false);
@@ -45,338 +716,152 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
 
   const handleChangePassword = async () => {
     if (!newPassword) return;
-    if (newPassword !== confirmPassword) {
-      toast({ title: 'Passwords do not match', variant: 'destructive' });
-      return;
-    }
-    if (newPassword.length < 6) {
-      toast({ title: 'Password too short', description: 'Must be at least 6 characters', variant: 'destructive' });
-      return;
-    }
+    if (newPassword !== confirmPassword) { toast({ title: 'Passwords do not match', variant: 'destructive' }); return; }
+    if (newPassword.length < 6) { toast({ title: 'Password too short', description: 'Must be at least 6 characters', variant: 'destructive' }); return; }
     setSavingPassword(true);
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Password updated successfully' });
-      setNewPassword('');
-      setConfirmPassword('');
+      toast({ title: 'Password updated!' });
+      setNewPassword(''); setConfirmPassword('');
     }
     setSavingPassword(false);
   };
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
-      <header className="bg-white border-b sticky top-0 z-20">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button onClick={() => window.location.href = '/dashboard'} className="text-sm text-muted-foreground hover:text-foreground transition-colors">← Back</button>
-            <ChevronRight size={14} className="text-muted-foreground" />
-            <span className="text-sm font-semibold">My Profile</span>
+  const sections = [
+    {
+      icon: <User size={18} className="text-primary" />,
+      title: 'Account Information',
+      content: (
+        <div className="space-y-4">
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Full Name</label>
+              <input value={editName} onChange={e => setEditName(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" placeholder="Your full name" />
+            </div>
+            <div>
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Phone Number</label>
+              <input value={editPhone} onChange={e => setEditPhone(e.target.value)}
+                className="w-full h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" placeholder="Phone number" />
+            </div>
           </div>
-          <button onClick={handleSignOut} className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 font-medium transition-colors">
-            <LogOut size={16} /> Sign Out
+          <div>
+            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Current Email</label>
+            <input value={user?.email || ''} disabled
+              className="w-full h-10 px-3 rounded-xl border text-sm bg-muted text-muted-foreground cursor-not-allowed" />
+          </div>
+          <button onClick={handleSaveProfile} disabled={savingProfile}
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:bg-primary/90 disabled:opacity-60 transition-colors">
+            {savingProfile ? <Loader2 size={14} className="animate-spin" /> : <Pencil size={14} />}
+            Save Changes
           </button>
         </div>
-      </header>
-
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-5">
-
-        {/* Account info */}
-        <div className="bg-white rounded-2xl border p-6 space-y-5">
-          <div className="flex items-center gap-2 pb-2 border-b">
-            <User size={18} className="text-primary" />
-            <h2 className="font-bold text-base">Account Information</h2>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-1.5">Full Name</label>
-              <div className="flex gap-2">
-                <input
-                  value={editName}
-                  onChange={e => setEditName(e.target.value)}
-                  className="flex-1 h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  placeholder="Your full name"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-1.5">Phone Number</label>
-              <input
-                value={editPhone}
-                onChange={e => setEditPhone(e.target.value)}
-                className="w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                placeholder="Phone number"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wide block mb-1.5">Current Email</label>
-              <input
-                value={user?.email || ''}
-                disabled
-                className="w-full h-10 px-3 rounded-lg border text-sm bg-muted text-muted-foreground cursor-not-allowed"
-              />
-            </div>
-            <button
-              onClick={handleSaveProfile}
-              disabled={savingProfile}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-60 transition-colors"
-            >
-              {savingProfile ? <Loader2 size={15} className="animate-spin" /> : <Pencil size={15} />}
-              Save Changes
-            </button>
-          </div>
-        </div>
-
-        {/* Change email */}
-        <div className="bg-white rounded-2xl border p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-2 border-b">
-            <Mail size={18} className="text-primary" />
-            <h2 className="font-bold text-base">Change Email Address</h2>
-          </div>
-          <p className="text-sm text-muted-foreground">Enter your new email. We'll send a confirmation link — your email won't change until you click it.</p>
-          <div className="flex gap-2">
-            <input
-              type="email"
-              value={newEmail}
-              onChange={e => setNewEmail(e.target.value)}
-              placeholder="new@email.com"
-              className="flex-1 h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <button
-              onClick={handleChangeEmail}
-              disabled={savingEmail || !newEmail}
-              className="px-4 py-2 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors whitespace-nowrap"
-            >
-              {savingEmail ? <Loader2 size={15} className="animate-spin" /> : 'Send Link'}
-            </button>
-          </div>
-        </div>
-
-        {/* Change password */}
-        <div className="bg-white rounded-2xl border p-6 space-y-4">
-          <div className="flex items-center gap-2 pb-2 border-b">
-            <KeyRound size={18} className="text-primary" />
-            <h2 className="font-bold text-base">Change Password</h2>
-          </div>
-          <div className="space-y-3">
-            <input
-              type="password"
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-              placeholder="New password (min. 6 characters)"
-              className="w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <input
-              type="password"
-              value={confirmPassword}
-              onChange={e => setConfirmPassword(e.target.value)}
-              placeholder="Confirm new password"
-              className="w-full h-10 px-3 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-            />
-            <button
-              onClick={handleChangePassword}
-              disabled={savingPassword || !newPassword}
-              className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
-            >
-              {savingPassword ? <Loader2 size={15} className="animate-spin" /> : <KeyRound size={15} />}
-              Update Password
-            </button>
-          </div>
-        </div>
-
-        {/* Sign out */}
-        <div className="bg-white rounded-2xl border p-6">
-          <div className="flex items-center gap-2 pb-2 border-b mb-4">
-            <LogOut size={18} className="text-red-500" />
-            <h2 className="font-bold text-base">Sign Out</h2>
-          </div>
-          <p className="text-sm text-muted-foreground mb-4">You will be signed out of your account on this device.</p>
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors"
-          >
-            <LogOut size={15} /> Sign Out
+      ),
+    },
+    {
+      icon: <Mail size={18} className="text-blue-600" />,
+      title: 'Change Email Address',
+      desc: "Enter your new email. We'll send a confirmation link — your email won't change until you click it.",
+      content: (
+        <div className="flex gap-2">
+          <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="new@email.com"
+            className="flex-1 h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" />
+          <button onClick={handleChangeEmail} disabled={savingEmail || !newEmail}
+            className="px-4 py-2 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition-colors whitespace-nowrap">
+            {savingEmail ? <Loader2 size={14} className="animate-spin" /> : 'Send Link'}
           </button>
         </div>
+      ),
+    },
+    {
+      icon: <KeyRound size={18} className="text-amber-600" />,
+      title: 'Change Password',
+      content: (
+        <div className="space-y-3">
+          <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+            placeholder="New password (min. 6 characters)"
+            className="w-full h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" />
+          <input type="password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+            placeholder="Confirm new password"
+            className="w-full h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" />
+          <button onClick={handleChangePassword} disabled={savingPassword || !newPassword}
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:bg-primary/90 disabled:opacity-50 transition-colors">
+            {savingPassword ? <Loader2 size={14} className="animate-spin" /> : <KeyRound size={14} />}
+            Update Password
+          </button>
+        </div>
+      ),
+    },
+  ];
 
-      </main>
-    </div>
-  );
-}
-
-// ── Status helpers ────────────────────────────────────────────────────────────
-const STATUS_MAP: Record<string, { label: string; color: string; bg: string; border: string; icon: React.ReactNode }> = {
-  draft:           { label: 'Draft',            color: 'text-gray-600',   bg: 'bg-gray-50',   border: 'border-gray-200',  icon: <FileText size={16} /> },
-  payment_pending: { label: 'Payment Pending',  color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200', icon: <CreditCard size={16} /> },
-  submitted:       { label: 'Under Review',     color: 'text-blue-700',   bg: 'bg-blue-50',   border: 'border-blue-200',  icon: <Clock size={16} /> },
-  review:          { label: 'Under Review',     color: 'text-blue-700',   bg: 'bg-blue-50',   border: 'border-blue-200',  icon: <Clock size={16} /> },
-  admitted:        { label: 'Admitted!',         color: 'text-green-700',  bg: 'bg-green-50',  border: 'border-green-200', icon: <Star size={16} /> },
-  fees_pending:    { label: 'Fees Pending',     color: 'text-amber-700',  bg: 'bg-amber-50',  border: 'border-amber-200', icon: <CreditCard size={16} /> },
-  active:          { label: 'Active Student',   color: 'text-emerald-700',bg: 'bg-emerald-50',border: 'border-emerald-200',icon: <GraduationCap size={16} /> },
-  rejected:        { label: 'Not Admitted',     color: 'text-red-700',    bg: 'bg-red-50',    border: 'border-red-200',   icon: <AlertCircle size={16} /> },
-};
-
-// ── Journey steps ─────────────────────────────────────────────────────────────
-const STEPS = [
-  { key: 'apply',    label: 'Apply',        icon: <FileText size={14} /> },
-  { key: 'pay',      label: 'Pay Fee',      icon: <CreditCard size={14} /> },
-  { key: 'review',   label: 'Review',       icon: <Clock size={14} /> },
-  { key: 'admitted', label: 'Admitted',     icon: <Star size={14} /> },
-  { key: 'accept',   label: 'Accept',       icon: <CheckCircle size={14} /> },
-  { key: 'active',   label: 'Active',       icon: <GraduationCap size={14} /> },
-];
-
-function getStepIndex(status: string | undefined) {
-  switch (status) {
-    case 'draft':            return 0;
-    case 'payment_pending':  return 1;
-    case 'submitted':
-    case 'review':           return 2;
-    case 'admitted':         return 3;
-    case 'fees_pending':     return 4;
-    case 'active':           return 5;
-    default:                 return 0;
-  }
-}
-
-function ProgressTracker({ status }: { status: string | undefined }) {
-  const current = getStepIndex(status);
   return (
-    <div className="w-full">
-      <div className="flex items-center justify-between gap-1">
-        {STEPS.map((step, i) => {
-          const done = i < current;
-          const active = i === current;
-          return (
-            <div key={step.key} className="flex-1 flex flex-col items-center gap-1.5">
-              {/* connector line before */}
-              <div className="w-full flex items-center">
-                {i > 0 && (
-                  <div className={`flex-1 h-0.5 ${i <= current ? 'bg-primary' : 'bg-border'}`} />
-                )}
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 text-xs transition-all
-                  ${done ? 'bg-primary text-white' : active ? 'bg-primary text-white ring-4 ring-primary/20' : 'bg-muted text-muted-foreground border border-border'}`}>
-                  {done ? <CheckCircle size={14} /> : step.icon}
-                </div>
-                {i < STEPS.length - 1 && (
-                  <div className={`flex-1 h-0.5 ${i < current ? 'bg-primary' : 'bg-border'}`} />
-                )}
-              </div>
-              <span className={`text-[10px] sm:text-xs font-medium text-center leading-tight
-                ${active ? 'text-primary' : done ? 'text-foreground' : 'text-muted-foreground'}`}>
-                {step.label}
-              </span>
-            </div>
-          );
-        })}
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-lg font-bold">My Account</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">Manage your personal information and security</p>
+      </div>
+
+      {sections.map((sec) => (
+        <div key={sec.title} className="bg-white rounded-2xl border p-5 space-y-4 hover:shadow-md transition-shadow">
+          <div className="flex items-center gap-2 pb-3 border-b">
+            {sec.icon}
+            <h3 className="font-bold text-sm">{sec.title}</h3>
+          </div>
+          {sec.desc && <p className="text-sm text-muted-foreground">{sec.desc}</p>}
+          {sec.content}
+        </div>
+      ))}
+
+      <div className="bg-white rounded-2xl border border-red-100 p-5 hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 pb-3 border-b border-red-100 mb-4">
+          <LogOut size={18} className="text-red-500" />
+          <h3 className="font-bold text-sm text-red-700">Sign Out</h3>
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">You will be signed out of your account on this device.</p>
+        <button onClick={handleSignOut}
+          className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition-colors">
+          <LogOut size={14} /> Sign Out
+        </button>
       </div>
     </div>
   );
 }
 
-// ── What To Do Next card ───────────────────────────────────────────────────────
-function WhatNextCard({
-  status, isAdmitted, hasPaidAcceptanceFee, formFeePaid,
-  onPayAcceptance, onDownloadLetter,
-}: {
+// ── Shell wrapper ─────────────────────────────────────────────────────────────
+function DashboardShell({ children, currentTab, onNavigate, profile, user, onSignOut, status, formFeePaid }: {
+  children: React.ReactNode;
+  currentTab: string;
+  onNavigate: (tab: string) => void;
+  profile: any; user: any;
+  onSignOut: () => void;
   status?: string;
-  isAdmitted: boolean;
-  hasPaidAcceptanceFee: boolean;
   formFeePaid: boolean;
-  onPayAcceptance: () => void;
-  onDownloadLetter: () => void;
 }) {
-  const cards: Record<string, { icon: React.ReactNode; headline: string; sub: string; cta?: { label: string; action: () => void }; color: string }> = {
-    submitted: {
-      icon: <Clock size={24} className="text-blue-600" />,
-      headline: 'Your application is under review',
-      sub: 'Our admissions team is reviewing your details. You will be notified once a decision is made — this typically takes 1–3 business days.',
-      color: 'bg-blue-50 border-blue-200',
-    },
-    review: {
-      icon: <Clock size={24} className="text-blue-600" />,
-      headline: 'Your application is under review',
-      sub: 'Our admissions team is reviewing your details. You will be notified once a decision is made — this typically takes 1–3 business days.',
-      color: 'bg-blue-50 border-blue-200',
-    },
-    admitted: {
-      icon: <Star size={24} className="text-green-600" />,
-      headline: 'Congratulations — you have been admitted!',
-      sub: 'Pay your acceptance fee to unlock your admission letter and confirm your place.',
-      cta: { label: 'Pay Acceptance Fee', action: onPayAcceptance },
-      color: 'bg-green-50 border-green-200',
-    },
-    fees_pending: {
-      icon: <CheckCircle size={24} className="text-emerald-600" />,
-      headline: 'Admission confirmed — download your letter',
-      sub: 'Your acceptance fee has been received. Download your official admission letter below.',
-      cta: { label: 'Download Admission Letter', action: onDownloadLetter },
-      color: 'bg-emerald-50 border-emerald-200',
-    },
-    active: {
-      icon: <GraduationCap size={24} className="text-emerald-600" />,
-      headline: "You're an active IJMB student!",
-      sub: 'Your registration is complete. Attend your assigned centre and prepare for your A-Level examinations.',
-      color: 'bg-emerald-50 border-emerald-200',
-    },
-    rejected: {
-      icon: <AlertCircle size={24} className="text-red-600" />,
-      headline: 'Application not successful',
-      sub: 'Unfortunately your application was not approved this time. Contact us on WhatsApp and we will help you understand the next steps.',
-      cta: { label: 'Chat on WhatsApp', action: () => window.open('https://wa.link/udcjk0', '_blank') },
-      color: 'bg-red-50 border-red-200',
-    },
-  };
-
-  const card = cards[status || 'submitted'] || cards.submitted;
-
+  const [drawerOpen, setDrawerOpen] = useState(false);
   return (
-    <div className={`rounded-2xl border p-5 sm:p-6 ${card.color}`}>
-      <div className="flex items-start gap-4">
-        <div className="shrink-0 mt-0.5">{card.icon}</div>
-        <div className="flex-1 min-w-0">
-          <p className="font-bold text-foreground text-base sm:text-lg mb-1">{card.headline}</p>
-          <p className="text-sm text-muted-foreground leading-relaxed">{card.sub}</p>
-          {card.cta && (
-            <button
-              onClick={card.cta.action}
-              className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors"
-            >
-              {card.cta.label} <ArrowRight size={15} />
-            </button>
-          )}
+    <div className="min-h-screen bg-slate-50">
+      <Sidebar currentTab={currentTab} onNavigate={onNavigate} profile={profile} user={user} onSignOut={onSignOut} formFeePaid={formFeePaid} status={status} />
+      <MobileHeader profile={profile} currentTab={currentTab} onMenuOpen={() => setDrawerOpen(true)} />
+      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} profile={profile} user={user} currentTab={currentTab} onNavigate={onNavigate} onSignOut={onSignOut} status={status} />
+      <main className="lg:pl-64 xl:pl-72 pb-24 lg:pb-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          {children}
         </div>
-      </div>
+      </main>
+      <MobileBottomNav currentTab={currentTab} onNavigate={onNavigate} />
     </div>
   );
 }
 
-// ── Main Dashboard component ──────────────────────────────────────────────────
+// ── Main Dashboard ─────────────────────────────────────────────────────────────
 const Dashboard = () => {
   const {
-    user,
-    profile,
-    application,
-    olevelResults,
-    sessions,
-    centres,
-    combos,
-    formFee,
-    loading,
-    loadError,
-    saving,
-    uploading,
-    editName,
-    setEditName,
-    editPhone,
-    setEditPhone,
-    updateProfile,
-    saveApplication,
-    handleFileUpload,
-    handlePaymentSuccess,
-    fetchData
+    user, profile, application, olevelResults, sessions, centres, combos,
+    formFee, loading, loadError, saving, uploading,
+    editName, setEditName, editPhone, setEditPhone,
+    updateProfile, saveApplication, handleFileUpload, handlePaymentSuccess, fetchData
   } = useStudentDashboard();
 
   const { signOut } = useAuth();
@@ -384,10 +869,8 @@ const Dashboard = () => {
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get('tab') || 'dashboard';
 
-  const handleSignOut = async () => {
-    await signOut();
-    router.push('/');
-  };
+  const handleSignOut = async () => { await signOut(); router.push('/'); };
+  const navigate = (tab: string) => router.push(tab === 'dashboard' ? '/dashboard' : `/dashboard?tab=${tab}`);
 
   const formFeePaid = application?.form_fee_paid || false;
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application.status);
@@ -395,37 +878,26 @@ const Dashboard = () => {
   const isPaymentPending = application?.status === 'payment_pending';
   const isDraft = !application || application.status === 'draft' || !application.status;
 
-  const statusInfo = STATUS_MAP[application?.status || 'draft'] || STATUS_MAP.submitted;
-  const firstName = (profile?.full_name?.split(' ')[0]) || application?.first_name || user?.email?.split('@')[0] || 'Student';
-
-  const downloadAdmissionLetter = async () => {
-    if (!application?.admission_letter_path) return;
-    const { data } = await supabase.storage.from('student-documents').createSignedUrl(application.admission_letter_path, 300);
-    if (data?.signedUrl) window.open(data.signedUrl, '_blank');
-  };
-
-  const handleDownloadApplicationForm = (_action: 'download' | 'preview' | 'print') => {
-    // Wait for all images to load before printing so passport shows correctly
+  const handlePrint = () => {
     const images = document.querySelectorAll('img');
     const pending = Array.from(images).filter(img => !img.complete);
     if (pending.length > 0) {
-      Promise.all(pending.map(img => new Promise(r => { img.onload = r; img.onerror = r; })))
-        .then(() => window.print());
+      Promise.all(pending.map(img => new Promise(r => { img.onload = r; img.onerror = r; }))).then(() => window.print());
     } else {
       window.print();
     }
   };
 
-  // ── Loading ──────────────────────────────────────────────────────────────────
+  // Loading
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-primary/5 to-background">
+      <div className="flex items-center justify-center min-h-screen bg-slate-50">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <Loader2 size={28} className="animate-spin text-primary" />
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
+            <Loader2 size={30} className="animate-spin text-primary" />
           </div>
           <div className="text-center">
-            <p className="font-semibold text-foreground">Loading your dashboard</p>
+            <p className="font-bold text-foreground">Loading your dashboard</p>
             <p className="text-sm text-muted-foreground mt-1">Just a moment…</p>
           </div>
         </div>
@@ -433,34 +905,37 @@ const Dashboard = () => {
     );
   }
 
-  // ── Load error — don't fall through to the form ──────────────────────────
+  // Load error
   if (loadError) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl border p-8 max-w-sm w-full text-center space-y-4">
-          <AlertCircle size={36} className="text-red-500 mx-auto" />
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl border p-8 max-w-sm w-full text-center space-y-4 shadow-lg">
+          <div className="w-14 h-14 rounded-2xl bg-red-100 flex items-center justify-center mx-auto">
+            <AlertCircle size={28} className="text-red-500" />
+          </div>
           <h2 className="font-bold text-lg">Could not load your dashboard</h2>
-          <p className="text-sm text-muted-foreground">There was a problem fetching your application data. Please try refreshing the page.</p>
-          <Button onClick={() => window.location.reload()} className="w-full">Refresh Page</Button>
+          <p className="text-sm text-muted-foreground">There was a problem fetching your data. Please try refreshing.</p>
+          <Button onClick={() => window.location.reload()} className="w-full rounded-xl">Refresh Page</Button>
           <button onClick={handleSignOut} className="text-xs text-muted-foreground hover:text-red-600 transition-colors">Sign out and try again</button>
         </div>
       </div>
     );
   }
 
-  // ── Stage 1: Fill Application ─────────────────────────────────────────────
+  // Stage 1: Fill Application
   if (isDraft) {
     return (
       <>
         <SEOHead title="Complete Application – IJMB" description="Complete your IJMB application." />
-        <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
-          <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
-          <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-            {/* Welcome banner */}
-            <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
-              <p className="text-sm font-medium opacity-80 mb-1">Welcome, {firstName}</p>
-              <h1 className="text-2xl sm:text-3xl font-bold mb-2">Complete Your Application</h1>
-              <p className="opacity-80 text-sm">Fill in the form below to submit your IJMB 2026/2027 application.</p>
+        <DashboardShell currentTab="application" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
+          <div className="space-y-6">
+            <div className="relative overflow-hidden rounded-2xl bg-[hsl(145,63%,18%)] text-white p-6 sm:p-8">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+              <div className="relative">
+                <p className="text-sm text-white/70 mb-1">Welcome, {profile?.full_name?.split(' ')[0] || 'Student'}</p>
+                <h1 className="text-2xl sm:text-3xl font-black mb-2">Complete Your Application</h1>
+                <p className="text-white/70 text-sm">Fill in all required fields and upload your documents to submit your IJMB application.</p>
+              </div>
             </div>
             <ApplicationForm
               application={application}
@@ -473,306 +948,152 @@ const Dashboard = () => {
               onFileUpload={handleFileUpload}
               uploading={uploading}
             />
-          </main>
-        </div>
+          </div>
+        </DashboardShell>
       </>
     );
   }
 
-  // ── Stage 2: Pay Form Fee ─────────────────────────────────────────────────
+  // Stage 2: Pay Form Fee
   if (isPaymentPending && !formFeePaid) {
     return (
       <>
         <SEOHead title="Payment – IJMB" description="Pay your IJMB registration fee." />
-        <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
-          <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
-          <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-            {/* Success + next step banner */}
-            <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
-              <div className="flex items-center gap-3 mb-3">
-                <CheckCircle size={24} className="opacity-90" />
-                <p className="font-bold text-lg">Application Submitted!</p>
+        <DashboardShell currentTab="payments" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
+          <div className="space-y-5">
+            <div className="relative overflow-hidden rounded-2xl bg-[hsl(145,63%,18%)] text-white p-6 sm:p-8">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+              <div className="relative flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+                  <CheckCircle size={24} />
+                </div>
+                <div>
+                  <p className="font-black text-xl mb-1">Application Submitted!</p>
+                  <p className="text-white/70 text-sm">One final step — pay the ₦{formFee.toLocaleString()} registration fee to send your application for review.</p>
+                </div>
               </div>
-              <p className="opacity-80 text-sm">One final step — pay the ₦5,500 registration fee to send your application for review.</p>
             </div>
-
-            {/* Progress */}
             <div className="bg-white rounded-2xl border p-5 sm:p-6">
-              <p className="text-sm font-semibold text-muted-foreground mb-5">Your Journey</p>
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-5">Your Journey</p>
               <ProgressTracker status="payment_pending" />
             </div>
-
-            <DashboardPayments
-              user={user}
-              application={application}
-              onFeePaymentSuccess={async (feeName) => {
-                if (feeName === 'form_fee') await handlePaymentSuccess();
-              }}
-            />
-          </main>
-        </div>
+            <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName) => {
+              if (feeName === 'form_fee') await handlePaymentSuccess();
+            }} />
+          </div>
+        </DashboardShell>
       </>
     );
   }
 
-  // ── Profile tab ──────────────────────────────────────────────────────────
-  if (currentTab === 'profile') {
-    return <ProfileTab
-      user={user}
-      profile={profile}
-      editName={editName}
-      setEditName={setEditName}
-      editPhone={editPhone}
-      setEditPhone={setEditPhone}
-      updateProfile={updateProfile}
-      handleSignOut={handleSignOut}
-    />;
-  }
-
-  // ── Stage 3: Payments tab ─────────────────────────────────────────────────
-  if (currentTab === 'payments') {
-    return (
-      <>
-        <SEOHead title="Payments – IJMB" description="Pay your IJMB fees." />
-        <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-20">
-          <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
-          <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-            <div className="flex items-center gap-3 mb-2">
-              <button onClick={() => window.location.href = '/dashboard'} className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1.5 transition-colors">
-                ← Back
-              </button>
-              <ChevronRight size={14} className="text-muted-foreground" />
-              <span className="text-sm font-medium">Payments</span>
-            </div>
-
-            <div className="bg-white rounded-2xl border p-5 sm:p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <CreditCard size={20} className="text-primary" />
-                <h1 className="text-xl font-bold">Payments</h1>
-              </div>
-              <div className="p-4 bg-blue-50 text-blue-800 rounded-xl border border-blue-200 text-sm mb-6">
-                After your admission is granted, pay the Acceptance Fee to download your admission letter. Tuition and Hostel fees become available after acceptance.
-              </div>
-              <DashboardPayments
-                user={user}
-                application={application}
-                onFeePaymentSuccess={async (feeName) => {
-                  if (feeName === 'form_fee') {
-                    await handlePaymentSuccess();
-                  } else if (application?.id) {
-                    if (feeName === 'acceptance_fee' && application.status === 'admitted') {
-                      await supabase.from('applications').update({ status: 'fees_pending', updated_at: new Date().toISOString() }).eq('id', application.id);
-                    }
-                    if (feeName === 'tuition_fee' && ['admitted', 'fees_pending'].includes(application.status)) {
-                      await supabase.from('applications').update({ status: 'active', updated_at: new Date().toISOString() }).eq('id', application.id);
-                    }
-                  }
-                  await fetchData();
-                }}
-              />
-            </div>
-          </main>
-        </div>
-      </>
-    );
-  }
-
-  // ── Stage 4: Main Dashboard (submitted / reviewed / admitted / active) ─────
+  // Full dashboard with shell
   return (
     <>
       <SEOHead title="Student Dashboard – IJMB" description="Manage your IJMB application." canonical="https://www.ijmb.info/dashboard" />
 
       <DashboardPrintView
-        application={application}
-        profile={profile}
-        user={user}
-        sessions={sessions}
-        centres={centres}
-        combos={combos}
-        olevelResults={olevelResults}
-        formFee={formFee}
+        application={application} profile={profile} user={user}
+        sessions={sessions} centres={centres} combos={combos}
+        olevelResults={olevelResults} formFee={formFee}
       />
 
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 to-background pb-24 print:hidden">
-        <DashboardHeader profile={profile} user={user} signOut={handleSignOut} />
+      <div className="print:hidden">
+        <DashboardShell currentTab={currentTab} onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
 
-        <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-5">
+          {currentTab === 'dashboard' && (
+            <OverviewTab
+              application={application} profile={profile} user={user}
+              centres={centres} formFee={formFee} sessions={sessions}
+              onNavigate={navigate} handlePaymentSuccess={handlePaymentSuccess} fetchData={fetchData}
+            />
+          )}
 
-          {/* ── Hero greeting + status ── */}
-          <div className="rounded-2xl bg-primary text-primary-foreground p-6 sm:p-8">
-            <div className="flex items-start justify-between gap-4 flex-wrap">
+          {currentTab === 'application' && (
+            <div className="space-y-5">
               <div>
-                <p className="text-sm font-medium opacity-75 mb-1">Welcome back</p>
-                <h1 className="text-2xl sm:text-3xl font-bold">{firstName}</h1>
-                <p className="opacity-75 text-sm mt-1">IJMB 2026/2027 Applicant</p>
+                <h2 className="text-lg font-bold">Application</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">Your submitted application details</p>
               </div>
-              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold ${statusInfo.bg} ${statusInfo.color} ${statusInfo.border} border`}>
-                {statusInfo.icon}
-                {statusInfo.label}
+              <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800 flex items-center gap-3">
+                <CheckCircle size={18} className="text-amber-600 shrink-0" />
+                <span>Your application has been submitted. Contact support if you need to make changes.</span>
               </div>
-            </div>
-
-            {/* Quick info row */}
-            <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5 pt-5 border-t border-white/20 text-sm">
-              <span className="opacity-80">
-                <span className="opacity-60 mr-1.5">App ID:</span>
-                <span className="font-semibold">{application?.application_number || application?.id?.split('-')[0].toUpperCase()}</span>
-              </span>
-              <span className="opacity-80">
-                <span className="opacity-60 mr-1.5">Course:</span>
-                <span className="font-semibold">{application?.intended_course || '—'}</span>
-              </span>
-              <span className="opacity-80">
-                <span className="opacity-60 mr-1.5">Session:</span>
-                <span className="font-semibold">2026/2027</span>
-              </span>
-            </div>
-          </div>
-
-          {/* ── Progress tracker ── */}
-          <div className="bg-white rounded-2xl border p-5 sm:p-6">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-5">Your Journey</p>
-            <ProgressTracker status={application?.status} />
-          </div>
-
-          {/* ── What To Do Next ── */}
-          <WhatNextCard
-            status={application?.status}
-            isAdmitted={!!isAdmitted}
-            hasPaidAcceptanceFee={!!hasPaidAcceptanceFee}
-            formFeePaid={formFeePaid}
-            onPayAcceptance={() => window.location.href = '?tab=payments'}
-            onDownloadLetter={downloadAdmissionLetter}
-          />
-
-          {/* ── Application details + documents grid ── */}
-          <div className="grid sm:grid-cols-2 gap-5">
-
-            {/* Application Details */}
-            <div className="bg-white rounded-2xl border p-5 sm:p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <User size={16} className="text-primary" />
-                <h2 className="font-bold text-base">Application Details</h2>
-              </div>
-              <dl className="space-y-3 text-sm">
-                {[
-                  { label: 'Full Name', value: `${application?.surname || ''} ${application?.first_name || ''} ${application?.middle_name || ''}`.trim() || '—' },
-                  { label: 'Application ID', value: application?.application_number || application?.id?.split('-')[0].toUpperCase() || '—' },
-                  { label: 'Preferred Centre', value: centres.find(c => c.id === application?.preferred_centre_id)?.name || '—' },
-                  { label: 'Course of Choice', value: application?.intended_course || '—' },
-                ].map(({ label, value }) => (
-                  <div key={label} className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground shrink-0">{label}</dt>
-                    <dd className="font-medium text-right text-foreground">{value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-
-            {/* Payments Quick View */}
-            <div className="bg-white rounded-2xl border p-5 sm:p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-1">
-                <CreditCard size={16} className="text-primary" />
-                <h2 className="font-bold text-base">Payments</h2>
-              </div>
-              <div className="space-y-3 text-sm">
-                {[
-                  { label: 'Registration Form Fee', paid: formFeePaid, amount: '₦5,500' },
-                  { label: 'Acceptance Fee', paid: !!hasPaidAcceptanceFee, amount: 'See payments' },
-                  { label: 'Tuition Fee', paid: application?.status === 'active', amount: 'See payments' },
-                ].map(({ label, paid, amount }) => (
-                  <div key={label} className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className={`w-2 h-2 rounded-full ${paid ? 'bg-green-500' : 'bg-muted-foreground/30'}`} />
-                      <span className={paid ? 'text-foreground' : 'text-muted-foreground'}>{label}</span>
+              <div className="bg-white rounded-2xl border p-5 space-y-4">
+                <h3 className="font-bold text-sm border-b pb-3">Personal Information</h3>
+                <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                  {[
+                    { label: 'Surname', value: application?.surname },
+                    { label: 'First Name', value: application?.first_name },
+                    { label: 'Middle Name', value: application?.middle_name },
+                    { label: 'Gender', value: application?.gender },
+                    { label: 'Date of Birth', value: application?.date_of_birth },
+                    { label: 'State of Origin', value: application?.state_of_origin },
+                    { label: 'LGA', value: application?.lga },
+                    { label: 'Phone', value: application?.guardian_phone },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+                      <p className="font-semibold">{value || '—'}</p>
                     </div>
-                    <span className={`text-xs font-medium ${paid ? 'text-green-600' : 'text-muted-foreground'}`}>
-                      {paid ? '✓ Paid' : amount}
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <button
-                onClick={() => window.location.href = '?tab=payments'}
-                className="mt-2 w-full text-center text-xs font-semibold text-primary border border-primary/30 rounded-lg py-2.5 hover:bg-primary/5 transition-colors"
-              >
-                View All Payments →
-              </button>
-            </div>
-          </div>
-
-          {/* ── Documents ── */}
-          {formFeePaid && (
-            <div className="bg-white rounded-2xl border p-5 sm:p-6">
-              <div className="flex items-center gap-2 mb-5">
-                <FileText size={16} className="text-primary" />
-                <h2 className="font-bold text-base">Documents</h2>
-              </div>
-
-              <div className="space-y-3">
-                {/* Application form */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-muted/30 rounded-xl border">
-                  <div>
-                    <p className="font-semibold text-sm">Application Form</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">
-                      {application?.application_number || application?.id?.split('-')[0].toUpperCase()}
-                    </p>
-                  </div>
-                  <div className="flex gap-2 flex-wrap">
-                    <Button variant="outline" size="sm" onClick={() => handleDownloadApplicationForm('print')}>
-                      <Printer size={14} className="mr-1.5" /> Print / Save as PDF
-                    </Button>
-                  </div>
+                  ))}
                 </div>
-
-                {/* Admission letter */}
-                {isAdmitted && (
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
-                    <div>
-                      <p className="font-semibold text-sm text-green-800">Admission Letter</p>
-                      <p className="text-xs text-green-700 mt-0.5">Official IJMB Admission Letter 2026/2027</p>
+                <h3 className="font-bold text-sm border-b pb-3 pt-2">Programme Selection</h3>
+                <div className="grid sm:grid-cols-2 gap-4 text-sm">
+                  {[
+                    { label: 'Intended Course', value: application?.intended_course },
+                    { label: 'Preferred Centre', value: centres.find((c: any) => c.id === application?.preferred_centre_id)?.name },
+                    { label: 'Subject Combination', value: combos.find((c: any) => c.id === application?.subject_combination_id)?.name },
+                    { label: 'Application Number', value: application?.application_number },
+                  ].map(({ label, value }) => (
+                    <div key={label}>
+                      <p className="text-xs text-muted-foreground mb-0.5">{label}</p>
+                      <p className="font-semibold">{value || '—'}</p>
                     </div>
-                    {hasPaidAcceptanceFee ? (
-                      <Button size="sm" onClick={downloadAdmissionLetter} className="bg-green-700 hover:bg-green-800 text-white">
-                        <Download size={14} className="mr-1.5" /> Download
-                      </Button>
-                    ) : (
-                      <span className="text-xs text-amber-700 bg-amber-50 px-3 py-2 rounded-lg border border-amber-200">
-                        Pay acceptance fee to unlock
-                      </span>
-                    )}
-                  </div>
-                )}
+                  ))}
+                </div>
               </div>
             </div>
           )}
 
-          {/* ── Support ── */}
-          <div className="rounded-2xl border p-5 sm:p-6 bg-[#f0fdf4] border-[#bbf7d0]">
-            <div className="flex items-start gap-4">
-              <div className="w-11 h-11 rounded-2xl bg-[#25D366] flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-6 h-6 fill-white">
-                  <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16.004c0 3.5 1.129 6.744 3.047 9.379L1.054 31.27l6.1-1.957a15.9 15.9 0 008.85 2.691C24.826 32 32 24.826 32 16.004S24.826 0 16.004 0zm9.35 22.617c-.393 1.107-1.943 2.025-3.188 2.293-.852.182-1.963.326-5.705-1.227-4.787-1.986-7.867-6.834-8.107-7.152-.229-.318-1.928-2.568-1.928-4.895s1.221-3.473 1.654-3.947c.434-.475.947-.594 1.262-.594.316 0 .631.002.908.016.291.016.682-.111 1.068.814.393.947 1.34 3.264 1.457 3.502.119.238.197.514.039.83-.158.318-.236.514-.475.791-.236.277-.498.619-.711.83-.238.238-.486.496-.209.971.277.475 1.234 2.035 2.65 3.299 1.82 1.623 3.354 2.127 3.83 2.365.475.238.752.197 1.029-.119.277-.316 1.182-1.379 1.498-1.854.316-.475.633-.395 1.068-.238.434.158 2.752 1.299 3.225 1.535.475.238.791.355.908.553.119.197.119 1.145-.275 2.252z"/>
-                </svg>
+          {currentTab === 'payments' && (
+            <div className="space-y-5">
+              <div>
+                <h2 className="text-lg font-bold">Payments</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">Manage your fees and view transaction history</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-green-900 text-sm">Need help? Chat with us on WhatsApp</p>
-                <p className="text-xs text-green-800 mt-0.5 leading-relaxed">
-                  Our admissions team is available Monday–Saturday, 8am–6pm. We typically reply within minutes.
-                </p>
-                <a
-                  href="https://wa.link/udcjk0"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 px-4 py-2 bg-[#25D366] text-white text-xs font-semibold rounded-lg hover:bg-[#1da851] transition-colors"
-                >
-                  Open WhatsApp Chat <ArrowRight size={13} />
-                </a>
+              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-800">
+                Acceptance, Tuition, and Hostel fees become available after your admission is approved.
               </div>
+              <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName) => {
+                if (feeName === 'form_fee') {
+                  await handlePaymentSuccess();
+                } else if (application?.id) {
+                  if (feeName === 'acceptance_fee' && application.status === 'admitted') {
+                    await supabase.from('applications').update({ status: 'fees_pending', updated_at: new Date().toISOString() }).eq('id', application.id);
+                  }
+                  if (feeName === 'tuition_fee' && ['admitted', 'fees_pending'].includes(application.status)) {
+                    await supabase.from('applications').update({ status: 'active', updated_at: new Date().toISOString() }).eq('id', application.id);
+                  }
+                }
+                await fetchData();
+              }} />
             </div>
-          </div>
+          )}
 
-        </main>
+          {currentTab === 'documents' && (
+            <DocumentsTab application={application} onPrint={handlePrint} />
+          )}
+
+          {currentTab === 'profile' && (
+            <ProfileTab
+              user={user} profile={profile}
+              editName={editName} setEditName={setEditName}
+              editPhone={editPhone} setEditPhone={setEditPhone}
+              updateProfile={updateProfile} handleSignOut={handleSignOut}
+            />
+          )}
+
+        </DashboardShell>
       </div>
     </>
   );

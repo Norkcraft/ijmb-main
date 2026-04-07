@@ -8,6 +8,9 @@ import InternalLinks from "@/components/InternalLinks";
 import { CheckCircle, AlertCircle, BookOpen, GraduationCap } from "lucide-react";
 import Link from "next/link";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const federalUnis = [
   "University of Lagos (UNILAG)", "Ahmadu Bello University (ABU) Zaria", "University of Ibadan (UI)",
   "University of Nigeria, Nsukka (UNN)", "University of Ilorin (UNILORIN)", "University of Benin (UNIBEN)",
@@ -40,7 +43,7 @@ const faqs = [
 const Universities = () => (
   <>
     <SEOHead
-      title="List of Universities Accepting IJMB for Direct Entry 2026/2027"
+      title={`List of Universities Accepting IJMB for Direct Entry ${YEAR}`}
       description="Complete and updated list of federal, state, and private universities accepting IJMB for 200 level direct entry admission in Nigeria."
       canonical="https://www.ijmb.info/universities-accepting-ijmb"
       keywords="Universities accepting IJMB, IJMB direct entry list, does UNILAG accept IJMB, federal universities accepting IJMB"
@@ -50,7 +53,7 @@ const Universities = () => (
     <section className="section-padding">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">
-          Universities Accepting IJMB for Direct Entry 2026/2027
+          Universities Accepting IJMB for Direct Entry {YEAR}
         </h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-8">
           One of the biggest advantages of the <strong>Interim Joint Matriculation Board (IJMB)</strong> programme is its wide acceptance.

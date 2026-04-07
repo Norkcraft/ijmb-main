@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, Upload, ExternalLink, Loader2, CheckCircle, XCircle, FileText, Download, Eye, RefreshCw } from 'lucide-react';
+import { ArrowLeft, Upload, ExternalLink, Loader2, CheckCircle, XCircle, FileText, Download, Eye } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 
 const AdminApplicationDetail = () => {
@@ -25,7 +25,6 @@ const AdminApplicationDetail = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [generatingPdf, setGeneratingPdf] = useState(false);
 
   // Editable fields
   const [status, setStatus] = useState('');
@@ -142,45 +141,8 @@ const AdminApplicationDetail = () => {
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   };
 
-  const generateApplicationPdf = async () => {
-    setGeneratingPdf(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-
-      const res = await fetch('/api/admin/regenerate-pdf', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: JSON.stringify({ applicationId: app.id })
-      });
-
-      if (!res.ok) {
-        // Try to parse JSON error, fallback to text if not JSON
-        const contentType = res.headers.get('content-type');
-        if (contentType && contentType.includes('application/json')) {
-          const err = await res.json();
-          throw new Error(err.message || 'Generation failed');
-        } else {
-          const errText = await res.text();
-          throw new Error(errText || 'Generation failed with server error');
-        }
-      }
-
-      const data = await res.json();
-
-      // Update local state
-      setApp((prev: any) => ({ ...prev, application_form_url: data.url }));
-      toast({ title: 'Success', description: 'Application form generated successfully' });
-
-    } catch (error: any) {
-      console.error(error);
-      toast({ title: 'Error', description: error.message || 'Failed to generate PDF', variant: 'destructive' });
-    } finally {
-      setGeneratingPdf(false);
-    }
+  const openPrintView = () => {
+    window.open(`/portal-admin/applications/${app.id}/print`, '_blank');
   };
 
   const uploadAdmissionLetter = async () => {
@@ -337,50 +299,24 @@ const AdminApplicationDetail = () => {
                 <div className="pt-4 border-t space-y-2 text-sm">
                   <h4 className="font-semibold mb-2">Application Documents</h4>
 
-                  {app.application_form_url ? (
-                    <div className="bg-muted/30 p-3 rounded-md border space-y-3">
-                      <div className="flex items-center justify-between">
-                         <div className="flex items-center gap-2">
-                           <FileText size={16} className="text-blue-600" />
-                           <span className="font-medium">Application Form</span>
-                         </div>
-                         <Badge variant="outline" className="bg-green-50 text-green-700">Generated</Badge>
+                  <div className="bg-muted/30 p-3 rounded-md border space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileText size={16} className="text-blue-600" />
+                        <span className="font-medium">Application Form</span>
                       </div>
-                      <div className="text-xs text-muted-foreground">ID: {app.application_number || app.id.split('-')[0].toUpperCase()}</div>
-
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 h-8 text-xs"
-                          onClick={() => window.open(app.application_form_url, '_blank')}
-                        >
-                          <Download size={12} className="mr-1" /> Download
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 h-8 text-xs"
-                          onClick={() => window.open(`/verify/${app.id}`, '_blank')}
-                        >
-                          <Eye size={12} className="mr-1" /> Verify Page
-                        </Button>
-                      </div>
+                      <Badge variant="outline" className="bg-blue-50 text-blue-700">Print View</Badge>
                     </div>
-                  ) : (
-                    <div className="bg-muted/30 p-3 rounded-md border flex items-center justify-between text-muted-foreground">
-                      <span className="text-xs italic">Form not yet generated (Fee unpaid or missing)</span>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className="h-6 text-xs"
-                        onClick={generateApplicationPdf}
-                        disabled={generatingPdf}
-                      >
-                        {generatingPdf ? <Loader2 size={12} className="animate-spin" /> : <><RefreshCw size={12} className="mr-1" /> Generate Now</>}
-                      </Button>
-                    </div>
-                  )}
+                    <div className="text-xs text-muted-foreground">ID: {app.application_number || app.id.split('-')[0].toUpperCase()}</div>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full h-8 text-xs"
+                      onClick={openPrintView}
+                    >
+                      <Eye size={12} className="mr-1" /> Open Print View
+                    </Button>
+                  </div>
 
                   <h4 className="font-semibold mb-2 mt-4">Fee Status</h4>
                   <div className="flex justify-between items-center">

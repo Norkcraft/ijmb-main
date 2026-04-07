@@ -7,6 +7,9 @@ import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
 import { CheckCircle } from "lucide-react";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const faqs = [
   { question: "How much is IJMB form?", answer: "The IJMB registration form and total fees typically range from ₦80,000 to ₦150,000 depending on the study centre location and inclusions. Contact us for the exact current fees." },
   { question: "Can I pay IJMB fees in instalments?", answer: "Some IJMB centres allow instalment payments. Typically, you can pay 60-70% during registration and the balance before resumption. Confirm with your chosen centre." },
@@ -17,7 +20,7 @@ const faqs = [
 const Fees = () => (
   <>
     <SEOHead
-      title="IJMB Fees Nigeria 2026/2027 – Complete Fee Breakdown"
+      title={`IJMB Fees Nigeria ${YEAR} – Complete Fee Breakdown`}
       description="Current IJMB fees in Nigeria. Full breakdown of registration, tuition, and exam fees for the IJMB programme. Apply now."
       canonical="https://www.ijmb.info/ijmb-fees"
     />
@@ -25,7 +28,7 @@ const Fees = () => (
 
     <section className="section-padding">
       <div className="container-narrow">
-        <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB Fees in Nigeria 2026/2027</h1>
+        <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">IJMB Fees in Nigeria {YEAR}</h1>
         <p className="text-lg text-muted-foreground leading-relaxed mb-8">
           Understanding the IJMB fees is essential before you begin your registration. The total cost of the IJMB programme
           in Nigeria varies by centre but remains affordable compared to private university tuition or years of repeated UTME attempts.

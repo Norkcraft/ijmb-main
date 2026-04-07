@@ -52,28 +52,37 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
           application_id: applicationId,
           amount: amount,
           reference: reference.reference,
-          status: 'success', 
+          status: 'success',
+          fee_type: paymentType,
           metadata: { ...reference, payment_type: paymentType }
         });
 
         if (error) {
-           console.error('Payment DB Insert Error:', error);
-           // Even if logging fails, we might want to proceed if the payment was actually successful on Paystack
+          console.error('Payment DB Insert Error:', error);
+          toast({
+            title: "Payment recorded on Paystack but not saved",
+            description: `Please contact support with your reference: ${reference.reference}`,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Payment Successful",
+            description: `Reference: ${reference.reference}`,
+          });
         }
 
-        toast({
-          title: "Payment Successful",
-          description: `Reference: ${reference.reference}`,
-        });
-        
-        // Trigger the parent success callback to update UI state immediately
+        // Always trigger success callback — Paystack already charged the card
         await onSuccess({ reference: reference.reference, paymentType, amount });
-        
+
       } catch (error: any) {
         console.error('Payment recording error:', error);
-        // Fallback: still try to update UI if we have a reference
+        toast({
+          title: "Payment may have succeeded",
+          description: `Please contact support with reference if you were charged. Ref: ${reference?.reference || 'unknown'}`,
+          variant: "destructive"
+        });
         if (reference?.reference) {
-            await onSuccess({ reference: reference.reference, paymentType, amount });
+          await onSuccess({ reference: reference.reference, paymentType, amount });
         }
       }
     },

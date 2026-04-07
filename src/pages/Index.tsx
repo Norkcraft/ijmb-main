@@ -16,6 +16,9 @@ import studentsLaptop from "@/assets/students-laptop.jpeg";
 import { useScrollReveal, useCountUp } from "@/hooks/useScrollReveal";
 import { GraduationCap, CheckCircle, BookOpen, Users, ArrowRight, MapPin, Star, ChevronLeft, ChevronRight } from "lucide-react";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const stats = [
   { value: 200, suffix: "+", label: "Universities Nationwide" },
   { value: 50, suffix: "K+", label: "Students Enrolled" },
@@ -170,8 +173,8 @@ const Index = () => {
   return (
     <>
       <SEOHead
-        title="IJMB Registration Nigeria 2026/2027 – Gain 200 Level Admission"
-        description="Register for IJMB programme in Nigeria. Gain direct entry admission into 200 level without UTME. Apply for 2026/2027 session now."
+        title={`IJMB Registration Nigeria ${YEAR} – Gain 200 Level Admission`}
+        description={`Register for IJMB programme in Nigeria. Gain direct entry admission into 200 level without UTME. Apply for ${YEAR} session now.`}
         canonical="https://www.ijmb.info"
         keywords="IJMB registration Nigeria, IJMB programme, direct entry admission, 200 level without UTME"
         schema={schema}
@@ -186,10 +189,10 @@ const Index = () => {
         <div ref={heroRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 lg:py-20">
           <div className="max-w-3xl">
             <span className="hero-badge inline-block px-4 py-1.5 text-sm font-medium bg-accent text-accent-foreground rounded-full mb-6">
-              2026/2027 Registration Now Open
+              {YEAR} Registration Now Open
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-bold leading-tight mb-6 text-primary-foreground">
-              IJMB Registration 2026/2027 —{" "}
+              IJMB Registration {YEAR} —{" "}
               <span className="text-accent">200 Level Without UTME</span>
             </h1>
             <p className="hero-desc text-lg lg:text-xl mb-8 leading-relaxed text-primary-foreground/90">
@@ -316,7 +319,7 @@ const Index = () => {
           <div className="text-center mb-12">
             <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">How It Works</p>
             <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">
-              How to Register for IJMB 2026/2027
+              How to Register for IJMB {YEAR}
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               IJMB registration is straightforward. Complete these three steps online and start your Direct Entry journey today.

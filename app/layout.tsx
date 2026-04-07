@@ -20,13 +20,16 @@ const dmSans = DM_Sans({
   display: 'swap',
 });
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.ijmb.info'),
   title: {
-    default: 'IJMB Registration Nigeria 2026/2027 – 200 Level Admission Without UTME',
+    default: `IJMB Registration Nigeria ${YEAR} – 200 Level Admission Without UTME`,
     template: '%s | IJMB Info',
   },
-  description: 'Register for IJMB programme in Nigeria. Gain direct entry admission into 200 level without UTME. Apply for 2026/2027 session now. Accepted by 200+ universities.',
+  description: `Register for IJMB programme in Nigeria. Gain direct entry admission into 200 level without UTME. Apply for ${YEAR} session now. Accepted by 200+ universities.`,
   keywords: ['IJMB registration', 'IJMB programme', 'direct entry admission', '200 level without UTME', 'IJMB Nigeria'],
   icons: {
     icon: [

@@ -8,6 +8,9 @@ import InternalLinks from "@/components/InternalLinks";
 import { CheckCircle, XCircle, ArrowRight, ShieldCheck, Zap, Clock } from "lucide-react";
 import Link from "next/link";
 
+const yr = new Date().getFullYear();
+const YEAR = `${yr}/${yr + 1}`;
+
 const faqs = [
   { question: "Is IJMB better than JAMB?", answer: "For many students, IJMB is better because it offers a guaranteed path to 200 Level (Direct Entry) admission. Unlike JAMB which is highly unpredictable and competitive for 100 Level, IJMB provides a structured academic programme where hard work directly translates to admission." },
   { question: "Can I write both IJMB and JAMB?", answer: "Yes! In fact, we encourage it. You can register for IJMB to secure your A-Level result while also writing JAMB UTME. This gives you two independent chances of gaining admission in the same year." },
@@ -18,7 +21,7 @@ const faqs = [
 const IJMBvsJAMB = () => (
   <>
     <SEOHead
-      title="IJMB vs JAMB 2026/2027 – The Ultimate Comparison Guide"
+      title={`IJMB vs JAMB ${YEAR} – The Ultimate Comparison Guide`}
       description="IJMB vs JAMB: Which is better for admission? Discover why IJMB is the smarter alternative to UTME for gaining 200 level university admission in Nigeria."
       canonical="https://www.ijmb.info/ijmb-vs-jamb"
       keywords="IJMB vs JAMB, is IJMB better than JAMB, IJMB vs UTME, advantages of IJMB, direct entry vs UTME"

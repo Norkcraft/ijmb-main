@@ -2,7 +2,7 @@
 const LOGO = 'https://www.ijmb.info/ijmb-logo.jpeg';
 const SITE = 'https://www.ijmb.info';
 const SUPPORT_EMAIL = 'support@ijmb.info';
-const YEAR = '2026/2027';
+const YEAR = new Date().getFullYear() + '/' + (new Date().getFullYear() + 1);
 
 const header = (title: string) => `
   <div style="background:#1a3c6e;padding:28px 32px;text-align:center">

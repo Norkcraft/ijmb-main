@@ -22,7 +22,7 @@ const VerifyEmail = () => {
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email: user.email,
-      options: { emailRedirectTo: window.location.origin }
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
     });
 
     if (error) {
