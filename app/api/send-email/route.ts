@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
   // Admission offer emails are admin-only
   if (type === 'admission_offer') {
     const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-    if (!profile || !['super_admin', 'coordinator'].includes(profile.role)) {
+    if (!profile || !['super_admin', 'coordinator', 'admin'].includes(profile.role)) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
   }

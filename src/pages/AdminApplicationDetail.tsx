@@ -51,7 +51,7 @@ const AdminApplicationDetail = () => {
       const [appRes, centreRes, olRes] = await Promise.all([
         supabase.from('applications').select(`
           *,
-          profiles:user_id(full_name, phone, id),
+          profiles:user_id(full_name, phone, id, email),
           session:session_id(name, code),
           preferred_centre:preferred_centre_id(name, state),
           assigned_centre:assigned_centre_id(name, state),
@@ -115,21 +115,30 @@ const AdminApplicationDetail = () => {
         const appId = app.application_number || app.id.split('-')[0].toUpperCase();
 
         if (studentEmail) {
-          fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              type: 'admission_offer',
-              data: {
-                email: studentEmail,
-                fullName: studentName,
-                applicationId: appId,
-                centre: centreName,
-                resumptionDate: 'As communicated by your centre',
-                subjects: app.subject_combination?.name || 'As selected',
-              },
-            }),
-          }).catch(() => {});
+          try {
+            const emailRes = await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'admission_offer',
+                data: {
+                  email: studentEmail,
+                  fullName: studentName,
+                  applicationId: appId,
+                  centre: centreName,
+                  resumptionDate: 'As communicated by your centre',
+                  subjects: app.subject_combo?.name || 'As selected',
+                },
+              }),
+            });
+            if (!emailRes.ok) {
+              toast({ title: 'Warning', description: 'Application admitted but admission email failed to send.', variant: 'destructive' });
+            }
+          } catch {
+            toast({ title: 'Warning', description: 'Application admitted but admission email failed to send.', variant: 'destructive' });
+          }
+        } else {
+          toast({ title: 'Warning', description: 'Application admitted but no email address found for this student.', variant: 'destructive' });
         }
       }
     }
