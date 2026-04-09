@@ -124,11 +124,11 @@ export const DashboardPayments = ({
                   if (name === 'form_fee') {
                     paid = !!application?.form_fee_paid || optimisticPaid.has('form_fee');
                   } else if (name === 'tuition_fee') {
-                    paid = application?.tuition_payment_status === 'fully_paid' || optimisticPaid.has('tuition_fee');
-                    isPartPaid = !paid && application?.tuition_payment_status === 'part_paid';
+                    paid = application?.tuition_payment_status === 'fully_paid' || optimisticPaid.has('tuition_fee') || paidFeeNames.has('tuition_fee');
+                    isPartPaid = !paid && (application?.tuition_payment_status === 'part_paid');
                     amountPaid = Number(application?.tuition_amount_paid) || 0;
                   } else if (name === 'hostel_fee') {
-                    paid = !!application?.hostel_fee_paid || optimisticPaid.has('hostel_fee');
+                    paid = !!application?.hostel_fee_paid || optimisticPaid.has('hostel_fee') || paidFeeNames.has('hostel_fee');
                   } else {
                     paid = paidFeeNames.has(name) || optimisticPaid.has(name);
                   }

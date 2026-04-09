@@ -1152,15 +1152,12 @@ const Dashboard = () => {
               <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName) => {
                 if (feeName === 'form_fee') {
                   await handlePaymentSuccess();
-                } else if (application?.id) {
-                  if (feeName === 'acceptance_fee' && application.status === 'admitted') {
-                    await supabase.from('applications').update({ status: 'fees_pending', updated_at: new Date().toISOString() }).eq('id', application.id);
-                  }
-                  if (feeName === 'tuition_fee' && ['admitted', 'fees_pending'].includes(application.status)) {
-                    await supabase.from('applications').update({ status: 'active', updated_at: new Date().toISOString() }).eq('id', application.id);
-                  }
+                } else {
+                  // Application status is updated by the Paystack webhook (service role bypasses RLS).
+                  // Re-fetch immediately to reflect any changes, then again after 5s to catch the webhook.
+                  await fetchData();
+                  setTimeout(() => fetchData(), 5000);
                 }
-                await fetchData();
               }} />
             </div>
           )}
