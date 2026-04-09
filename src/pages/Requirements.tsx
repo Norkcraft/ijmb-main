@@ -68,19 +68,60 @@ const Requirements = () => (
           ))}
         </div>
 
+        <h2 className="text-2xl font-heading font-bold mt-10 mb-4">IJMB Grading System</h2>
+        <p className="text-muted-foreground leading-relaxed mb-4">
+          IJMB uses an A-Level points system. You sit 3 subjects; each is graded A–F. The maximum total is <strong>15 points</strong>.
+          Universities set their own minimum cut-off per course.
+        </p>
+        <div className="overflow-x-auto mb-8">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-primary text-primary-foreground">
+                <th className="text-left p-3 font-heading">Grade</th>
+                <th className="text-left p-3 font-heading">Points</th>
+                <th className="text-left p-3 font-heading">Performance</th>
+                <th className="text-left p-3 font-heading">Typical Courses</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["A", "5", "Distinction", "All courses (Medicine, Law, Engineering)"],
+                ["B", "4", "Very Good", "Engineering, Science, Law"],
+                ["C", "3", "Good", "Social Sciences, Arts, Commerce"],
+                ["D", "2", "Satisfactory", "Less competitive courses"],
+                ["E", "1", "Marginal Pass", "Some state university courses"],
+                ["F", "0", "Fail", "Does not count"],
+              ].map(([grade, pts, perf, courses]) => (
+                <tr key={grade} className="border-b border-border hover:bg-muted/20">
+                  <td className="p-3 font-bold">{grade}</td>
+                  <td className="p-3 font-semibold text-primary">{pts} pts</td>
+                  <td className="p-3">{perf}</td>
+                  <td className="p-3 text-muted-foreground text-xs">{courses}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">IJMB Subject Combinations</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">
-          Candidates are required to choose 3 A-Level subjects for the IJMB programme. Your subject combination should align
-          with your intended course of study at the university. Common IJMB subject combinations include:
+          Candidates choose 3 A-Level subjects. Your combination must align with the university faculty requirements
+          for your intended course. Here are the standard combinations:
         </p>
         <div className="grid sm:grid-cols-2 gap-4 mb-8">
           {[
-            { course: "Medicine & Health Sciences", subjects: "Biology, Chemistry, Physics" },
-            { course: "Engineering", subjects: "Mathematics, Physics, Chemistry" },
-            { course: "Law", subjects: "Literature, Government, CRS/IRS" },
-            { course: "Accounting & Finance", subjects: "Accounting, Economics, Business Studies" },
-            { course: "Mass Communication", subjects: "Literature, Government, Economics" },
-            { course: "Computer Science", subjects: "Mathematics, Physics, Computer Science" },
+            { course: "Medicine, Pharmacy, Nursing", subjects: "Biology, Chemistry, Physics" },
+            { course: "Engineering (all types)", subjects: "Mathematics, Physics, Chemistry" },
+            { course: "Computer Science", subjects: "Mathematics, Physics, Chemistry" },
+            { course: "Law", subjects: "Literature in English, Government, Economics" },
+            { course: "Accounting & Banking/Finance", subjects: "Accounting, Economics, Commerce" },
+            { course: "Mass Communication", subjects: "Literature in English, Government, Economics" },
+            { course: "Economics / Business Admin", subjects: "Economics, Mathematics, Government" },
+            { course: "Biochemistry / Microbiology", subjects: "Biology, Chemistry, Mathematics" },
+            { course: "Agricultural Science", subjects: "Biology, Chemistry, Agricultural Science" },
+            { course: "Architecture / Quantity Surveying", subjects: "Mathematics, Physics, Chemistry" },
+            { course: "History / Political Science", subjects: "History, Government, Economics" },
+            { course: "Geography / Urban Planning", subjects: "Geography, Economics, Mathematics" },
           ].map((combo) => (
             <div key={combo.course} className="bg-secondary p-4 rounded-lg">
               <div className="font-medium text-sm mb-1">{combo.course}</div>

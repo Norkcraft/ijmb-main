@@ -131,10 +131,47 @@ const Fees = () => (
           ))}
         </div>
 
+        <h2 className="text-2xl font-heading font-bold mt-10 mb-4">IJMB vs Other Admission Routes — Cost Comparison</h2>
+        <p className="text-muted-foreground leading-relaxed mb-4">
+          When evaluating IJMB fees, it helps to compare the total cost across different admission pathways:
+        </p>
+        <div className="overflow-x-auto mb-8">
+          <table className="w-full border-collapse text-sm shadow-sm rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-primary text-primary-foreground">
+                <th className="text-left p-4 font-heading">Route</th>
+                <th className="text-left p-4 font-heading">Approx. Cost</th>
+                <th className="text-left p-4 font-heading">Entry Level</th>
+                <th className="text-left p-4 font-heading">Time to Degree</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["IJMB (this programme)", "₦80k – ₦150k", "200 Level", "3 years after IJMB"],
+                ["JAMB UTME (1 attempt)", "₦5k – ₦10k", "100 Level", "4 years"],
+                ["JAMB UTME (3 failed attempts)", "₦15k–₦30k + 3 years lost", "100 Level if admitted", "7 years total"],
+                ["Private university (direct)", "₦500k – ₦1.5M/year", "100 Level", "4–5 years"],
+                ["Foundation programme (abroad)", "₦2M – ₦5M+", "Year 1 overseas", "4 years"],
+              ].map(([route, cost, level, time], i) => (
+                <tr key={i} className={`border-b border-border ${i === 0 ? 'bg-green-50' : 'hover:bg-muted/20'} transition-colors`}>
+                  <td className={`p-4 font-medium ${i === 0 ? 'text-green-800' : ''}`}>{route}</td>
+                  <td className={`p-4 ${i === 0 ? 'text-green-700 font-bold' : ''}`}>{cost}</td>
+                  <td className="p-4">{level}</td>
+                  <td className="p-4 text-muted-foreground">{time}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">Is IJMB Worth the Investment?</h2>
+        <p className="text-muted-foreground leading-relaxed mb-4">
+          Absolutely. The IJMB fees are a worthwhile investment when you consider that you skip 100 level entirely and
+          enter 200 level directly — saving at least one full year of university tuition, accommodation, and living expenses.
+        </p>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          Absolutely. The IJMB fees are a worthwhile investment when you consider that you will skip 100 level entirely and
-          enter 200 level directly. This saves you at least one year of university tuition, accommodation, and living expenses.
+          For a student at a federal university where annual tuition is ₦50,000–₦100,000, skipping one year alone saves
+          that amount. At a private university where fees run ₦500,000–₦1.5M per year, the savings are even more dramatic.
           Many students who have spent years writing UTME without success find that IJMB is the most cost-effective and reliable
           path to university admission in Nigeria.
         </p>

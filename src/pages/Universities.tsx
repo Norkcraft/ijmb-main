@@ -129,17 +129,69 @@ const Universities = () => (
            </Link>
         </div>
 
+        <h2 className="text-2xl font-heading font-bold mt-10 mb-6">Typical IJMB Points Required by Course</h2>
+        <p className="text-muted-foreground mb-4">
+          Each university sets its own cut-off, but these are commonly observed minimum points across Nigerian institutions:
+        </p>
+        <div className="overflow-x-auto mb-10">
+          <table className="w-full border-collapse text-sm shadow-sm rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-primary text-primary-foreground">
+                <th className="text-left p-4 font-heading">Course</th>
+                <th className="text-left p-4 font-heading">Typical Minimum</th>
+                <th className="text-left p-4 font-heading">Recommended Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["Medicine & Surgery (MBBS)", "12–13 points", "14–15 points"],
+                ["Law (LLB)", "12–13 points", "13–15 points"],
+                ["Pharmacy", "12–13 points", "13–14 points"],
+                ["Engineering (all types)", "10–12 points", "12–13 points"],
+                ["Computer Science", "10–11 points", "12–13 points"],
+                ["Biochemistry / Microbiology", "9–10 points", "11–12 points"],
+                ["Economics / Accounting", "9–10 points", "11–12 points"],
+                ["Mass Communication", "9–10 points", "11–12 points"],
+                ["Social Sciences / Arts", "8–9 points", "10–11 points"],
+                ["Education", "6–8 points", "9–10 points"],
+              ].map(([course, min, rec], i) => (
+                <tr key={i} className="border-b border-border hover:bg-muted/20 transition-colors">
+                  <td className="p-4 font-medium">{course}</td>
+                  <td className="p-4 text-orange-700 font-semibold">{min}</td>
+                  <td className="p-4 text-green-700 font-semibold">{rec}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">Does UNILAG Accept IJMB?</h2>
         <p className="text-muted-foreground leading-relaxed mb-6">
           <strong>Yes, the University of Lagos (UNILAG) accepts IJMB</strong> for direct entry admission.
-          However, UNILAG is highly competitive. To stand a good chance, you typically need to score <strong>12 points and above</strong>
-          in your IJMB final examination. Additionally, you must have the correct O-Level subject combination.
+          UNILAG is highly competitive — you typically need <strong>12 points minimum</strong>, with Medicine and Law
+          requiring 13–15 points. UNILAG also conducts a Direct Entry screening exercise. Ensure your O-Level
+          and IJMB combination match your chosen faculty requirements exactly.
         </p>
 
         <h2 className="text-2xl font-heading font-bold mt-4 mb-4">Does UI Accept IJMB?</h2>
         <p className="text-muted-foreground leading-relaxed mb-6">
-          <strong>Yes, the University of Ibadan (UI) accepts IJMB.</strong> Similar to UNILAG, UI requires high points.
-          Candidates are also expected to participate in the university's Direct Entry screening exercise.
+          <strong>Yes, the University of Ibadan (UI) accepts IJMB.</strong> UI is among Nigeria's most prestigious institutions.
+          Candidates need high scores and a matching O-Level combination. UI also conducts a post-UTME/DE screening for
+          eligible candidates. Aim for 13+ points if UI is your first choice.
+        </p>
+
+        <h2 className="text-2xl font-heading font-bold mt-4 mb-4">Does ABU Zaria Accept IJMB?</h2>
+        <p className="text-muted-foreground leading-relaxed mb-6">
+          <strong>Yes — and ABU Zaria administers the IJMB programme itself.</strong> ABU accepts IJMB for all faculties
+          including Medicine, Law, Engineering, Sciences, and Social Sciences. Being the examining body gives ABU candidates
+          a natural familiarity with the examination style, though cut-off points are still competitive.
+        </p>
+
+        <h2 className="text-2xl font-heading font-bold mt-4 mb-4">Does OAU Accept IJMB?</h2>
+        <p className="text-muted-foreground leading-relaxed mb-6">
+          <strong>Yes, Obafemi Awolowo University (OAU) accepts IJMB</strong> for Direct Entry. OAU is well-regarded for
+          Medicine, Law, and Engineering. Competitive cut-offs apply — aim for 12–14 points depending on your chosen course.
+          OAU candidates may be required to attend a screening exercise.
         </p>
 
         <InternalLinks exclude="/universities-accepting-ijmb" />
