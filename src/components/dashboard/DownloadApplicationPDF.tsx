@@ -24,7 +24,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
           *,
           profiles ( email, phone ),
           sessions ( name, code ),
-          centres ( name, state, address ),
+          centres ( name, state, location ),
           subject_combinations ( name, subject1, subject2, subject3 )
         `)
         .eq('id', applicationId)

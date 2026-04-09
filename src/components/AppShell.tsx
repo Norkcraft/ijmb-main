@@ -17,7 +17,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     <>
       {!isAppRoute && <Navbar />}
       {!isAppRoute && <ScrollToTop />}
-      <main className="min-h-screen">{children}</main>
+      <main className="min-h-screen print:min-h-0">{children}</main>
       {!isAppRoute && <Footer />}
       {!isAppRoute && <StickyMobileCTA />}
       {!isAppRoute && <WhatsAppButton />}
