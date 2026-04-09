@@ -1,8 +1,8 @@
 'use client';
 
-import { PaystackButton } from 'react-paystack';
-import { Button } from '@/components/ui/button';
-import { CreditCard, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { usePaystackPayment } from 'react-paystack';
+import { CreditCard, Lock, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/lib/supabaseClient';
 
@@ -15,107 +15,117 @@ interface PaymentButtonProps {
   paymentType: string;
   disabled?: boolean;
   label?: string;
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  variant?: 'default' | 'outline';
 }
 
-const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymentType, disabled, label, variant }: PaymentButtonProps) => {
+const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymentType, disabled, label, variant = 'default' }: PaymentButtonProps) => {
   const { toast } = useToast();
-  
-  // Replace with your actual Paystack public key from environment variable
-  const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || 'pk_test_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';
+  const [loading, setLoading] = useState(false);
 
-  const componentProps = {
+  const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '';
+
+  const config = {
     email,
-    amount: amount * 100, // Paystack expects amount in kobo
+    amount: amount * 100, // Paystack expects kobo
     publicKey,
     metadata: {
       user_id: userId,
       application_id: applicationId,
       payment_type: paymentType,
       custom_fields: [
-        { display_name: "Payment Type", variable_name: "payment_type", value: paymentType },
-        { display_name: "Application ID", variable_name: "application_id", value: applicationId }
-      ]
-    },
-    text: label || `Pay ₦${amount.toLocaleString()}`,
-    onSuccess: async (reference: any) => {
-      try {
-        // Only verify 'success' status if it's explicitly returned, otherwise assume success for callback
-        if (reference.status && reference.status !== 'success') {
-             toast({ title: "Payment Failed", description: "Transaction was not successful.", variant: "destructive" });
-             return;
-        }
-
-        // Record payment in database
-        const { error } = await supabase.from('payments').insert({
-          user_id: userId,
-          application_id: applicationId,
-          amount: amount,
-          reference: reference.reference,
-          status: 'success',
-          fee_type: paymentType,
-          metadata: { ...reference, payment_type: paymentType }
-        });
-
-        if (error) {
-          console.error('Payment DB Insert Error:', error);
-          toast({
-            title: "Payment recorded on Paystack but not saved",
-            description: `Please contact support with your reference: ${reference.reference}`,
-            variant: "destructive"
-          });
-        } else {
-          toast({
-            title: "Payment Successful",
-            description: `Reference: ${reference.reference}`,
-          });
-        }
-
-        // Always trigger success callback — Paystack already charged the card
-        await onSuccess({ reference: reference.reference, paymentType, amount });
-
-      } catch (error: any) {
-        console.error('Payment recording error:', error);
-        toast({
-          title: "Payment may have succeeded",
-          description: `Please contact support with reference if you were charged. Ref: ${reference?.reference || 'unknown'}`,
-          variant: "destructive"
-        });
-        if (reference?.reference) {
-          await onSuccess({ reference: reference.reference, paymentType, amount });
-        }
-      }
-    },
-    onClose: () => {
-      toast({
-        title: "Payment Cancelled",
-        description: "You closed the payment window.",
-        variant: "destructive"
-      });
+        { display_name: 'Payment Type', variable_name: 'payment_type', value: paymentType },
+        { display_name: 'Application ID', variable_name: 'application_id', value: applicationId ?? '' },
+      ],
     },
   };
 
-  if (!publicKey || publicKey.includes('xxxx')) {
+  const initializePayment = usePaystackPayment(config);
+
+  const handlePayment = () => {
+    if (disabled || loading) return;
+
+    initializePayment({
+      onSuccess: async (reference: any) => {
+        setLoading(true);
+        try {
+          if (reference.status && reference.status !== 'success') {
+            toast({ title: 'Payment Failed', description: 'Transaction was not successful.', variant: 'destructive' });
+            return;
+          }
+
+          const { error } = await supabase.from('payments').insert({
+            user_id: userId,
+            application_id: applicationId,
+            amount: amount,
+            reference: reference.reference,
+            type: paymentType,
+            status: 'success',
+            metadata: { ...reference, payment_type: paymentType },
+          });
+
+          if (error) {
+            console.error('Payment DB Insert Error:', error);
+            toast({
+              title: 'Payment recorded on Paystack but not saved locally',
+              description: `Contact support with reference: ${reference.reference}`,
+              variant: 'destructive',
+            });
+          } else {
+            toast({ title: 'Payment Successful!', description: `Reference: ${reference.reference}` });
+          }
+
+          await onSuccess({ reference: reference.reference, paymentType, amount });
+        } catch (err: any) {
+          console.error('Payment recording error:', err);
+          toast({
+            title: 'Payment may have succeeded',
+            description: `Contact support if charged. Ref: ${reference?.reference ?? 'unknown'}`,
+            variant: 'destructive',
+          });
+          if (reference?.reference) {
+            await onSuccess({ reference: reference.reference, paymentType, amount });
+          }
+        } finally {
+          setLoading(false);
+        }
+      },
+      onClose: () => {
+        toast({ title: 'Payment Cancelled', description: 'You closed the payment window.', variant: 'destructive' });
+      },
+    });
+  };
+
+  if (!publicKey) {
     return (
-      <div className="text-red-500 text-sm p-2 border border-red-200 rounded bg-red-50 mb-2">
-        Error: Paystack Public Key not configured in .env
+      <div className="text-red-600 text-sm p-3 border border-red-300 rounded-lg bg-red-50">
+        Paystack key not configured — contact support.
       </div>
     );
   }
 
+  const isOutline = variant === 'outline';
+
   return (
-    <div className="w-full">
-      {/* @ts-ignore - React-Paystack types might be slightly off */}
-      <PaystackButton {...componentProps} className="w-full">
-        <Button 
-          className={`w-full ${!variant ? 'cta-gradient' : ''}`} 
-          disabled={disabled}
-          variant={variant || "default"}
-        >
-          <CreditCard size={16} className="mr-2" /> {label || `Pay ₦${amount.toLocaleString()} Now`}
-        </Button>
-      </PaystackButton>
-    </div>
+    <button
+      type="button"
+      onClick={handlePayment}
+      disabled={disabled || loading}
+      className={[
+        'relative w-full flex items-center justify-center gap-2 rounded-lg px-5 py-3 font-semibold text-base transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-offset-2',
+        isOutline
+          ? 'border-2 border-green-600 text-green-700 bg-white hover:bg-green-50 focus:ring-green-500'
+          : 'bg-green-600 hover:bg-green-700 active:bg-green-800 text-white shadow-md hover:shadow-lg focus:ring-green-500',
+        (disabled || loading) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer',
+      ].join(' ')}
+    >
+      {loading ? (
+        <Loader2 size={18} className="animate-spin" />
+      ) : (
+        <CreditCard size={18} />
+      )}
+      <span>{loading ? 'Processing...' : (label ?? `Pay ₦${amount.toLocaleString()} Now`)}</span>
+      {!loading && !isOutline && <Lock size={14} className="ml-auto opacity-70" />}
+    </button>
   );
 };
 

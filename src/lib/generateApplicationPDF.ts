@@ -33,7 +33,7 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
         centres (
           name,
           state,
-          address
+          location
         ),
         subject_combinations (
           name,
@@ -103,6 +103,7 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       registrationDate: new Date(app.created_at).toLocaleDateString('en-GB', {
         day: '2-digit', month: 'long', year: 'numeric'
       }),
+      academicSession: app.sessions?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
       surname: app.surname || '',
       firstName: app.first_name || '',
       middleName: app.middle_name || '',
@@ -113,7 +114,7 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       phoneNumber: app.guardian_phone || app.profiles?.phone || '',
       email: app.profiles?.email || '',
       residentialAddress: app.residential_address || '',
-      centreOfStudy: app.centres ? `${app.centres.name}, ${app.centres.state}` : 'Not Assigned',
+      centreOfStudy: app.centres ? `${app.centres.name}${app.centres.location ? ', ' + app.centres.location : ''}, ${app.centres.state}` : 'Not Assigned',
       courseOfChoice: app.intended_course || '',
       subjectCombination: app.subject_combinations 
         ? `${app.subject_combinations.name} (${app.subject_combinations.subject1}, ${app.subject_combinations.subject2}, ${app.subject_combinations.subject3})`

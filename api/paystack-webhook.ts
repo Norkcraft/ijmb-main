@@ -58,9 +58,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         .from('payments')
         .upsert({
           reference,
-          user_id: metadata?.user_id, // Ensure user_id is passed in metadata
+          user_id: metadata?.user_id,
           application_id: applicationId,
           amount: amount / 100, // Convert kobo to naira
+          type: paymentType || 'form_fee',
           status: 'success',
           metadata: event.data
         }, { onConflict: 'reference' });

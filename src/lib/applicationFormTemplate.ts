@@ -1,6 +1,7 @@
 export interface ApplicationFormData {
   applicationId: string;
   registrationDate: string;
+  academicSession: string;
   surname: string;
   firstName: string;
   middleName: string;
@@ -304,7 +305,7 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
         </div>
         <div class="meta-field">
           <strong>Academic Session:</strong>
-          <span>${new Date().getFullYear()}/${new Date().getFullYear() + 1}</span>
+          <span>${data.academicSession}</span>
         </div>
       </div>
 
