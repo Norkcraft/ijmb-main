@@ -2,11 +2,7 @@ import type { Metadata } from 'next';
 import { Space_Grotesk, DM_Sans } from 'next/font/google';
 import './globals.css';
 import Providers from '@/components/Providers';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
-import ScrollToTop from '@/components/ScrollToTop';
-import StickyMobileCTA from '@/components/StickyMobileCTA';
-import WhatsAppButton from '@/components/WhatsAppButton';
+import AppShell from '@/components/AppShell';
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -62,14 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
       <body>
         <Providers>
-          <Navbar />
-          <ScrollToTop />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
-          <StickyMobileCTA />
-          <WhatsAppButton />
+          <AppShell>{children}</AppShell>
         </Providers>
       </body>
     </html>

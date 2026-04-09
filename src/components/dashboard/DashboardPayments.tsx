@@ -150,91 +150,101 @@ export const DashboardPayments = ({
                   }
 
                   return (
-                    <div key={fee.id} className="border rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      <div>
-                        <div className="flex items-center gap-3 mb-1">
-                          <h3 className="font-semibold text-lg">{feeLabel(name)}</h3>
-                          {paid ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              <CheckCircle size={12} className="mr-1" /> Paid
-                            </Badge>
-                          ) : isPartPaid ? (
-                            <Badge className="bg-blue-100 text-blue-800">
-                              <Clock size={12} className="mr-1" /> Part Paid
-                            </Badge>
-                          ) : (
-                            <Badge className="bg-orange-100 text-orange-800">
-                              <Clock size={12} className="mr-1" /> Pending
-                            </Badge>
+                    <div
+                      key={fee.id}
+                      className={[
+                        'rounded-xl overflow-hidden border',
+                        paid
+                          ? 'border-green-200 bg-green-50'
+                          : blocked
+                          ? 'border-border bg-muted/30 opacity-60'
+                          : 'border-amber-200 bg-gradient-to-br from-amber-50 to-orange-50',
+                      ].join(' ')}
+                    >
+                      <div className="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <h3 className="font-semibold text-lg">{feeLabel(name)}</h3>
+                            {paid ? (
+                              <Badge className="bg-green-600 text-white">
+                                <CheckCircle size={12} className="mr-1" /> Paid
+                              </Badge>
+                            ) : isPartPaid ? (
+                              <Badge className="bg-blue-600 text-white">
+                                <Clock size={12} className="mr-1" /> Part Paid
+                              </Badge>
+                            ) : (
+                              <Badge className="bg-amber-500 text-white">
+                                <Clock size={12} className="mr-1" /> Pending
+                              </Badge>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-2">{fee.description || '—'}</p>
+
+                          <div className={`text-2xl font-bold ${paid ? 'text-green-700' : 'text-foreground'}`}>
+                            {notConfigured ? '₦—' : `₦${amount.toLocaleString()}`}
+                          </div>
+
+                          {isPartPaid && (
+                            <div className="text-sm mt-1">
+                              <span className="text-green-600 font-medium">Paid: ₦{amountPaid.toLocaleString()}</span>
+                              <span className="mx-2">|</span>
+                              <span className="text-destructive font-medium">Balance: ₦{balance.toLocaleString()}</span>
+                            </div>
+                          )}
+
+                          {blocked && (
+                            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+                              <AlertCircle size={12} /> Available after admission is approved.
+                            </p>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground mb-2">{fee.description || '—'}</p>
 
-                        <div className="text-xl font-bold">
-                          {notConfigured ? '₦—' : `₦${amount.toLocaleString()}`}
-                        </div>
-
-                        {isPartPaid && (
-                          <div className="text-sm mt-1">
-                            <span className="text-green-600 font-medium">Paid: ₦{amountPaid.toLocaleString()}</span>
-                            <span className="mx-2">|</span>
-                            <span className="text-destructive font-medium">Balance: ₦{balance.toLocaleString()}</span>
-                          </div>
-                        )}
-
-                        {blocked && (
-                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
-                            <AlertCircle size={12} /> Available after admission is approved.
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="shrink-0 w-full md:w-auto space-y-2">
-                        {paid ? (
-                          <div className="text-sm text-green-700 bg-green-50 px-4 py-2 rounded-md border border-green-200 w-full text-center flex items-center justify-center">
-                            <CheckCircle size={16} className="mr-2" /> Payment Confirmed
-                          </div>
-                        ) : (
-                          <div className="flex flex-col gap-2 w-full md:w-56">
-                            {user && (
-                              <>
-                                <PaymentButton
-                                  email={user.email || ''}
-                                  amount={isPartPaid ? balance : amount}
-                                  userId={user.id}
-                                  applicationId={application?.id}
-                                  paymentType={name}
-                                  label={isPartPaid ? `Pay Balance (₦${balance.toLocaleString()})` : `Pay Now (₦${amount.toLocaleString()})`}
-                                  disabled={blocked || notConfigured}
-                                  onSuccess={async ({ paymentType }) => {
-                                    // Mark paid immediately in local state so UI updates at once
-                                    setOptimisticPaid(prev => new Set([...prev, paymentType]));
-                                    await onFeePaymentSuccess(paymentType);
-                                    await fetchData();
-                                  }}
-                                />
-
-                                {showInstallment && !isPartPaid && (
+                        <div className="shrink-0 w-full md:w-56">
+                          {paid ? (
+                            <div className="flex items-center justify-center gap-2 text-sm font-semibold text-green-700 bg-green-100 border border-green-300 px-4 py-3 rounded-lg w-full">
+                              <CheckCircle size={18} /> Payment Confirmed
+                            </div>
+                          ) : (
+                            <div className="flex flex-col gap-2 w-full">
+                              {user && (
+                                <>
                                   <PaymentButton
                                     email={user.email || ''}
-                                    amount={amount / 2}
+                                    amount={isPartPaid ? balance : amount}
                                     userId={user.id}
                                     applicationId={application?.id}
                                     paymentType={name}
-                                    label={`Pay Installment (₦${(amount / 2).toLocaleString()})`}
+                                    label={isPartPaid ? `Pay Balance (₦${balance.toLocaleString()})` : `Pay ₦${amount.toLocaleString()} Now`}
                                     disabled={blocked || notConfigured}
-                                    variant="outline"
                                     onSuccess={async ({ paymentType }) => {
+                                      setOptimisticPaid(prev => new Set([...prev, paymentType]));
                                       await onFeePaymentSuccess(paymentType);
                                       await fetchData();
                                     }}
                                   />
-                                )}
 
-                              </>
-                            )}
-                          </div>
-                        )}
+                                  {showInstallment && !isPartPaid && (
+                                    <PaymentButton
+                                      email={user.email || ''}
+                                      amount={amount / 2}
+                                      userId={user.id}
+                                      applicationId={application?.id}
+                                      paymentType={name}
+                                      label={`Pay Installment (₦${(amount / 2).toLocaleString()})`}
+                                      disabled={blocked || notConfigured}
+                                      variant="outline"
+                                      onSuccess={async ({ paymentType }) => {
+                                        await onFeePaymentSuccess(paymentType);
+                                        await fetchData();
+                                      }}
+                                    />
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
