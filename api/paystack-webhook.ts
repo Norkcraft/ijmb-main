@@ -97,6 +97,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         await sendEmail({ to: userEmail, subject, html });
       }
 
+      // Update application fields based on payment type
+      if (paymentType === 'acceptance_fee') {
+        await supabaseServer
+          .from('applications')
+          .update({ status: 'fees_pending', updated_at: new Date().toISOString() })
+          .eq('id', applicationId);
+      }
+
+      if (paymentType === 'hostel_fee') {
+        await supabaseServer
+          .from('applications')
+          .update({ hostel_fee_paid: true, updated_at: new Date().toISOString() })
+          .eq('id', applicationId);
+      }
+
+      if (paymentType === 'tuition_fee') {
+        const amountNaira = amount / 100;
+        await supabaseServer
+          .from('applications')
+          .update({
+            tuition_payment_status: 'fully_paid',
+            tuition_amount_paid: amountNaira,
+            status: 'active',
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', applicationId);
+      }
+
       // If it's the Form Fee, update application status and Generate PDF
       if (paymentType === 'form_fee') {
 

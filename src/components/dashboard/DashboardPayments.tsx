@@ -29,6 +29,9 @@ export const DashboardPayments = ({
   const [loading, setLoading] = useState(true);
   const [hostelNeeded, setHostelNeeded] = useState(application?.hostel_needed || false);
   const [processing, setProcessing] = useState(false);
+  // Optimistic paid state — updated immediately on payment success so the UI
+  // shows "Paid" right away without waiting for the Paystack webhook to fire.
+  const [optimisticPaid, setOptimisticPaid] = useState<Set<string>>(new Set());
 
   // Toggle Hostel
   const toggleHostel = async (val: boolean) => {
@@ -119,15 +122,15 @@ export const DashboardPayments = ({
                   let amountPaid = 0;
 
                   if (name === 'form_fee') {
-                    paid = !!application?.form_fee_paid;
+                    paid = !!application?.form_fee_paid || optimisticPaid.has('form_fee');
                   } else if (name === 'tuition_fee') {
-                    paid = application?.tuition_payment_status === 'fully_paid';
-                    isPartPaid = application?.tuition_payment_status === 'part_paid';
+                    paid = application?.tuition_payment_status === 'fully_paid' || optimisticPaid.has('tuition_fee');
+                    isPartPaid = !paid && application?.tuition_payment_status === 'part_paid';
                     amountPaid = Number(application?.tuition_amount_paid) || 0;
                   } else if (name === 'hostel_fee') {
-                    paid = !!application?.hostel_fee_paid;
+                    paid = !!application?.hostel_fee_paid || optimisticPaid.has('hostel_fee');
                   } else {
-                    paid = paidFeeNames.has(name);
+                    paid = paidFeeNames.has(name) || optimisticPaid.has(name);
                   }
 
                   // Force form_fee to always be visible and actionable if not paid
@@ -204,6 +207,8 @@ export const DashboardPayments = ({
                                   label={isPartPaid ? `Pay Balance (₦${balance.toLocaleString()})` : `Pay Now (₦${amount.toLocaleString()})`}
                                   disabled={blocked || notConfigured}
                                   onSuccess={async ({ paymentType }) => {
+                                    // Mark paid immediately in local state so UI updates at once
+                                    setOptimisticPaid(prev => new Set([...prev, paymentType]));
                                     await onFeePaymentSuccess(paymentType);
                                     await fetchData();
                                   }}
@@ -225,6 +230,7 @@ export const DashboardPayments = ({
                                     }}
                                   />
                                 )}
+
                               </>
                             )}
                           </div>
