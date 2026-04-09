@@ -103,6 +103,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
         centreOfStudy: centreName,
         courseOfChoice: app.intended_course || '-',
         subjectCombination: subjectCombo,
+        academicSession: app.sessions?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
         passportPhotoBase64: passportBase64,
         qrCodeBase64,
         logoBase64,
