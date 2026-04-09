@@ -11,7 +11,7 @@ const APP_ROUTES = ['/dashboard', '/portal-admin'];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isAppRoute = APP_ROUTES.some((r) => pathname.startsWith(r));
+  const isAppRoute = APP_ROUTES.some((r) => pathname?.startsWith(r));
 
   return (
     <>
