@@ -22,25 +22,10 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       .from('applications')
       .select(`
         *,
-        profiles (
-          email,
-          phone
-        ),
-        sessions (
-          name,
-          code
-        ),
-        centres (
-          name,
-          state,
-          location
-        ),
-        subject_combinations (
-          name,
-          subject1,
-          subject2,
-          subject3
-        )
+        profiles ( email, phone ),
+        sessions ( name, code ),
+        centres ( name, state, location ),
+        subject_combinations ( name, subject1, subject2, subject3 )
       `)
       .eq('id', applicationId)
       .single();
@@ -48,6 +33,24 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
     if (appError || !app) {
       throw new Error(`Failed to fetch application: ${appError?.message || 'Not found'}`);
     }
+
+    // Fetch O-Level results
+    const { data: olevelRows } = await supabase
+      .from('olevel_results')
+      .select('subject, grade, exam_type, exam_year')
+      .eq('application_id', applicationId)
+      .order('created_at');
+
+    // Fetch form_fee payment for reference/date
+    const { data: feePayment } = await supabase
+      .from('payments')
+      .select('reference, created_at, amount')
+      .eq('application_id', applicationId)
+      .eq('type', 'form_fee')
+      .eq('status', 'success')
+      .order('created_at')
+      .limit(1)
+      .maybeSingle();
 
     // 2. Fetch Passport Photo (Convert to Base64)
     let passportBase64 = '';
@@ -98,6 +101,7 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
     const displayId = app.application_number || generateApplicationId(1000); 
 
     // 6. Build HTML
+    const sc = app.subject_combinations;
     const htmlContent = buildApplicationFormHTML({
       applicationId: displayId,
       registrationDate: new Date(app.created_at).toLocaleDateString('en-GB', {
@@ -116,12 +120,24 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       residentialAddress: app.residential_address || '',
       centreOfStudy: app.centres ? `${app.centres.name}${app.centres.location ? ', ' + app.centres.location : ''}, ${app.centres.state}` : 'Not Assigned',
       courseOfChoice: app.intended_course || '',
-      subjectCombination: app.subject_combinations 
-        ? `${app.subject_combinations.name} (${app.subject_combinations.subject1}, ${app.subject_combinations.subject2}, ${app.subject_combinations.subject3})`
-        : 'Pending',
+      subjectCombination: sc ? sc.name : 'Pending',
+      subject1: sc?.subject1 || '',
+      subject2: sc?.subject2 || '',
+      subject3: sc?.subject3 || '',
+      olevelResults: (olevelRows || []).map((r: any) => ({
+        subject: r.subject || '',
+        grade: r.grade || '—',
+        examYear: r.exam_year || '—',
+        examType: r.exam_type || '—',
+      })),
+      paymentReference: feePayment?.reference || '',
+      paymentDate: feePayment?.created_at
+        ? new Date(feePayment.created_at).toLocaleDateString('en-GB')
+        : '',
+      amountPaid: feePayment?.amount ? `₦${Number(feePayment.amount).toLocaleString()}` : '',
       passportPhotoBase64: passportBase64,
       qrCodeBase64: qrCodeBase64,
-      logoBase64: logoBase64
+      logoBase64: logoBase64,
     });
 
     // 7. Launch Puppeteer (Optimized for Serverless)

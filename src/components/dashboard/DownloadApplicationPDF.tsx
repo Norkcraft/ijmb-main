@@ -18,19 +18,33 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
     setLoading(true);
     try {
       // 1. Fetch full application data
-      const { data: app, error } = await supabase
-        .from('applications')
-        .select(`
-          *,
-          profiles ( email, phone ),
-          sessions ( name, code ),
-          centres ( name, state, location ),
-          subject_combinations ( name, subject1, subject2, subject3 )
-        `)
-        .eq('id', applicationId)
-        .single();
+      const [appRes, olevelRes, paymentRes] = await Promise.all([
+        supabase
+          .from('applications')
+          .select('*, profiles(email,phone), sessions(name,code), centres(name,state,location), subject_combinations(name,subject1,subject2,subject3)')
+          .eq('id', applicationId)
+          .single(),
+        supabase
+          .from('olevel_results')
+          .select('subject, grade, exam_type, exam_year')
+          .eq('application_id', applicationId)
+          .order('created_at'),
+        supabase
+          .from('payments')
+          .select('reference, created_at, amount')
+          .eq('application_id', applicationId)
+          .eq('type', 'form_fee')
+          .eq('status', 'success')
+          .order('created_at')
+          .limit(1)
+          .maybeSingle(),
+      ]);
 
+      const app = appRes.data;
+      const error = appRes.error;
       if (error || !app) throw new Error('Could not load application data.');
+      const olevelRows = olevelRes.data || [];
+      const feePayment = paymentRes.data;
 
       // 2. Load passport photo as base64
       let passportBase64 = '';
@@ -85,25 +99,40 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
         : 'Not Assigned';
 
       // 6. Build HTML and open print window
+      const sc = app.subject_combinations;
       const html = buildApplicationFormHTML({
         applicationId: displayId,
         registrationDate,
         surname: app.surname || '',
         firstName: app.first_name || '',
         middleName: app.middle_name || '',
-        gender: app.gender || '-',
+        gender: app.gender || '',
         dateOfBirth: app.date_of_birth
           ? new Date(app.date_of_birth).toLocaleDateString('en-GB')
-          : '-',
-        stateOfOrigin: app.state_of_origin || '-',
-        lga: app.lga || '-',
-        phoneNumber: app.profiles?.phone || app.phone_number || '-',
-        email: app.profiles?.email || '-',
-        residentialAddress: app.residential_address || '-',
+          : '',
+        stateOfOrigin: app.state_of_origin || '',
+        lga: app.lga || '',
+        phoneNumber: app.profiles?.phone || app.guardian_phone || '',
+        email: app.profiles?.email || '',
+        residentialAddress: app.residential_address || '',
         centreOfStudy: centreName,
-        courseOfChoice: app.intended_course || '-',
-        subjectCombination: subjectCombo,
+        courseOfChoice: app.intended_course || '',
+        subjectCombination: sc ? sc.name : '',
+        subject1: sc?.subject1 || '',
+        subject2: sc?.subject2 || '',
+        subject3: sc?.subject3 || '',
         academicSession: app.sessions?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
+        olevelResults: olevelRows.map((r: any) => ({
+          subject: r.subject || '',
+          grade: r.grade || '—',
+          examYear: r.exam_year || '—',
+          examType: r.exam_type || '—',
+        })),
+        paymentReference: feePayment?.reference || '',
+        paymentDate: feePayment?.created_at
+          ? new Date(feePayment.created_at).toLocaleDateString('en-GB')
+          : '',
+        amountPaid: feePayment?.amount ? `₦${Number(feePayment.amount).toLocaleString()}` : '',
         passportPhotoBase64: passportBase64,
         qrCodeBase64,
         logoBase64,
