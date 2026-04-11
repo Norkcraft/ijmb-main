@@ -1,3 +1,14 @@
+/** Escape user-supplied strings before embedding in HTML email to prevent XSS */
+function esc(str: string | undefined | null): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 // Shared branding constants
 const LOGO = 'https://www.ijmb.info/ijmb-logo.jpeg';
 const SITE = 'https://www.ijmb.info';
@@ -56,12 +67,12 @@ export function welcomeEmail(fullName: string, email: string) {
   const body = `
     ${header('Welcome to IJMB Portal')}
     <div style="padding:36px 32px">
-      <h1 style="color:#1a3c6e;margin:0 0 8px;font-size:22px">Welcome, ${fullName}! 🎓</h1>
+      <h1 style="color:#1a3c6e;margin:0 0 8px;font-size:22px">Welcome, ${esc(fullName)}! 🎓</h1>
       <p style="color:#475569;margin:0 0 20px;line-height:1.7">
         Your IJMB Student Portal account has been created successfully. You're one step closer to gaining <strong>direct entry into 200 Level</strong> at any Nigerian university — without UTME.
       </p>
       <div style="background:#f0f7ff;border-left:4px solid #1a3c6e;padding:16px 20px;border-radius:0 8px 8px 0;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#1e293b"><strong>Your account email:</strong> ${email}</p>
+        <p style="margin:0;font-size:14px;color:#1e293b"><strong>Your account email:</strong> ${esc(email)}</p>
       </div>
       <h3 style="color:#1a3c6e;font-size:15px;margin:0 0 12px">What to do next:</h3>
       <ol style="color:#475569;font-size:14px;line-height:2;margin:0 0 24px;padding-left:20px">
@@ -78,7 +89,7 @@ export function welcomeEmail(fullName: string, email: string) {
     </div>
     ${footer()}
   `;
-  return { html: wrapper(body), subject: `Welcome to IJMB Portal, ${fullName}!` };
+  return { html: wrapper(body), subject: `Welcome to IJMB Portal, ${esc(fullName)}!` };
 }
 
 // ─── 2. PAYMENT CONFIRMATION ───────────────────────────────────────────────
@@ -110,7 +121,7 @@ export function paymentConfirmationEmail(
         <h1 style="color:#16a34a;margin:0;font-size:22px">Payment Successful!</h1>
       </div>
       <p style="color:#475569;margin:0 0 24px;line-height:1.7">
-        Hi <strong>${fullName}</strong>, we have received your payment. Here are your payment details:
+        Hi <strong>${esc(fullName)}</strong>, we have received your payment. Here are your payment details:
       </p>
       <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
         <tbody>
@@ -146,13 +157,13 @@ export function applicationSubmittedEmail(
     <div style="padding:36px 32px">
       <h1 style="color:#1a3c6e;margin:0 0 12px;font-size:22px">Application Received!</h1>
       <p style="color:#475569;margin:0 0 20px;line-height:1.7">
-        Hi <strong>${fullName}</strong>, your IJMB ${YEAR} application has been submitted successfully and is now under review by our admissions team.
+        Hi <strong>${esc(fullName)}</strong>, your IJMB ${YEAR} application has been submitted successfully and is now under review by our admissions team.
       </p>
       <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
         <tbody>
-          ${infoRow('Application ID', applicationId)}
-          ${infoRow('Assigned Centre', centre || 'To be assigned')}
-          ${infoRow('Subjects', subjects || 'As selected')}
+          ${infoRow('Application ID', esc(applicationId))}
+          ${infoRow('Assigned Centre', esc(centre) || 'To be assigned')}
+          ${infoRow('Subjects', esc(subjects) || 'As selected')}
           ${infoRow('Session', YEAR)}
           ${infoRow('Status', '<span style="color:#d97706">⏳ Under Review</span>')}
         </tbody>
@@ -170,7 +181,7 @@ export function applicationSubmittedEmail(
   `;
   return {
     html: wrapper(body),
-    subject: `Application Submitted — ID: ${applicationId} | IJMB ${YEAR}`
+    subject: `Application Submitted — ID: ${esc(applicationId)} | IJMB ${YEAR}`
   };
 }
 
@@ -187,7 +198,7 @@ export function admissionOfferEmail(
     <div style="padding:36px 32px">
       <div style="text-align:center;margin-bottom:28px">
         <div style="font-size:48px;margin-bottom:8px">🎉</div>
-        <h1 style="color:#1a3c6e;margin:0;font-size:24px">Congratulations, ${fullName}!</h1>
+        <h1 style="color:#1a3c6e;margin:0;font-size:24px">Congratulations, ${esc(fullName)}!</h1>
         <p style="color:#475569;margin:8px 0 0">You have been offered admission into the IJMB Programme</p>
       </div>
       <div style="background:#f0f7ff;border:2px solid #1a3c6e;border-radius:10px;padding:20px 24px;margin-bottom:24px;text-align:center">
@@ -196,11 +207,11 @@ export function admissionOfferEmail(
       </div>
       <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
         <tbody>
-          ${infoRow('Full Name', fullName)}
-          ${infoRow('Application ID', applicationId)}
-          ${infoRow('Study Centre', centre)}
-          ${infoRow('Subject Combination', subjects)}
-          ${infoRow('Resumption Date', resumptionDate)}
+          ${infoRow('Full Name', esc(fullName))}
+          ${infoRow('Application ID', esc(applicationId))}
+          ${infoRow('Study Centre', esc(centre))}
+          ${infoRow('Subject Combination', esc(subjects))}
+          ${infoRow('Resumption Date', esc(resumptionDate))}
           ${infoRow('Status', '<span style="color:#16a34a;font-weight:bold">✓ ADMITTED</span>')}
         </tbody>
       </table>
@@ -217,7 +228,7 @@ export function admissionOfferEmail(
   `;
   return {
     html: wrapper(body),
-    subject: `🎉 Admission Offer — IJMB ${YEAR} | ${fullName}`
+    subject: `Admission Offer — IJMB ${YEAR} | ${esc(fullName)}`
   };
 }
 
@@ -253,10 +264,10 @@ export function accountUpdateEmail(fullName: string, changeDescription: string) 
     <div style="padding:36px 32px">
       <h1 style="color:#1a3c6e;margin:0 0 12px;font-size:22px">Your Account Was Updated</h1>
       <p style="color:#475569;margin:0 0 20px;line-height:1.7">
-        Hi <strong>${fullName}</strong>, this is a notification that your IJMB Student Portal account was recently updated.
+        Hi <strong>${esc(fullName)}</strong>, this is a notification that your IJMB Student Portal account was recently updated.
       </p>
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#1e293b"><strong>Change made:</strong> ${changeDescription}</p>
+        <p style="margin:0;font-size:14px;color:#1e293b"><strong>Change made:</strong> ${esc(changeDescription)}</p>
         <p style="margin:6px 0 0;font-size:12px;color:#94a3b8">Date: ${new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
       </div>
       <div style="background:#fef2f2;border-left:4px solid #ef4444;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px">

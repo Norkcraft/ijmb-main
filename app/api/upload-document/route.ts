@@ -21,6 +21,12 @@ function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const entry = rateLimitMap.get(ip);
   if (!entry || now > entry.resetAt) {
+    // Clean up expired entries to prevent memory leak
+    if (rateLimitMap.size > 5000) {
+      for (const [key, val] of rateLimitMap) {
+        if (now > val.resetAt) rateLimitMap.delete(key);
+      }
+    }
     rateLimitMap.set(ip, { count: 1, resetAt: now + 60_000 });
     return true;
   }

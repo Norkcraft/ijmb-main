@@ -20,6 +20,17 @@ export interface ApplicationFormData {
   logoBase64: string;          // base64 data URI of site logo
 }
 
+/** Escape user-supplied strings before embedding them in HTML to prevent XSS */
+function esc(str: string | undefined | null): string {
+  if (!str) return '';
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
   const accentColor = '#1a5276'; // Deep Green/Navy hybrid
   const lightGray = '#f8f9fa';
@@ -31,7 +42,7 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IJMB Application Form - ${data.applicationId}</title>
+  <title>IJMB Application Form - ${esc(data.applicationId)}</title>
   <style>
     @page {
       size: A4;
@@ -297,15 +308,15 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
       <div class="meta-info">
         <div class="meta-field">
           <strong>Application ID:</strong>
-          <span>${data.applicationId}</span>
+          <span>${esc(data.applicationId)}</span>
         </div>
         <div class="meta-field">
           <strong>Registration Date:</strong>
-          <span>${data.registrationDate}</span>
+          <span>${esc(data.registrationDate)}</span>
         </div>
         <div class="meta-field">
           <strong>Academic Session:</strong>
-          <span>${data.academicSession}</span>
+          <span>${esc(data.academicSession)}</span>
         </div>
       </div>
 
@@ -326,23 +337,23 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
       <table>
         <tr>
           <td class="label-col">Surname</td>
-          <td class="value-col">${data.surname}</td>
+          <td class="value-col">${esc(data.surname)}</td>
         </tr>
         <tr>
           <td class="label-col">First Name</td>
-          <td class="value-col">${data.firstName}</td>
+          <td class="value-col">${esc(data.firstName)}</td>
         </tr>
         <tr>
           <td class="label-col">Middle Name</td>
-          <td class="value-col">${data.middleName || '-'}</td>
+          <td class="value-col">${esc(data.middleName) || '-'}</td>
         </tr>
         <tr>
           <td class="label-col">Gender</td>
-          <td class="value-col">${data.gender}</td>
+          <td class="value-col">${esc(data.gender)}</td>
         </tr>
         <tr>
           <td class="label-col">Date of Birth</td>
-          <td class="value-col">${data.dateOfBirth}</td>
+          <td class="value-col">${esc(data.dateOfBirth)}</td>
         </tr>
       </table>
     </div>
@@ -353,11 +364,11 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
       <table>
         <tr>
           <td class="label-col">State of Origin</td>
-          <td class="value-col">${data.stateOfOrigin}</td>
+          <td class="value-col">${esc(data.stateOfOrigin)}</td>
         </tr>
         <tr>
           <td class="label-col">Local Govt. Area</td>
-          <td class="value-col">${data.lga}</td>
+          <td class="value-col">${esc(data.lga)}</td>
         </tr>
       </table>
     </div>
@@ -368,15 +379,15 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
       <table>
         <tr>
           <td class="label-col">Phone Number</td>
-          <td class="value-col">${data.phoneNumber}</td>
+          <td class="value-col">${esc(data.phoneNumber)}</td>
         </tr>
         <tr>
           <td class="label-col">Email Address</td>
-          <td class="value-col">${data.email}</td>
+          <td class="value-col">${esc(data.email)}</td>
         </tr>
         <tr>
           <td class="label-col">Residential Address</td>
-          <td class="value-col">${data.residentialAddress}</td>
+          <td class="value-col">${esc(data.residentialAddress)}</td>
         </tr>
       </table>
     </div>
@@ -387,15 +398,15 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
       <table>
         <tr>
           <td class="label-col">Centre of Study</td>
-          <td class="value-col">${data.centreOfStudy}</td>
+          <td class="value-col">${esc(data.centreOfStudy)}</td>
         </tr>
         <tr>
           <td class="label-col">Course of Choice</td>
-          <td class="value-col">${data.courseOfChoice}</td>
+          <td class="value-col">${esc(data.courseOfChoice)}</td>
         </tr>
         <tr>
           <td class="label-col">Subject Combination</td>
-          <td class="value-col">${data.subjectCombination}</td>
+          <td class="value-col">${esc(data.subjectCombination)}</td>
         </tr>
       </table>
     </div>
