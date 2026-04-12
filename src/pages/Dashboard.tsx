@@ -13,6 +13,7 @@ import { useStudentDashboard } from '@/hooks/useStudentDashboard';
 import { DashboardPrintView } from '@/components/dashboard/DashboardPrintView';
 import { DashboardPayments } from '@/components/dashboard/DashboardPayments';
 import { ApplicationForm } from '@/components/application/ApplicationForm';
+import { DownloadApplicationPDF } from '@/components/dashboard/DownloadApplicationPDF';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -593,9 +594,8 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
 }
 
 // ── Documents tab ─────────────────────────────────────────────────────────────
-function DocumentsTab({ application, onPrint, sessions, centres, combos }: {
+function DocumentsTab({ application, sessions, centres, combos }: {
   application: any;
-  onPrint: () => void;
   sessions: any[];
   centres: any[];
   combos: any[];
@@ -689,33 +689,6 @@ function DocumentsTab({ application, onPrint, sessions, centres, combos }: {
     setTimeout(() => win.print(), 600);
   };
 
-  const docs = [
-    {
-      title: 'Application Form',
-      desc: 'Official registration form with your application details',
-      icon: <FileText size={20} className="text-primary" />,
-      bg: 'bg-primary/8',
-      available: !!formFeePaid,
-      lockedMsg: 'Pay registration fee to unlock',
-      action: onPrint,
-      actionLabel: 'Print / Save PDF',
-      actionIcon: <Printer size={14} />,
-      style: 'primary',
-    },
-    {
-      title: 'Admission Letter',
-      desc: 'Official IJMB admission letter for your session',
-      icon: <BadgeCheck size={20} className="text-green-600" />,
-      bg: 'bg-green-50',
-      available: !!hasPaidAcceptanceFee,
-      lockedMsg: isAdmitted ? 'Pay acceptance fee to unlock' : 'Available after admission is granted',
-      action: downloadLetter,
-      actionLabel: 'Download Letter',
-      actionIcon: <Download size={14} />,
-      style: 'green',
-    },
-  ];
-
   return (
     <div className="space-y-4">
       <div>
@@ -724,38 +697,58 @@ function DocumentsTab({ application, onPrint, sessions, centres, combos }: {
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        {docs.map((doc) => (
-          <div key={doc.title} className={`bg-white rounded-2xl border p-5 space-y-4 transition-shadow hover:shadow-md ${!doc.available ? 'opacity-80' : ''}`}>
-            <div className="flex items-start gap-3">
-              <div className={`w-11 h-11 rounded-2xl ${doc.bg} flex items-center justify-center shrink-0`}>
-                {doc.icon}
-              </div>
-              <div>
-                <h3 className="font-bold text-sm">{doc.title}</h3>
-                <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{doc.desc}</p>
-              </div>
-            </div>
 
-            {doc.available ? (
-              <button
-                onClick={doc.action}
-                className={`w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl transition-colors
-                  ${doc.style === 'green'
-                    ? 'bg-green-600 hover:bg-green-700 text-white'
-                    : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
-              >
-                {doc.actionIcon}{doc.actionLabel}
-              </button>
-            ) : (
-              <div className="flex items-center gap-2 py-2.5 px-4 bg-muted/50 rounded-xl border border-dashed border-muted-foreground/30">
-                <div className="w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center shrink-0">
-                  <Clock size={10} className="text-muted-foreground" />
-                </div>
-                <span className="text-xs text-muted-foreground font-medium">{doc.lockedMsg}</span>
-              </div>
-            )}
+        {/* Application Form */}
+        <div className={`bg-white rounded-2xl border p-5 space-y-4 transition-shadow hover:shadow-md ${!formFeePaid ? 'opacity-80' : ''}`}>
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-primary/8 flex items-center justify-center shrink-0">
+              <FileText size={20} className="text-primary" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">Application Form</h3>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Official registration form with your application details</p>
+            </div>
           </div>
-        ))}
+          {formFeePaid && application?.id ? (
+            <DownloadApplicationPDF applicationId={application.id} />
+          ) : (
+            <div className="flex items-center gap-2 py-2.5 px-4 bg-muted/50 rounded-xl border border-dashed border-muted-foreground/30">
+              <div className="w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center shrink-0">
+                <Clock size={10} className="text-muted-foreground" />
+              </div>
+              <span className="text-xs text-muted-foreground font-medium">Pay registration fee to unlock</span>
+            </div>
+          )}
+        </div>
+
+        {/* Admission Letter */}
+        <div className={`bg-white rounded-2xl border p-5 space-y-4 transition-shadow hover:shadow-md ${!hasPaidAcceptanceFee ? 'opacity-80' : ''}`}>
+          <div className="flex items-start gap-3">
+            <div className="w-11 h-11 rounded-2xl bg-green-50 flex items-center justify-center shrink-0">
+              <BadgeCheck size={20} className="text-green-600" />
+            </div>
+            <div>
+              <h3 className="font-bold text-sm">Admission Letter</h3>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Official IJMB admission letter for your session</p>
+            </div>
+          </div>
+          {hasPaidAcceptanceFee ? (
+            <button
+              onClick={downloadLetter}
+              className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors"
+            >
+              <Download size={14} /> Download Letter
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 py-2.5 px-4 bg-muted/50 rounded-xl border border-dashed border-muted-foreground/30">
+              <div className="w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center shrink-0">
+                <Clock size={10} className="text-muted-foreground" />
+              </div>
+              <span className="text-xs text-muted-foreground font-medium">{isAdmitted ? 'Pay acceptance fee to unlock' : 'Available after admission is granted'}</span>
+            </div>
+          )}
+        </div>
+
       </div>
 
       <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-sm text-blue-800">
@@ -1163,7 +1156,7 @@ const Dashboard = () => {
           )}
 
           {currentTab === 'documents' && (
-            <DocumentsTab application={application} onPrint={handlePrint} sessions={sessions} centres={centres} combos={combos} />
+            <DocumentsTab application={application} sessions={sessions} centres={centres} combos={combos} />
           )}
 
           {currentTab === 'profile' && (

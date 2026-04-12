@@ -21,7 +21,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       const [appRes, olevelRes, paymentRes] = await Promise.all([
         supabase
           .from('applications')
-          .select('*, profiles(email,phone), sessions(name,code), centres(name,state,location), subject_combinations(name,subject1,subject2,subject3)')
+          .select('*, profiles:user_id(email,phone), sessions:session_id(name,code), centres:preferred_centre_id(name,state,location), subject_combinations:subject_combination_id(name,subject1,subject2,subject3)')
           .eq('id', applicationId)
           .single(),
         supabase
