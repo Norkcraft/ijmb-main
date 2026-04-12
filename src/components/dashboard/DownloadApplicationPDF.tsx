@@ -46,35 +46,16 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       const olevelRows = olevelRes.data || [];
       const feePayment = paymentRes.data;
 
-      // 2. Load passport photo as base64
+      // 2. Get passport photo as a signed URL (instant — no download/encode)
       let passportBase64 = '';
       if (app.passport_path) {
-        const { data: photoBlob } = await supabase.storage
+        const { data: signed } = await supabase.storage
           .from('student-documents')
-          .download(app.passport_path);
-        if (photoBlob) {
-          const ab = await photoBlob.arrayBuffer();
-          const bytes = new Uint8Array(ab);
-          let binary = '';
-          bytes.forEach((b) => (binary += String.fromCharCode(b)));
-          const b64 = btoa(binary);
-          passportBase64 = `data:${photoBlob.type || 'image/jpeg'};base64,${b64}`;
-        }
+          .createSignedUrl(app.passport_path, 300);
+        if (signed?.signedUrl) passportBase64 = signed.signedUrl;
       }
 
-      // 3. Load logo as base64
-      let logoBase64 = '';
-      try {
-        const resp = await fetch('/ijmb-logo.jpeg');
-        const blob = await resp.blob();
-        const ab = await blob.arrayBuffer();
-        const bytes = new Uint8Array(ab);
-        let binary = '';
-        bytes.forEach((b) => (binary += String.fromCharCode(b)));
-        logoBase64 = `data:image/jpeg;base64,${btoa(binary)}`;
-      } catch {
-        // logo optional
-      }
+      // 3. Skip logo fetch — template falls back to the public URL automatically
 
       // 4. Generate QR code
       const verifyUrl = `https://www.ijmb.info/verify/${applicationId}`;
@@ -135,7 +116,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
         amountPaid: feePayment?.amount ? `₦${Number(feePayment.amount).toLocaleString()}` : '',
         passportPhotoBase64: passportBase64,
         qrCodeBase64,
-        logoBase64,
+        logoBase64: '',
       });
 
       const win = window.open('', '_blank', 'width=900,height=700');
@@ -146,9 +127,10 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       win.document.write(html);
       win.document.close();
       win.focus();
+      // Wait for passport image (signed URL) and fonts to load before printing
       setTimeout(() => {
         win.print();
-      }, 800);
+      }, 1500);
     } catch (err) {
       console.error('PDF generation error:', err);
       alert('Failed to generate PDF. Please try again.');
