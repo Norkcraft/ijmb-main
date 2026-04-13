@@ -6,7 +6,8 @@ const BASE_URL = 'https://www.ijmb.info';
 const cities = [
   'lagos', 'abuja', 'ibadan', 'ilorin', 'port-harcourt', 'benin', 'kano',
   'kaduna', 'jos', 'enugu', 'owerri', 'aba', 'uyo', 'akure', 'ado-ekiti',
-  'abeokuta', 'osogbo', 'minna', 'lokoja', 'makurdi',
+  'abeokuta', 'osogbo', 'minna', 'lokoja', 'makurdi', 'anambra', 'awka',
+  'onitsha', 'asaba', 'calabar', 'warri', 'sokoto', 'zaria',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

@@ -1021,5 +1021,226 @@ export const blogPosts: BlogPost[] = [
     date: '2026-04-09',
     image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&q=80&w=800',
     tags: ['Law', 'LLB', 'Direct Entry', 'IJMB']
+  },
+  {
+    id: '11',
+    slug: 'ijmb-in-anambra-state',
+    title: 'IJMB in Anambra State 2026 – Centres, Fees & How to Register',
+    excerpt: 'Complete guide to IJMB registration in Anambra State. Find accredited IJMB study centres in Awka and Onitsha, registration fees, requirements, and how to apply online.',
+    content: `
+      <h2>IJMB in Anambra State 2026</h2>
+      <p>Anambra State students can now register for the <strong>Interim Joint Matriculation Board (IJMB)</strong> programme through the official Anambra City Centre and gain <strong>direct entry admission into 200 level</strong> without writing UTME. This guide covers everything you need to know about IJMB in Anambra — centres, fees, requirements, and how to register online.</p>
+
+      <h2>IJMB Study Centres in Anambra State</h2>
+      <p>The following IJMB accredited study centres are available in Anambra State:</p>
+      <ul>
+        <li><strong>Anambra City Centre</strong> – Awka (State Capital)</li>
+        <li><strong>Onitsha Study Centre</strong> – Onitsha</li>
+      </ul>
+      <p>These centres are affiliated with Ahmadu Bello University (ABU) Zaria and are fully approved by the Federal Government of Nigeria.</p>
+
+      <h2>IJMB Registration Requirements in Anambra</h2>
+      <p>To register for IJMB in Anambra State, you need:</p>
+      <ul>
+        <li>Minimum of 5 O-Level credits (WAEC, NECO, GCE, or NABTEB) including English Language and Mathematics</li>
+        <li>Awaiting O-Level results is also accepted</li>
+        <li>Valid passport photograph</li>
+        <li>Valid means of identification (birth certificate, national ID, or student ID)</li>
+        <li>Form fee payment receipt</li>
+      </ul>
+
+      <h2>IJMB Fees in Anambra State 2026</h2>
+      <table>
+        <thead><tr><th>Fee Type</th><th>Amount</th></tr></thead>
+        <tbody>
+          <tr><td>Application/Form Fee</td><td>₦5,500</td></tr>
+          <tr><td>Tuition Fee (per session)</td><td>₦80,000 – ₦120,000</td></tr>
+          <tr><td>Hostel Accommodation (optional)</td><td>₦40,000 – ₦80,000</td></tr>
+        </tbody>
+      </table>
+      <p><em>Note: Fees may vary slightly by centre. Contact the Anambra City Centre directly for the most up-to-date fee schedule.</em></p>
+
+      <h2>Popular IJMB Subject Combinations in Anambra</h2>
+      <p>Students from Anambra commonly register for the following IJMB subject combinations:</p>
+      <ul>
+        <li><strong>Medicine &amp; Pharmacy:</strong> Biology, Chemistry, Physics</li>
+        <li><strong>Engineering:</strong> Mathematics, Physics, Chemistry</li>
+        <li><strong>Law &amp; Social Sciences:</strong> Government, Economics, Literature</li>
+        <li><strong>Accounting &amp; Business:</strong> Economics, Accounting, Mathematics</li>
+        <li><strong>Education:</strong> Varies by teaching subject</li>
+      </ul>
+
+      <h2>How to Register for IJMB in Anambra Online</h2>
+      <ol>
+        <li>Visit <strong>www.ijmb.info</strong> and click "Register Now"</li>
+        <li>Create an account with your email address</li>
+        <li>Fill in your personal and academic details</li>
+        <li>Select <strong>Anambra City Centre</strong> as your preferred study centre</li>
+        <li>Choose your subject combination</li>
+        <li>Pay the form fee of <strong>₦5,500</strong> via Paystack (card, bank transfer, or USSD)</li>
+        <li>Download and print your registration slip</li>
+      </ol>
+
+      <h2>Universities Near Anambra That Accept IJMB</h2>
+      <p>Students from Anambra who complete the IJMB programme can gain direct entry into universities nearby, including:</p>
+      <ul>
+        <li>Nnamdi Azikiwe University (NAU), Awka</li>
+        <li>Chukwuemeka Odumegwu Ojukwu University (COOU)</li>
+        <li>Paul University, Awka</li>
+        <li>Madonna University, Okija</li>
+        <li>University of Nigeria, Nsukka (UNN)</li>
+        <li>All federal and state universities across Nigeria</li>
+      </ul>
+
+      <h2>Frequently Asked Questions – IJMB Anambra</h2>
+      <h3>Can I register for IJMB online from Anambra?</h3>
+      <p>Yes. Registration is done entirely online at <strong>www.ijmb.info</strong>. You do not need to visit any office to register.</p>
+
+      <h3>Is the Anambra City Centre accredited?</h3>
+      <p>Yes. The Anambra City Centre is an officially accredited IJMB study centre affiliated with Ahmadu Bello University Zaria.</p>
+
+      <h3>When does the IJMB programme start in Anambra?</h3>
+      <p>The 2026/2027 academic session typically begins between October and December. Register early to secure your spot.</p>
+    `,
+    author: 'IJMB Admin',
+    date: '2026-04-13',
+    image: 'https://images.unsplash.com/photo-1571260899304-425eee4c7efc?auto=format&fit=crop&q=80&w=800',
+    tags: ['Anambra', 'IJMB Centres', 'South-East', 'Registration']
+  },
+  {
+    id: '12',
+    slug: 'ijmb-grading-system-point-calculation',
+    title: 'IJMB Grading System & Point Calculation 2026 – What Score Do You Need?',
+    excerpt: 'Understand the IJMB grading system and how ABU Zaria calculates your points. Learn what scores you need for Medicine, Law, Engineering and other courses.',
+    content: `
+      <h2>IJMB Grading System Explained</h2>
+      <p>The IJMB examination is conducted by <strong>Ahmadu Bello University (ABU) Zaria</strong>. Results are graded on a points system similar to the UK A-Level grading format. Understanding this grading system is essential for knowing whether your score qualifies you for your preferred university and course.</p>
+
+      <h2>IJMB Grade Points Table</h2>
+      <table>
+        <thead><tr><th>Grade</th><th>Points</th><th>Percentage Range</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td>5</td><td>70% and above</td></tr>
+          <tr><td>B</td><td>4</td><td>60% – 69%</td></tr>
+          <tr><td>C</td><td>3</td><td>50% – 59%</td></tr>
+          <tr><td>D</td><td>2</td><td>45% – 49%</td></tr>
+          <tr><td>E</td><td>1</td><td>40% – 44%</td></tr>
+          <tr><td>F</td><td>0</td><td>Below 40%</td></tr>
+        </tbody>
+      </table>
+      <p>Your total IJMB score is the sum of points from your <strong>3 subject examinations</strong>, giving a maximum of <strong>15 points</strong>.</p>
+
+      <h2>Minimum Points Required by Course</h2>
+      <table>
+        <thead><tr><th>Course</th><th>Minimum Points</th><th>Typical Requirement</th></tr></thead>
+        <tbody>
+          <tr><td>Medicine &amp; Surgery (MBBS)</td><td>12</td><td>ABB or better</td></tr>
+          <tr><td>Pharmacy (B.Pharm)</td><td>10</td><td>BBB or better</td></tr>
+          <tr><td>Law (LLB)</td><td>9</td><td>BBC or better</td></tr>
+          <tr><td>Engineering (all types)</td><td>9</td><td>BBC or better</td></tr>
+          <tr><td>Computer Science</td><td>8</td><td>BCC or better</td></tr>
+          <tr><td>Accounting / Business Admin</td><td>7</td><td>BCC or CCC</td></tr>
+          <tr><td>Education (various)</td><td>6</td><td>CCC or better</td></tr>
+          <tr><td>Arts &amp; Humanities</td><td>6</td><td>CCC or better</td></tr>
+          <tr><td>Social Sciences</td><td>6</td><td>CCC or better</td></tr>
+        </tbody>
+      </table>
+      <p><em>Note: Exact requirements vary by university. Always confirm with your target institution's Direct Entry cut-off points.</em></p>
+
+      <h2>How IJMB Points Are Calculated</h2>
+      <p>You sit examinations in <strong>3 subjects</strong>. Each subject is graded A–F and assigned points (5–0). Your total is out of 15.</p>
+      <p><strong>Example:</strong> A student who scores A in Biology (5), B in Chemistry (4), and C in Physics (3) has a total of <strong>12 points</strong> — qualifying for Medicine at most universities.</p>
+
+      <h2>IJMB Result Checker</h2>
+      <p>IJMB results are released by ABU Zaria after the annual examinations. To check your result:</p>
+      <ol>
+        <li>Visit the official ABU Zaria IJMB results portal</li>
+        <li>Enter your examination number and date of birth</li>
+        <li>Your result slip will be displayed with individual subject grades and total points</li>
+      </ol>
+      <p>Results are also sent to your registered email address once released.</p>
+
+      <h2>What Happens if You Fail IJMB?</h2>
+      <p>If you do not achieve the minimum points required, you can:</p>
+      <ul>
+        <li><strong>Re-sit</strong> the IJMB examinations in the next session</li>
+        <li>Apply to universities with lower cut-off points</li>
+        <li>Consider a different course with lower entry requirements</li>
+      </ul>
+      <p>There is no limit to how many times you can sit the IJMB examinations.</p>
+    `,
+    author: 'Academic Affairs',
+    date: '2026-04-13',
+    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&q=80&w=800',
+    tags: ['IJMB Grades', 'Point System', 'Results', 'Direct Entry']
+  },
+  {
+    id: '13',
+    slug: 'ijmb-direct-entry-medicine-2026',
+    title: 'IJMB for Medicine 2026 – How to Get Into MBBS Through Direct Entry',
+    excerpt: 'Can you study Medicine through IJMB direct entry? Yes. Learn the subject combinations, minimum points, and universities accepting IJMB for MBBS in Nigeria.',
+    content: `
+      <h2>Can You Study Medicine Through IJMB?</h2>
+      <p>Yes — IJMB is one of the most reliable routes into <strong>Medicine (MBBS)</strong> in Nigeria through Direct Entry. Many universities accept IJMB candidates for 200-level Medicine, provided you achieve the required points in the right subject combination.</p>
+
+      <h2>IJMB Subject Combination for Medicine</h2>
+      <p>For Medicine and Surgery (MBBS), you must take:</p>
+      <ul>
+        <li><strong>Biology</strong></li>
+        <li><strong>Chemistry</strong></li>
+        <li><strong>Physics</strong> (some universities accept Mathematics in place of Physics)</li>
+      </ul>
+      <p>This combination is also required for Pharmacy, Nursing, Veterinary Medicine, and other health sciences.</p>
+
+      <h2>Minimum IJMB Points for Medicine</h2>
+      <p>Most universities require a minimum of <strong>12 points</strong> (equivalent to ABB) for Medicine. Some top federal universities require <strong>13–15 points</strong>. The more competitive the university, the higher the cut-off.</p>
+
+      <h2>Universities Accepting IJMB for Medicine in Nigeria</h2>
+      <h3>Federal Universities</h3>
+      <ul>
+        <li>University of Lagos (UNILAG) – Cut-off: 12 points</li>
+        <li>University of Ibadan (UI) – Cut-off: 13 points</li>
+        <li>Ahmadu Bello University (ABU), Zaria – Cut-off: 12 points</li>
+        <li>University of Nigeria, Nsukka (UNN) – Cut-off: 12 points</li>
+        <li>Obafemi Awolowo University (OAU), Ile-Ife – Cut-off: 13 points</li>
+        <li>University of Benin (UNIBEN) – Cut-off: 12 points</li>
+        <li>Nnamdi Azikiwe University (NAU), Awka – Cut-off: 12 points</li>
+      </ul>
+      <h3>State Universities</h3>
+      <ul>
+        <li>Lagos State University (LASU)</li>
+        <li>Ambrose Alli University (AAU), Ekpoma</li>
+        <li>Delta State University (DELSU), Abraka</li>
+      </ul>
+      <h3>Private Universities</h3>
+      <ul>
+        <li>Babcock University, Ilishan-Remo</li>
+        <li>Afe Babalola University (ABUAD), Ado-Ekiti</li>
+        <li>Bingham University, Karu</li>
+        <li>Bowen University, Iwo</li>
+      </ul>
+
+      <h2>Tips to Score High in IJMB Medicine Subjects</h2>
+      <ul>
+        <li>Start past question practice early — ABU Zaria past questions are available online</li>
+        <li>Focus on understanding concepts, not just memorisation</li>
+        <li>Attend all lectures and practical sessions at your study centre</li>
+        <li>Form study groups with fellow students in the same combination</li>
+        <li>Aim for at least 70% in each subject (grade A = 5 points)</li>
+      </ul>
+
+      <h2>How to Register for IJMB Medicine Combination</h2>
+      <ol>
+        <li>Visit <strong>www.ijmb.info</strong> and create an account</li>
+        <li>Select your preferred IJMB study centre</li>
+        <li>Choose the <strong>Biology/Chemistry/Physics</strong> subject combination</li>
+        <li>Pay the form fee (₦5,500) and tuition fee</li>
+        <li>Begin classes at the start of the academic session</li>
+      </ol>
+    `,
+    author: 'Academic Affairs',
+    date: '2026-04-13',
+    image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=800',
+    tags: ['Medicine', 'MBBS', 'Direct Entry', 'IJMB']
   }
 ];
