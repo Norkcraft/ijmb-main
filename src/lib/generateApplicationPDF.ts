@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium-min';
-import { supabaseServer as supabase } from './supabaseServer';
+import { createClient } from '@supabase/supabase-js';
 import { generateQRCodeBase64 } from './generateQRCode';
 import { buildApplicationFormHTML } from './applicationFormTemplate';
 import { generateApplicationId } from './generateApplicationId';
@@ -9,13 +9,25 @@ import path from 'path';
 
 /**
  * Generates a PDF buffer for a given application ID.
- * 
+ *
  * @param applicationId The UUID of the application
+ * @param userToken The user's auth token (used to access data through RLS)
  * @returns Buffer of the generated PDF
  */
-export const generateApplicationPDF = async (applicationId: string): Promise<Buffer> => {
+export const generateApplicationPDF = async (applicationId: string, userToken?: string): Promise<Buffer> => {
   let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
-  
+
+  // Build a supabase client: prefer service role (bypasses RLS), fall back to user token
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+  const supabase = serviceRoleKey
+    ? createClient(supabaseUrl, serviceRoleKey)
+    : createClient(supabaseUrl, anonKey, {
+        global: { headers: userToken ? { Authorization: `Bearer ${userToken}` } : {} },
+      });
+
   try {
     // 1. Fetch Application Data (flat columns only — no embedded joins to avoid PostgREST coercion errors)
     const { data: app, error: appError } = await supabase
@@ -44,7 +56,7 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
         ? supabase.from('centres').select('name, state, location').eq('id', appData.preferred_centre_id).single()
         : Promise.resolve({ data: null }),
       appData.subject_combination_id
-        ? supabase.from('subject_combinations').select('name, subject1, subject2, subject3').eq('id', appData.subject_combination_id).single()
+        ? supabase.from('subject_combinations').select('name, track').eq('id', appData.subject_combination_id).single()
         : Promise.resolve({ data: null }),
     ]);
 
@@ -139,10 +151,10 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       residentialAddress: appData.residential_address || '',
       centreOfStudy: (() => { const c = assignedCentre || preferredCentre; return c ? `${c.name}${c.location ? ', ' + c.location : ''}, ${c.state}` : 'Not Assigned'; })(),
       courseOfChoice: appData.intended_course || '',
-      subjectCombination: sc ? sc.name : 'Pending',
-      subject1: sc?.subject1 || '',
-      subject2: sc?.subject2 || '',
-      subject3: sc?.subject3 || '',
+      subjectCombination: sc ? `${sc.name}${sc.track ? ' (' + sc.track + ')' : ''}` : 'Pending',
+      subject1: '',
+      subject2: '',
+      subject3: '',
       olevelResults: (olevelRows || []).map((r: any) => ({
         subject: r.subject || '',
         grade: r.grade || '—',

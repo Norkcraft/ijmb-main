@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     if (error || !app) return NextResponse.json({ message: 'Application not found' }, { status: 404 });
     if (app.user_id !== user.id) return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
 
-    const pdfBuffer = await generateApplicationPDF(applicationId);
+    const pdfBuffer = await generateApplicationPDF(applicationId, token);
 
     const appNum = app.application_number || applicationId.split('-')[0].toUpperCase();
 
