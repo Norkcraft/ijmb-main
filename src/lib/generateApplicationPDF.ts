@@ -17,20 +17,10 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
   let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
   
   try {
-    // 1. Fetch Application Data
+    // 1. Fetch Application Data (flat columns only — no embedded joins to avoid PostgREST coercion errors)
     const { data: app, error: appError } = await supabase
       .from('applications')
-      .select(`
-        id, application_number, created_at, status,
-        surname, first_name, middle_name, gender, date_of_birth,
-        state_of_origin, lga, guardian_phone, residential_address,
-        intended_course, passport_path, form_fee_paid,
-        profiles:user_id ( email, phone ),
-        sessions:session_id ( name, code ),
-        assigned_centre:assigned_centre_id ( name, state, location ),
-        preferred_centre:preferred_centre_id ( name, state, location ),
-        subject_combinations:subject_combination_id ( name, subject1, subject2, subject3 )
-      `)
+      .select('id, application_number, created_at, status, user_id, session_id, assigned_centre_id, preferred_centre_id, subject_combination_id, surname, first_name, middle_name, gender, date_of_birth, state_of_origin, lga, guardian_phone, residential_address, intended_course, passport_path, form_fee_paid')
       .eq('id', applicationId)
       .single();
 
@@ -38,6 +28,31 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       throw new Error(`Failed to fetch application: ${appError?.message || 'Not found'}`);
     }
     const appData = app as any;
+
+    // Fetch related records individually
+    const [profileRes, sessionRes, assignedCentreRes, preferredCentreRes, subjectComboRes] = await Promise.all([
+      appData.user_id
+        ? supabase.from('profiles').select('email, phone').eq('id', appData.user_id).single()
+        : Promise.resolve({ data: null }),
+      appData.session_id
+        ? supabase.from('sessions').select('name, code').eq('id', appData.session_id).single()
+        : Promise.resolve({ data: null }),
+      appData.assigned_centre_id
+        ? supabase.from('centres').select('name, state, location').eq('id', appData.assigned_centre_id).single()
+        : Promise.resolve({ data: null }),
+      appData.preferred_centre_id
+        ? supabase.from('centres').select('name, state, location').eq('id', appData.preferred_centre_id).single()
+        : Promise.resolve({ data: null }),
+      appData.subject_combination_id
+        ? supabase.from('subject_combinations').select('name, subject1, subject2, subject3').eq('id', appData.subject_combination_id).single()
+        : Promise.resolve({ data: null }),
+    ]);
+
+    const profile = profileRes.data as any;
+    const session = sessionRes.data as any;
+    const assignedCentre = assignedCentreRes.data as any;
+    const preferredCentre = preferredCentreRes.data as any;
+    const subjectCombo = subjectComboRes.data as any;
 
     // Fetch O-Level results
     const { data: olevelRows } = await supabase
@@ -105,13 +120,13 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
     const displayId = appData.application_number || generateApplicationId(1000);
 
     // 6. Build HTML
-    const sc = appData.subject_combinations;
+    const sc = subjectCombo;
     const htmlContent = buildApplicationFormHTML({
       applicationId: displayId,
       registrationDate: new Date(appData.created_at).toLocaleDateString('en-GB', {
         day: '2-digit', month: 'long', year: 'numeric'
       }),
-      academicSession: appData.sessions?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
+      academicSession: session?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
       surname: appData.surname || '',
       firstName: appData.first_name || '',
       middleName: appData.middle_name || '',
@@ -119,10 +134,10 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       dateOfBirth: appData.date_of_birth ? new Date(appData.date_of_birth).toLocaleDateString('en-GB') : '',
       stateOfOrigin: appData.state_of_origin || '',
       lga: appData.lga || '',
-      phoneNumber: appData.guardian_phone || appData.profiles?.phone || '',
-      email: appData.profiles?.email || '',
+      phoneNumber: appData.guardian_phone || profile?.phone || '',
+      email: profile?.email || '',
       residentialAddress: appData.residential_address || '',
-      centreOfStudy: (() => { const c = appData.assigned_centre || appData.preferred_centre; return c ? `${c.name}${c.location ? ', ' + c.location : ''}, ${c.state}` : 'Not Assigned'; })(),
+      centreOfStudy: (() => { const c = assignedCentre || preferredCentre; return c ? `${c.name}${c.location ? ', ' + c.location : ''}, ${c.state}` : 'Not Assigned'; })(),
       courseOfChoice: appData.intended_course || '',
       subjectCombination: sc ? sc.name : 'Pending',
       subject1: sc?.subject1 || '',
