@@ -13,7 +13,7 @@ const yr = new Date().getFullYear();
 const YEAR = `${yr}/${yr + 1}`;
 
 const cities = [
-  "Lagos", "Abuja", "Ibadan", "Ilorin", "Port Harcourt", "Benin", "Kano", "Kaduna",
+  "Anambra", "Ilorin", "Lagos", "Abuja", "Ibadan", "Port Harcourt", "Benin", "Kano", "Kaduna",
   "Jos", "Enugu", "Owerri", "Aba", "Uyo", "Akure", "Ado-Ekiti", "Abeokuta",
   "Osogbo", "Minna", "Lokoja", "Makurdi",
 ];
