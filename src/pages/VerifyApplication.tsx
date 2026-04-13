@@ -37,10 +37,8 @@ const VerifyApplication = () => {
             created_at,
             intended_course,
             status,
-            centres (
-              name,
-              state
-            )
+            assigned_centre:assigned_centre_id(name,state),
+            preferred_centre:preferred_centre_id(name,state)
           `)
           .eq('id', applicationId)
           .single();
@@ -101,7 +99,8 @@ const VerifyApplication = () => {
 
   const fullName = `${application.surname} ${application.first_name} ${application.middle_name || ''}`.trim();
   const displayId = application.application_number || application.id.split('-')[0].toUpperCase();
-  const centreName = application.centres ? `${application.centres.name}, ${application.centres.state}` : 'Not Assigned';
+  const centre = application.assigned_centre || application.preferred_centre;
+  const centreName = centre ? `${centre.name}, ${centre.state}` : 'Not Assigned';
 
   return (
     <>
