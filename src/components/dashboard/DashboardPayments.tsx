@@ -62,12 +62,12 @@ export const DashboardPayments = ({
     if (payRes.error) toast({ title: 'Error', description: payRes.error.message, variant: 'destructive' });
 
     // Override global tuition/hostel fees with centre-specific ones when set
-    const centreFees = centreRes.data;
+    const centreFees = centreRes.data as { tuition_fee: number; hostel_fee: number } | null;
     const mergedFees = (feesRes.data || []).map((fee: any) => {
-      if (fee.name === 'tuition_fee' && centreFees?.tuition_fee > 0) {
+      if (fee.name === 'tuition_fee' && centreFees && centreFees.tuition_fee > 0) {
         return { ...fee, amount: centreFees.tuition_fee };
       }
-      if (fee.name === 'hostel_fee' && centreFees?.hostel_fee > 0) {
+      if (fee.name === 'hostel_fee' && centreFees && centreFees.hostel_fee > 0) {
         return { ...fee, amount: centreFees.hostel_fee };
       }
       return fee;
