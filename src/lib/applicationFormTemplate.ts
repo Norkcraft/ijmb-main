@@ -54,7 +54,7 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
     : `<tr><td class="nc">—</td><td colspan="2">${esc(data.subjectCombination) || '—'}</td></tr>`;
 
   const olevelRows = data.olevelResults && data.olevelResults.length
-    ? data.olevelResults.slice(0, 9).map((r, i) =>
+    ? data.olevelResults.slice(0, 7).map((r, i) =>
         `<tr><td class="nc">${i + 1}</td><td>${esc(r.subject)}</td><td>${esc(r.grade)}</td><td>${esc(r.examYear)}</td><td>${esc(r.examType)}</td></tr>`
       ).join('')
     : `<tr><td class="nc">—</td><td colspan="4" style="text-align:center;color:#bbb;font-style:italic;font-size:7px">O-Level results not yet uploaded</td></tr>`;
@@ -89,7 +89,7 @@ body{
 /* ── PAGE ───────────────────────────────── */
 .page{
   width:210mm;
-  min-height:297mm;
+  height:297mm;
   background:#fff;
   display:flex;
   flex-direction:column;
@@ -110,7 +110,7 @@ body{
   opacity:0.055;filter:grayscale(1);
 }
 
-.shell{position:relative;z-index:1;display:flex;flex-direction:column;flex:1}
+.shell{position:relative;z-index:1;display:flex;flex-direction:column;flex:1;min-height:0;overflow:hidden}
 
 /* ── HEADER ─────────────────────────────── */
 .hdr{background:#003d00;flex-shrink:0}
@@ -137,9 +137,9 @@ body{
 .rib-stamp{background:#c9950f;color:#1a3300;font-size:6.5px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;padding:0 12px;display:flex;align-items:center}
 
 /* ── BODY ───────────────────────────────── */
-.body{display:grid;grid-template-columns:1fr 112px;flex:1}
-.main{padding:7px 12px;border-right:1px solid #e2e2da;overflow:hidden}
-.side{padding:6px 6px;display:flex;flex-direction:column;gap:5px;align-items:center;background:#fafaf7}
+.body{display:grid;grid-template-columns:1fr 112px;grid-template-rows:1fr;flex:1;min-height:0;overflow:hidden}
+.main{padding:7px 12px;border-right:1px solid #e2e2da;overflow:hidden;min-height:0}
+.side{padding:6px 6px;display:flex;flex-direction:column;gap:5px;align-items:center;background:#fafaf7;overflow:hidden;min-height:0}
 
 /* ── SECTIONS ───────────────────────────── */
 .sec{margin-bottom:5px}
@@ -242,8 +242,8 @@ table tr:nth-child(even) td{background:rgba(0,61,0,0.018)}
 .ftr-pill{background:#c9950f;color:#1a3300;font-size:6.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 10px;border-radius:20px}
 
 @media print{
-  body{background:#fff;padding:0}
-  .page{box-shadow:none;width:210mm;min-height:297mm}
+  html,body{background:#fff!important;padding:0!important;margin:0!important;height:100%}
+  .page{box-shadow:none!important;width:210mm!important;height:297mm!important}
   @page{size:A4 portrait;margin:0}
 }
 </style>
