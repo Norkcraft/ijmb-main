@@ -119,17 +119,21 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
         logoBase64: '',
       });
 
-      const win = window.open('', '_blank', 'width=900,height=700');
-      if (!win) {
-        alert('Please allow pop-ups for this site to download your form.');
-        return;
-      }
-      win.document.write(html);
-      win.document.close();
-      win.focus();
-      // Wait for passport image (signed URL) to load before printing
+      // Inject a hidden iframe — no popup needed, no browser permission required
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:fixed;top:0;left:0;width:0;height:0;border:none;opacity:0;pointer-events:none';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentDocument || iframe.contentWindow?.document;
+      if (!doc) throw new Error('Could not create print frame.');
+      doc.open();
+      doc.write(html);
+      doc.close();
+
+      // Wait for passport image to load, then print and clean up
       setTimeout(() => {
-        win.print();
+        iframe.contentWindow?.print();
+        setTimeout(() => document.body.removeChild(iframe), 1000);
       }, 800);
     } catch (err) {
       console.error('PDF generation error:', err);
