@@ -14,7 +14,7 @@ import path from 'path';
  * @returns Buffer of the generated PDF
  */
 export const generateApplicationPDF = async (applicationId: string): Promise<Buffer> => {
-  let browser = null;
+  let browser: Awaited<ReturnType<typeof puppeteer.launch>> | null = null;
   
   try {
     // 1. Fetch Application Data
@@ -150,9 +150,8 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       );
       browser = await puppeteer.launch({
         args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
         executablePath: executablePath || undefined,
-        headless: true, // chromium.headless is deprecated in newer versions
+        headless: true,
       });
     } else {
       // Local development
