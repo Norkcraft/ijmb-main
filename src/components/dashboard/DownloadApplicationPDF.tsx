@@ -33,6 +33,10 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
   const handleDownload = async () => {
     setLoading(true);
     setStatus('Loading data…');
+
+    let container: HTMLDivElement | null = null;
+    let styleEl: HTMLStyleElement | null = null;
+
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
@@ -52,7 +56,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
 
       setStatus('Building form…');
 
-      // 2. Generate QR code and fetch logo (client-side)
+      // 2. Generate QR code and fetch logo client-side
       const siteUrl = window.location.origin;
       const [qrCodeBase64, logoBase64] = await Promise.all([
         generateQRCodeBase64(`${siteUrl}/verify/${data.rawId}`).catch(() => ''),
@@ -60,26 +64,19 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       ]);
 
       // 3. Format dates
-      const registrationDate = data.registrationDate
-        ? new Date(data.registrationDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' })
-        : '';
-      const paymentDate = data.paymentDate
-        ? new Date(data.paymentDate).toLocaleDateString('en-GB')
-        : '';
-      const dateOfBirth = data.dateOfBirth
-        ? new Date(data.dateOfBirth).toLocaleDateString('en-GB')
-        : '';
+      const fmt = (d: string) => d ? new Date(d).toLocaleDateString('en-GB') : '';
+      const fmtLong = (d: string) => d ? new Date(d).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
 
-      // 4. Build full HTML
+      // 4. Build full HTML string
       const html = buildApplicationFormHTML({
         applicationId: data.applicationId,
-        registrationDate,
+        registrationDate: fmtLong(data.registrationDate),
         academicSession: data.academicSession || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
         surname: data.surname,
         firstName: data.firstName,
         middleName: data.middleName,
         gender: data.gender,
-        dateOfBirth,
+        dateOfBirth: fmt(data.dateOfBirth),
         stateOfOrigin: data.stateOfOrigin,
         lga: data.lga,
         phoneNumber: data.phoneNumber,
@@ -90,7 +87,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
         subjectCombination: data.subjectCombination,
         olevelResults: data.olevelResults || [],
         paymentReference: data.paymentReference,
-        paymentDate,
+        paymentDate: fmt(data.paymentDate),
         amountPaid: data.amountPaid,
         passportPhotoBase64: data.passportPhotoBase64 || '',
         qrCodeBase64,
@@ -99,24 +96,35 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
 
       setStatus('Generating PDF…');
 
-      // 5. Render in hidden iframe
-      const iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:794px;height:1123px;border:none;visibility:hidden;';
-      document.body.appendChild(iframe);
+      // 5. Extract <style> and <body> from the HTML string and inject into main document
+      const cssMatch = html.match(/<style[^>]*>([\s\S]*?)<\/style>/i);
+      const bodyMatch = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+      const css = cssMatch?.[1] ?? '';
+      const bodyContent = bodyMatch?.[1] ?? '';
 
-      await new Promise<void>((resolve) => {
-        iframe.onload = () => resolve();
-        iframe.contentDocument!.open();
-        iframe.contentDocument!.write(html);
-        iframe.contentDocument!.close();
-      });
+      styleEl = document.createElement('style');
+      styleEl.id = '__pdf-style';
+      styleEl.textContent = css;
+      document.head.appendChild(styleEl);
 
-      // Wait for images to render
-      await new Promise(r => setTimeout(r, 800));
+      container = document.createElement('div');
+      container.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;height:1123px;overflow:hidden;background:#fff;z-index:-1;';
+      container.innerHTML = bodyContent;
+      document.body.appendChild(container);
 
-      // 6. Capture with html2canvas
+      // Wait for images inside the container to load
+      const images = Array.from(container.querySelectorAll('img'));
+      await Promise.all(
+        images.map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; }))
+      );
+      // Extra settle time for CSS rendering
+      await new Promise(r => setTimeout(r, 400));
+
+      // 6. Capture the .page element with html2canvas
       const { default: html2canvas } = await import('html2canvas');
-      const canvas = await html2canvas(iframe.contentDocument!.body, {
+      const pageEl = (container.querySelector('.page') as HTMLElement) || container;
+
+      const canvas = await html2canvas(pageEl, {
         scale: 2,
         useCORS: true,
         allowTaint: true,
@@ -125,14 +133,13 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
         windowWidth: 794,
         windowHeight: 1123,
         backgroundColor: '#ffffff',
+        logging: false,
       });
 
-      document.body.removeChild(iframe);
-
-      // 7. Build PDF and download
+      // 7. Build PDF and trigger download
       const { default: jsPDF } = await import('jspdf');
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const imgData = canvas.toDataURL('image/jpeg', 0.96);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
       pdf.save(`IJMB-Application-${data.applicationId}.pdf`);
 
@@ -140,6 +147,8 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       console.error('PDF download error:', err);
       alert(err.message || 'Failed to generate PDF. Please try again.');
     } finally {
+      if (container && document.body.contains(container)) document.body.removeChild(container);
+      if (styleEl && document.head.contains(styleEl)) document.head.removeChild(styleEl);
       setLoading(false);
       setStatus('');
     }

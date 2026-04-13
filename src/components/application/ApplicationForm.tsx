@@ -789,9 +789,9 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
                   </Button>
                 ) : (
                   !readOnly && (
-                    <Button type="submit" disabled={saving}>
-                      {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Save size={16} className="mr-2" />} 
-                      Submit Application
+                    <Button type="submit" disabled={saving || !!uploading}>
+                      {saving ? <Loader2 className="animate-spin mr-2" size={16} /> : <Save size={16} className="mr-2" />}
+                      {uploading ? 'Uploading…' : 'Submit Application'}
                     </Button>
                   )
                 )}
