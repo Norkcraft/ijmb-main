@@ -22,10 +22,11 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       .from('applications')
       .select(`
         *,
-        profiles ( email, phone ),
-        sessions ( name, code ),
-        centres ( name, state, location ),
-        subject_combinations ( name, subject1, subject2, subject3 )
+        profiles:user_id ( email, phone ),
+        sessions:session_id ( name, code ),
+        assigned_centre:assigned_centre_id ( name, state, location ),
+        preferred_centre:preferred_centre_id ( name, state, location ),
+        subject_combinations:subject_combination_id ( name, subject1, subject2, subject3 )
       `)
       .eq('id', applicationId)
       .single();
@@ -118,7 +119,7 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
       phoneNumber: app.guardian_phone || app.profiles?.phone || '',
       email: app.profiles?.email || '',
       residentialAddress: app.residential_address || '',
-      centreOfStudy: app.centres ? `${app.centres.name}${app.centres.location ? ', ' + app.centres.location : ''}, ${app.centres.state}` : 'Not Assigned',
+      centreOfStudy: (() => { const c = app.assigned_centre || app.preferred_centre; return c ? `${c.name}${c.location ? ', ' + c.location : ''}, ${c.state}` : 'Not Assigned'; })(),
       courseOfChoice: app.intended_course || '',
       subjectCombination: sc ? sc.name : 'Pending',
       subject1: sc?.subject1 || '',
