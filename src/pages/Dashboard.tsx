@@ -604,90 +604,15 @@ function DocumentsTab({ application, sessions, centres, combos }: {
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application?.status);
   const formFeePaid = application?.form_fee_paid;
 
-  const downloadLetter = () => {
-    const centre = centres.find((c: any) => c.id === application?.preferred_centre_id);
-    const session = sessions.find((s: any) => s.id === application?.session_id);
-    const combo = combos.find((c: any) => c.id === application?.subject_combination_id);
-    const fullName = [application?.surname, application?.first_name, application?.middle_name].filter(Boolean).join(' ') || 'Student';
-    const centreName = centre ? `${centre.name}, ${centre.state}` : 'To be assigned';
-    const sessionName = session?.name || new Date().getFullYear() + '/' + (new Date().getFullYear() + 1);
-    const comboName = combo?.name || application?.intended_course || 'As selected';
-    const appId = application?.application_number || application?.id?.split('-')[0]?.toUpperCase() || '-';
-    const today = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    const html = `<!DOCTYPE html><html><head><title>IJMB Admission Letter</title>
-    <style>
-      body { font-family: Georgia, serif; margin: 0; padding: 40px; color: #111; }
-      .header { display: flex; align-items: center; gap: 20px; border-bottom: 3px double #111; padding-bottom: 20px; margin-bottom: 30px; }
-      .logo { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; }
-      .org { flex: 1; }
-      .org h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
-      .org p { margin: 4px 0 0; font-size: 12px; color: #555; text-transform: uppercase; letter-spacing: 1px; }
-      .ref { text-align: right; font-size: 12px; color: #555; }
-      .ref strong { display: block; font-size: 14px; color: #111; }
-      h2 { text-align: center; text-transform: uppercase; letter-spacing: 2px; font-size: 16px; border-top: 1px solid #ccc; border-bottom: 1px solid #ccc; padding: 10px 0; margin: 30px 0; }
-      .salutation { margin-bottom: 20px; font-size: 15px; }
-      .body-text { line-height: 1.8; font-size: 14px; margin-bottom: 16px; }
-      table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 13px; }
-      td { padding: 10px 14px; border: 1px solid #ddd; }
-      td:first-child { font-weight: bold; width: 40%; background: #f9f9f9; }
-      .footer-sigs { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; margin-top: 60px; }
-      .sig-line { border-top: 1px solid #333; padding-top: 8px; font-size: 12px; text-align: center; }
-      .stamp-box { border: 1px dashed #aaa; height: 90px; display: flex; align-items: center; justify-content: center; color: #bbb; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border-radius: 4px; }
-      .notice { background: #f0fdf4; border: 1px solid #bbf7d0; padding: 14px 18px; border-radius: 6px; font-size: 12px; margin-top: 24px; color: #166534; }
-      @media print { @page { size: A4; margin: 15mm; } }
-    </style></head><body>
-    <div class="header">
-      <img class="logo" src="https://www.ijmb.info/ijmb-logo.jpeg" alt="IJMB" onerror="this.style.display='none'" />
-      <div class="org">
-        <h1>Interim Joint Matriculation Board</h1>
-        <p>Direct Entry Admission Programme — Nigeria</p>
-      </div>
-      <div class="ref">
-        <strong>Ref: IJMB/${appId}</strong>
-        Date: ${today}
-      </div>
-    </div>
-    <h2>Letter of Admission</h2>
-    <p class="salutation">Dear <strong>${fullName}</strong>,</p>
-    <p class="body-text">
-      We are pleased to inform you that following a review of your application to the Interim Joint Matriculation Board (IJMB) Direct Entry Admission Programme, you have been <strong>provisionally admitted</strong> for the <strong>${sessionName}</strong> academic session.
-    </p>
-    <p class="body-text">Please find the details of your admission below:</p>
-    <table>
-      <tr><td>Application Number</td><td>${appId}</td></tr>
-      <tr><td>Full Name</td><td>${fullName}</td></tr>
-      <tr><td>Academic Session</td><td>${sessionName}</td></tr>
-      <tr><td>Study Centre</td><td>${centreName}</td></tr>
-      <tr><td>Subject Combination</td><td>${comboName}</td></tr>
-      <tr><td>Admission Status</td><td><strong style="color:#166534">ADMITTED — CONFIRMED</strong></td></tr>
-    </table>
-    <p class="body-text">
-      You are required to report to your assigned study centre at the commencement of the academic session with a printed copy of this letter and two passport photographs. Ensure all outstanding fees are settled before resumption.
-    </p>
-    <div class="notice">
-      <strong>Important:</strong> This letter is only valid when presented alongside your original O-Level results and a valid means of identification.
-    </div>
-    <div class="footer-sigs">
-      <div>
-        <div class="stamp-box">Official Stamp</div>
-      </div>
-      <div>
-        <div class="sig-line">Registrar, IJMB Programme</div>
-      </div>
-    </div>
-    <p style="text-align:center;font-size:10px;color:#aaa;margin-top:40px;border-top:1px solid #eee;padding-top:12px;">
-      Generated on ${today} • Application ID: ${application?.id} • www.ijmb.info
-    </p>
-    </body></html>`;
-
-    const win = window.open('', '_blank', 'width=900,height=700');
-    if (!win) { alert('Please allow pop-ups for this site to open the admission letter.'); return; }
-    win.document.write(html);
-    win.document.close();
-    win.focus();
-    setTimeout(() => win.print(), 600);
+  const downloadLetter = async () => {
+    if (!application?.admission_letter_path) return;
+    const { data } = await supabase.storage
+      .from('student-documents')
+      .createSignedUrl(application.admission_letter_path, 300);
+    if (data?.signedUrl) window.open(data.signedUrl, '_blank');
   };
+
+  const hasAdmissionLetter = !!application?.admission_letter_path;
 
   return (
     <div className="space-y-4">
@@ -722,17 +647,17 @@ function DocumentsTab({ application, sessions, centres, combos }: {
         </div>
 
         {/* Admission Letter */}
-        <div className={`bg-white rounded-2xl border p-5 space-y-4 transition-shadow hover:shadow-md ${!hasPaidAcceptanceFee ? 'opacity-80' : ''}`}>
+        <div className={`bg-white rounded-2xl border p-5 space-y-4 transition-shadow hover:shadow-md ${!hasAdmissionLetter ? 'opacity-80' : ''}`}>
           <div className="flex items-start gap-3">
             <div className="w-11 h-11 rounded-2xl bg-green-50 flex items-center justify-center shrink-0">
               <BadgeCheck size={20} className="text-green-600" />
             </div>
             <div>
               <h3 className="font-bold text-sm">Admission Letter</h3>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Official IJMB admission letter for your session</p>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Official IJMB admission letter uploaded by the board</p>
             </div>
           </div>
-          {hasPaidAcceptanceFee ? (
+          {hasAdmissionLetter ? (
             <button
               onClick={downloadLetter}
               className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors"
@@ -744,7 +669,9 @@ function DocumentsTab({ application, sessions, centres, combos }: {
               <div className="w-4 h-4 rounded-full bg-muted-foreground/20 flex items-center justify-center shrink-0">
                 <Clock size={10} className="text-muted-foreground" />
               </div>
-              <span className="text-xs text-muted-foreground font-medium">{isAdmitted ? 'Pay acceptance fee to unlock' : 'Available after admission is granted'}</span>
+              <span className="text-xs text-muted-foreground font-medium">
+                {isAdmitted ? 'Your admission letter will appear here once uploaded by the board' : 'Available after admission is granted'}
+              </span>
             </div>
           )}
         </div>

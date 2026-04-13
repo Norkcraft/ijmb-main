@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  ArrowLeft, ExternalLink, Loader2, CheckCircle, XCircle, Eye, AlertCircle
+  ArrowLeft, ExternalLink, Loader2, CheckCircle, XCircle, Eye, AlertCircle, Upload
 } from 'lucide-react';
 
 // ── helpers ────────────────────────────────────────────────────────────────
@@ -65,6 +65,8 @@ const AdminApplicationDetail = () => {
   const [olevelMsg, setOlevelMsg] = useState('');
   const [savingPassport, setSavingPassport] = useState(false);
   const [savingOlevel, setSavingOlevel] = useState(false);
+  const [letterFile, setLetterFile] = useState<File | null>(null);
+  const [uploadingLetter, setUploadingLetter] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -233,6 +235,36 @@ const AdminApplicationDetail = () => {
   const openDoc = async (path: string) => {
     const { data } = await supabase.storage.from('student-documents').createSignedUrl(path, 300);
     if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+  };
+
+  const uploadAdmissionLetter = async () => {
+    if (!letterFile || !app) return;
+    setUploadingLetter(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) throw new Error('Not authenticated');
+
+      const formData = new FormData();
+      formData.append('file', letterFile);
+      formData.append('applicationId', app.id);
+
+      const res = await fetch('/api/upload-admission-letter', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || 'Upload failed');
+
+      setApp((prev: any) => ({ ...prev, admission_letter_path: json.path }));
+      setLetterFile(null);
+      toast({ title: 'Admission letter uploaded', description: 'Student can now download it from their dashboard.' });
+    } catch (err: any) {
+      toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setUploadingLetter(false);
+    }
   };
 
   // ── render ─────────────────────────────────────────────────────────────
@@ -506,6 +538,44 @@ const AdminApplicationDetail = () => {
                 ) : (
                   <p className="text-sm text-muted-foreground italic">Not uploaded yet.</p>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* Admission Letter Upload */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Admission Letter</CardTitle>
+                  {app.admission_letter_path
+                    ? <Badge className="bg-green-600 text-white">Uploaded</Badge>
+                    : <Badge variant="outline" className="text-amber-600 border-amber-400">Not uploaded</Badge>}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {app.admission_letter_path && (
+                  <Button size="sm" variant="outline" className="w-full" onClick={() => openDoc(app.admission_letter_path)}>
+                    <ExternalLink size={13} className="mr-1" /> View Current Letter
+                  </Button>
+                )}
+                <div className="space-y-2">
+                  <input
+                    type="file"
+                    accept="application/pdf"
+                    className="w-full text-xs text-muted-foreground file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                    onChange={e => setLetterFile(e.target.files?.[0] || null)}
+                  />
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    disabled={!letterFile || uploadingLetter}
+                    onClick={uploadAdmissionLetter}
+                  >
+                    {uploadingLetter
+                      ? <><Loader2 size={13} className="animate-spin mr-1" /> Uploading…</>
+                      : <><Upload size={13} className="mr-1" /> {app.admission_letter_path ? 'Replace Letter' : 'Upload Letter'}</>}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">PDF only, max 10 MB. Student can download once uploaded.</p>
+                </div>
               </CardContent>
             </Card>
 
