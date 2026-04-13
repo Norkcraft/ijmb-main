@@ -21,7 +21,10 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
     const { data: app, error: appError } = await supabase
       .from('applications')
       .select(`
-        *,
+        id, application_number, created_at, status,
+        surname, first_name, middle_name, gender, date_of_birth,
+        state_of_origin, lga, guardian_phone, residential_address,
+        intended_course, passport_path, form_fee_paid,
         profiles:user_id ( email, phone ),
         sessions:session_id ( name, code ),
         assigned_centre:assigned_centre_id ( name, state, location ),
@@ -34,6 +37,7 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
     if (appError || !app) {
       throw new Error(`Failed to fetch application: ${appError?.message || 'Not found'}`);
     }
+    const appData = app as any;
 
     // Fetch O-Level results
     const { data: olevelRows } = await supabase
@@ -55,14 +59,14 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
 
     // 2. Fetch Passport Photo (Convert to Base64)
     let passportBase64 = '';
-    if (app.passport_path) {
+    if (appData.passport_path) {
       try {
         const { data: photoData, error: photoError } = await supabase.storage
           .from('student-documents')
-          .download(app.passport_path);
+          .download(appData.passport_path);
 
         if (photoError) throw photoError;
-        
+
         if (photoData) {
           const arrayBuffer = await photoData.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
@@ -82,12 +86,11 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
         const logoBuffer = fs.readFileSync(logoPath);
         logoBase64 = `data:image/jpeg;base64,${logoBuffer.toString('base64')}`;
       } else {
-          // Try fetching placeholder as fallback if jpeg not found
-          const fallbackPath = path.resolve(process.cwd(), 'public', 'placeholder.svg');
-          if (fs.existsSync(fallbackPath)) {
-             const logoBuffer = fs.readFileSync(fallbackPath);
-             logoBase64 = `data:image/svg+xml;base64,${logoBuffer.toString('base64')}`;
-          }
+        const fallbackPath = path.resolve(process.cwd(), 'public', 'placeholder.svg');
+        if (fs.existsSync(fallbackPath)) {
+          const logoBuffer = fs.readFileSync(fallbackPath);
+          logoBase64 = `data:image/svg+xml;base64,${logoBuffer.toString('base64')}`;
+        }
       }
     } catch (err) {
       console.warn('Failed to load site logo:', err);
@@ -98,29 +101,29 @@ export const generateApplicationPDF = async (applicationId: string): Promise<Buf
     const verifyUrl = `${siteUrl}/verify/${applicationId}`;
     const qrCodeBase64 = await generateQRCodeBase64(verifyUrl);
 
-    // 5. Generate Application ID Format (e.g. IJMB-2026-000145)
-    const displayId = app.application_number || generateApplicationId(1000); 
+    // 5. Generate Application ID
+    const displayId = appData.application_number || generateApplicationId(1000);
 
     // 6. Build HTML
-    const sc = app.subject_combinations;
+    const sc = appData.subject_combinations;
     const htmlContent = buildApplicationFormHTML({
       applicationId: displayId,
-      registrationDate: new Date(app.created_at).toLocaleDateString('en-GB', {
+      registrationDate: new Date(appData.created_at).toLocaleDateString('en-GB', {
         day: '2-digit', month: 'long', year: 'numeric'
       }),
-      academicSession: app.sessions?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
-      surname: app.surname || '',
-      firstName: app.first_name || '',
-      middleName: app.middle_name || '',
-      gender: app.gender || '',
-      dateOfBirth: app.date_of_birth ? new Date(app.date_of_birth).toLocaleDateString('en-GB') : '',
-      stateOfOrigin: app.state_of_origin || '',
-      lga: app.lga || '',
-      phoneNumber: app.guardian_phone || app.profiles?.phone || '',
-      email: app.profiles?.email || '',
-      residentialAddress: app.residential_address || '',
-      centreOfStudy: (() => { const c = app.assigned_centre || app.preferred_centre; return c ? `${c.name}${c.location ? ', ' + c.location : ''}, ${c.state}` : 'Not Assigned'; })(),
-      courseOfChoice: app.intended_course || '',
+      academicSession: appData.sessions?.name || `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
+      surname: appData.surname || '',
+      firstName: appData.first_name || '',
+      middleName: appData.middle_name || '',
+      gender: appData.gender || '',
+      dateOfBirth: appData.date_of_birth ? new Date(appData.date_of_birth).toLocaleDateString('en-GB') : '',
+      stateOfOrigin: appData.state_of_origin || '',
+      lga: appData.lga || '',
+      phoneNumber: appData.guardian_phone || appData.profiles?.phone || '',
+      email: appData.profiles?.email || '',
+      residentialAddress: appData.residential_address || '',
+      centreOfStudy: (() => { const c = appData.assigned_centre || appData.preferred_centre; return c ? `${c.name}${c.location ? ', ' + c.location : ''}, ${c.state}` : 'Not Assigned'; })(),
+      courseOfChoice: appData.intended_course || '',
       subjectCombination: sc ? sc.name : 'Pending',
       subject1: sc?.subject1 || '',
       subject2: sc?.subject2 || '',
