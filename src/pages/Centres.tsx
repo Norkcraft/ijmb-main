@@ -163,6 +163,10 @@ const Centres = () => (
                     </CardTitle>
                  </CardHeader>
                  <CardContent className="space-y-4">
+                    <Link href="/ijmb-in-anambra" className="block p-3 rounded-lg hover:bg-muted transition-colors">
+                       <h4 className="font-bold text-primary">Anambra City Centre</h4>
+                       <p className="text-xs text-muted-foreground">Awka, Anambra State • New Centre</p>
+                    </Link>
                     <Link href="/ijmb-in-ilorin" className="block p-3 rounded-lg hover:bg-muted transition-colors">
                        <h4 className="font-bold text-primary">Ilorin Centre</h4>
                        <p className="text-xs text-muted-foreground">Kwara State • Excellent Science Labs</p>
@@ -174,10 +178,6 @@ const Centres = () => (
                     <Link href="/ijmb-in-abuja" className="block p-3 rounded-lg hover:bg-muted transition-colors">
                        <h4 className="font-bold text-primary">Abuja Centre</h4>
                        <p className="text-xs text-muted-foreground">Gwagwalada • Serene Environment</p>
-                    </Link>
-                    <Link href="/ijmb-in-ibadan" className="block p-3 rounded-lg hover:bg-muted transition-colors">
-                       <h4 className="font-bold text-primary">Ibadan Centre</h4>
-                       <p className="text-xs text-muted-foreground">Oyo State • Affordable Fees</p>
                     </Link>
                  </CardContent>
               </Card>

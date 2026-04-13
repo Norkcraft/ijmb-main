@@ -41,10 +41,10 @@ const Footer = () => (
         <div>
           <h3 className="font-heading font-bold mb-4">Popular Locations</h3>
           <ul className="space-y-2 text-sm opacity-80">
+            <li><Link href="/ijmb-in-anambra" className="hover:opacity-100 transition-opacity">IJMB in Anambra</Link></li>
+            <li><Link href="/ijmb-in-ilorin" className="hover:opacity-100 transition-opacity">IJMB in Ilorin</Link></li>
             <li><Link href="/ijmb-in-lagos" className="hover:opacity-100 transition-opacity">IJMB in Lagos</Link></li>
             <li><Link href="/ijmb-in-abuja" className="hover:opacity-100 transition-opacity">IJMB in Abuja</Link></li>
-            <li><Link href="/ijmb-in-ibadan" className="hover:opacity-100 transition-opacity">IJMB in Ibadan</Link></li>
-            <li><Link href="/ijmb-in-kano" className="hover:opacity-100 transition-opacity">IJMB in Kano</Link></li>
             <li><Link href="/ijmb-in-port-harcourt" className="hover:opacity-100 transition-opacity">IJMB in Port Harcourt</Link></li>
           </ul>
         </div>
