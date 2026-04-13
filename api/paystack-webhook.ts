@@ -6,6 +6,11 @@ import { sendEmail } from '../src/lib/resendClient';
 import { paymentConfirmationEmail, applicationSubmittedEmail } from '../src/lib/emailTemplates';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Allow GET so Paystack can verify the endpoint URL is reachable
+  if (req.method === 'GET') {
+    return res.status(200).json({ message: 'Webhook endpoint active' });
+  }
+
   // 1. Verify Request Method
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
