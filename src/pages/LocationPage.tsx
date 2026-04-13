@@ -593,6 +593,8 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                     <p className="flex justify-between"><span>Region</span><span className="font-medium text-foreground">{data.region}</span></p>
                     <p className="flex justify-between"><span>Nearby Universities</span><span className="font-medium text-foreground">{data.universities.length}+</span></p>
                     <p className="flex justify-between"><span>Form Fee</span><span className="font-medium text-foreground">₦5,500</span></p>
+                    <p className="flex justify-between"><span>Tuition Fee</span><span className="font-medium text-foreground">₦350,000</span></p>
+                    <p className="flex justify-between"><span>Hostel Fee</span><span className="font-medium text-foreground">₦150,000</span></p>
                     <p className="flex justify-between"><span>Programme Duration</span><span className="font-medium text-foreground">9 Months</span></p>
                     <p className="flex justify-between"><span>Session</span><span className="font-medium text-foreground">{YEAR}</span></p>
                   </div>

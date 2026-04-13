@@ -53,7 +53,7 @@ const faqs = [
   { question: "Who can register for IJMB?", answer: "Any candidate with at least 5 O-Level credits including English Language and Mathematics can register for the IJMB programme. There is no age restriction." },
   { question: "How long is the IJMB programme?", answer: "The IJMB programme runs for approximately 9 months (one academic session). After completion, candidates sit for the IJMB A-Level examination administered by ABU Zaria." },
   { question: "Do I need JAMB for IJMB?", answer: "You do not need to write UTME to register for IJMB. However, you will need a JAMB Direct Entry form to process your university admission after passing the IJMB examinations." },
-  { question: "How much is IJMB registration?", answer: "The IJMB registration form fee is ₦5,500. Total programme fees including tuition, study materials, and examinations range from ₦80,000 to ₦150,000 depending on your chosen study centre." },
+  { question: "How much is IJMB registration?", answer: "The IJMB registration form fee is ₦5,500. Tuition fee is ₦350,000 per session. Hostel accommodation is ₦150,000 per session." },
   { question: "Can I use IJMB for Medicine or Law?", answer: "Yes. Many universities accept IJMB for Medicine, Law, Engineering, Pharmacy, and other competitive courses. You typically need to score 9 points or higher in your IJMB A-Level examinations." },
   { question: "Is IJMB the same as JUPEB?", answer: "No. IJMB is administered by Ahmadu Bello University (ABU) Zaria while JUPEB is administered by the University of Lagos (UNILAG). Both offer A-Level qualifications for direct entry but have different curricula and examination bodies." },
 ];

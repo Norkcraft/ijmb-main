@@ -12,7 +12,7 @@ const allFaqs = [
   { question: "Who can register for IJMB?", answer: "Anyone with at least 5 O-Level credits including English and Mathematics from WAEC, NECO, or NABTEB. Awaiting result candidates may also apply." },
   { question: "How long is the IJMB programme?", answer: "The IJMB programme runs for approximately 9 months (one academic session)." },
   { question: "Do I need JAMB to register for IJMB?", answer: "No. You do not need a JAMB/UTME score to register for IJMB. However, after passing IJMB, you will need JAMB registration for direct entry processing." },
-  { question: "How much does IJMB cost?", answer: "The IJMB registration form fee is ₦5,500. Total programme fees (tuition, materials, exams) range from ₦80,000 to ₦150,000 depending on the study centre." },
+  { question: "How much does IJMB cost?", answer: "The IJMB registration form fee is ₦5,500. Tuition fee is ₦350,000 per session. Hostel accommodation is ₦150,000 per session." },
   { question: "Can I use IJMB for Medicine?", answer: "Yes. Many universities accept IJMB for Medicine, Dentistry, Pharmacy, and other health courses. You typically need high scores (9+ points)." },
   { question: "Where are IJMB centres located?", answer: "IJMB centres are spread across Nigeria including Lagos, Abuja, Ibadan, Kano, Port Harcourt, Ilorin, Jos, Enugu, and many more cities." },
   { question: "Is IJMB better than JAMB?", answer: "IJMB offers a more reliable path to admission with a 95%+ success rate. You enter 200 level directly, save one year, and avoid UTME stress." },

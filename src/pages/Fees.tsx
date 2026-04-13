@@ -11,7 +11,7 @@ const yr = new Date().getFullYear();
 const YEAR = `${yr}/${yr + 1}`;
 
 const faqs = [
-  { question: "How much is IJMB form?", answer: "The IJMB registration form and total fees typically range from ₦80,000 to ₦150,000 depending on the study centre location and inclusions. Contact us for the exact current fees." },
+  { question: "How much is IJMB form?", answer: "The IJMB registration form fee is ₦5,500. Tuition fee is ₦350,000 and hostel accommodation is ₦150,000 per session. Contact us for any centre-specific variations." },
   { question: "Can I pay IJMB fees in instalments?", answer: "Some IJMB centres allow instalment payments. Typically, you can pay 60-70% during registration and the balance before resumption. Confirm with your chosen centre." },
   { question: "What does the IJMB fee cover?", answer: "The IJMB fee covers registration, tuition, study materials, examination fees, and administrative charges. Accommodation and feeding are usually separate." },
   { question: "Is IJMB cheaper than going through UTME?", answer: "Yes. When you consider the cost of years of JAMB registration, tutorials, and an extra year in 100 level, IJMB often works out more cost-effective." },
@@ -48,8 +48,8 @@ const Fees = () => (
             </div>
             <div className="p-6 space-y-4">
               {[
-                { label: "Registration Form", price: "₦10,000 – ₦15,000" },
-                { label: "Tuition Fee", price: "₦50,000 – ₦80,000" },
+                { label: "Registration Form", price: "₦5,500" },
+                { label: "Tuition Fee", price: "₦350,000" },
                 { label: "Examination Fee", price: "₦15,000 – ₦25,000" },
                 { label: "Study Materials", price: "₦5,000 – ₦10,000" },
                 { label: "Administrative Charges", price: "₦5,000 – ₦10,000" },
@@ -70,8 +70,8 @@ const Fees = () => (
               <h3 className="text-2xl font-bold font-heading mb-2">Total Estimated Cost</h3>
               <p className="text-primary-foreground/80 mb-6">Complete academic session</p>
 
-              <div className="text-4xl font-bold mb-2">₦80k – ₦150k</div>
-              <p className="text-sm opacity-90 mb-8">per session</p>
+              <div className="text-4xl font-bold mb-2">₦350,000</div>
+              <p className="text-sm opacity-90 mb-8">tuition per session</p>
 
               <div className="space-y-2 text-sm text-left mx-auto max-w-xs mb-8">
                 <div className="flex items-center gap-2"><CheckCircle size={16} /> Includes Tuition</div>
@@ -100,7 +100,7 @@ const Fees = () => (
         </p>
         <div className="space-y-3 mb-8">
           {[
-            "Accommodation: ₦50,000 – ₦150,000 per session (varies by city and type)",
+            "Accommodation (Hostel): ₦150,000 per session",
             "Feeding: ₦30,000 – ₦60,000 per session (estimated)",
             "Transportation: Varies by centre location",
             "JAMB Direct Entry Registration: ₦3,500 (required after IJMB completion)",
@@ -147,7 +147,7 @@ const Fees = () => (
             </thead>
             <tbody>
               {[
-                ["IJMB (this programme)", "₦80k – ₦150k", "200 Level", "3 years after IJMB"],
+                ["IJMB (this programme)", "₦350,000", "200 Level", "3 years after IJMB"],
                 ["JAMB UTME (1 attempt)", "₦5k – ₦10k", "100 Level", "4 years"],
                 ["JAMB UTME (3 failed attempts)", "₦15k–₦30k + 3 years lost", "100 Level if admitted", "7 years total"],
                 ["Private university (direct)", "₦500k – ₦1.5M/year", "100 Level", "4–5 years"],

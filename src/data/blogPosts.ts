@@ -256,15 +256,15 @@ export const blogPosts: BlogPost[] = [
       <p>Paid after admission is offered to confirm your acceptance of the provisional admission. This fee often covers administrative setup and ID card processing.</p>
 
       <h3>3. Tuition Fees</h3>
-      <p><strong>Range: ₦180,000 - ₦250,000</strong></p>
+      <p><strong>₦350,000</strong></p>
       <p>This covers lectures, textbooks, and internal examinations for the entire 9-month duration. Most centres allow payment in installments (e.g., 50% upfront, then 25% + 25%).</p>
 
       <h3>4. Hostel Accommodation</h3>
-      <p><strong>Range: ₦50,000 - ₦100,000</strong> (Optional)</p>
+      <p><strong>₦150,000</strong> (Optional)</p>
       <p>If you choose to stay in the school hostel, this fee applies. It usually covers accommodation for the full session.</p>
 
       <h3>Total Estimated Cost</h3>
-      <p>On average, a student should budget between <strong>₦250,000 and ₦350,000</strong> for the entire programme, which is significantly cheaper than a year in many private universities.</p>
+      <p>A student should budget approximately <strong>₦500,000 – ₦505,500</strong> for the full programme (form fee + tuition + hostel), which is significantly cheaper than a year in many private universities.</p>
     `,
     author: 'Bursary Department',
     date: '2026-03-10',
@@ -843,8 +843,8 @@ export const blogPosts: BlogPost[] = [
       <ul>
         <li><strong>Registration Form:</strong> ₦5,500 (standard nationwide)</li>
         <li><strong>Acceptance Fee:</strong> ₦25,000 – ₦40,000</li>
-        <li><strong>Tuition Fee:</strong> ₦150,000 – ₦250,000 per session</li>
-        <li><strong>Hostel:</strong> ₦100,000 – ₦200,000 per session (varies widely by location)</li>
+        <li><strong>Tuition Fee:</strong> ₦350,000 per session</li>
+        <li><strong>Hostel:</strong> ₦150,000 per session</li>
       </ul>
 
       <h2>Universities Close to Abuja That Accept IJMB</h2>
@@ -1054,8 +1054,8 @@ export const blogPosts: BlogPost[] = [
         <thead><tr><th>Fee Type</th><th>Amount</th></tr></thead>
         <tbody>
           <tr><td>Application/Form Fee</td><td>₦5,500</td></tr>
-          <tr><td>Tuition Fee (per session)</td><td>₦80,000 – ₦120,000</td></tr>
-          <tr><td>Hostel Accommodation (optional)</td><td>₦40,000 – ₦80,000</td></tr>
+          <tr><td>Tuition Fee (per session)</td><td>₦350,000</td></tr>
+          <tr><td>Hostel Accommodation (optional)</td><td>₦150,000</td></tr>
         </tbody>
       </table>
       <p><em>Note: Fees may vary slightly by centre. Contact the Anambra City Centre directly for the most up-to-date fee schedule.</em></p>

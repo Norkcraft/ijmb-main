@@ -133,19 +133,19 @@ const Centres = () => (
                    </thead>
                    <tbody>
                       <tr className="border-b">
-                         <td className="p-3 font-medium">Major Cities (Lagos, Abuja, PH)</td>
-                         <td className="p-3">₦100,000 – ₦150,000</td>
-                         <td className="p-3">₦80,000 – ₦150,000</td>
+                         <td className="p-3 font-medium">All Centres (Standard)</td>
+                         <td className="p-3">₦350,000</td>
+                         <td className="p-3">₦150,000</td>
                       </tr>
                       <tr className="border-b">
-                         <td className="p-3 font-medium">State Capitals (Ibadan, Ilorin, Enugu)</td>
-                         <td className="p-3">₦70,000 – ₦100,000</td>
-                         <td className="p-3">₦50,000 – ₦80,000</td>
+                         <td className="p-3 font-medium">Registration Form Fee</td>
+                         <td className="p-3 font-medium text-primary">₦5,500</td>
+                         <td className="p-3">—</td>
                       </tr>
                       <tr>
-                         <td className="p-3 font-medium">Other Towns</td>
-                         <td className="p-3">₦60,000 – ₦80,000</td>
-                         <td className="p-3">₦30,000 – ₦50,000</td>
+                         <td className="p-3 font-medium">Total (with Hostel)</td>
+                         <td className="p-3 font-bold">₦505,500</td>
+                         <td className="p-3 text-muted-foreground">incl. above</td>
                       </tr>
                    </tbody>
                 </table>

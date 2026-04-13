@@ -6,7 +6,7 @@ const YEAR = `${yr}/${yr + 1}`;
 
 export const metadata: Metadata = {
   title: `IJMB Form Price & Fees ${YEAR} – Complete Cost Breakdown`,
-  description: 'How much is IJMB form in 2026? IJMB registration form fee is ₦5,500. Full breakdown of tuition (₦85,000), hostel (₦45,000), acceptance (₦15,000) and exam fees.',
+  description: 'How much is IJMB form in 2026? IJMB registration form fee is ₦5,500. Tuition fee ₦350,000. Hostel fee ₦150,000. Full cost breakdown for 2026/2027 session.',
   keywords: ['IJMB form price 2026', 'IJMB fees Nigeria', 'how much is IJMB form', 'IJMB registration fee', 'IJMB tuition fee', 'IJMB cost 2026 2027'],
   alternates: { canonical: 'https://www.ijmb.info/ijmb-fees' },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large' } },

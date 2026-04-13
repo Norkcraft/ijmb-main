@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 const faqs = [
   { question: 'What is IJMB?', answer: 'IJMB (Interim Joint Matriculation Board) is an Advanced Level programme administered by ABU Zaria that qualifies candidates for direct entry into 200 level of Nigerian universities without UTME.' },
   { question: 'Is IJMB legit and government recognised?', answer: 'Yes. IJMB is fully recognised by the Federal Government of Nigeria and the National Universities Commission (NUC). It is administered by Ahmadu Bello University (ABU) Zaria.' },
-  { question: 'How much is IJMB form in 2026?', answer: 'The IJMB registration form fee is ₦5,500. Additional programme fees (tuition, hostel, exams) range from ₦80,000 to ₦150,000 depending on your study centre.' },
+  { question: 'How much is IJMB form in 2026?', answer: 'The IJMB registration form fee is ₦5,500. Tuition fee is ₦350,000 per session. Hostel accommodation is ₦150,000 per session.' },
   { question: 'Who can register for IJMB?', answer: 'Anyone with at least 5 O-Level credits including English Language and Mathematics. Candidates awaiting O-Level results are also eligible.' },
   { question: 'How long is the IJMB programme?', answer: 'The IJMB programme runs for 9 months (one academic session). After completion you sit the IJMB A-Level examination.' },
   { question: 'Can I use IJMB for Medicine, Law or Engineering?', answer: 'Yes. IJMB is accepted for all courses including Medicine, Law, Engineering, Pharmacy, and Dentistry at most universities. You need 9+ points for competitive courses.' },
