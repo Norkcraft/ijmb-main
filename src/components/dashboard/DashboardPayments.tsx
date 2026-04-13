@@ -46,15 +46,34 @@ export const DashboardPayments = ({
   const fetchData = async () => {
     if (!user) return;
     setLoading(true);
-    const [feesRes, payRes] = await Promise.all([
+
+    // Determine which centre to fetch fees from (assigned takes priority over preferred)
+    const centreId = application?.assigned_centre_id || application?.preferred_centre_id;
+
+    const [feesRes, payRes, centreRes] = await Promise.all([
       supabase.from('fees').select('*').order('name'),
       supabase.from('payments').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+      centreId
+        ? supabase.from('centres').select('tuition_fee,hostel_fee').eq('id', centreId).single()
+        : Promise.resolve({ data: null, error: null }),
     ]);
 
     if (feesRes.error) toast({ title: 'Error', description: feesRes.error.message, variant: 'destructive' });
     if (payRes.error) toast({ title: 'Error', description: payRes.error.message, variant: 'destructive' });
 
-    setFees(feesRes.data || []);
+    // Override global tuition/hostel fees with centre-specific ones when set
+    const centreFees = centreRes.data;
+    const mergedFees = (feesRes.data || []).map((fee: any) => {
+      if (fee.name === 'tuition_fee' && centreFees?.tuition_fee > 0) {
+        return { ...fee, amount: centreFees.tuition_fee };
+      }
+      if (fee.name === 'hostel_fee' && centreFees?.hostel_fee > 0) {
+        return { ...fee, amount: centreFees.hostel_fee };
+      }
+      return fee;
+    });
+
+    setFees(mergedFees);
     setPayments(payRes.data || []);
     setLoading(false);
   };
@@ -103,9 +122,14 @@ export const DashboardPayments = ({
                     id="hostel-mode"
                     checked={hostelNeeded}
                     onCheckedChange={toggleHostel}
-                    disabled={processing}
+                    disabled={processing || !!application?.hostel_fee_paid}
                   />
-                  <Label htmlFor="hostel-mode" className="font-medium">I require Hostel Accommodation (Optional)</Label>
+                  <div>
+                    <Label htmlFor="hostel-mode" className="font-medium">I require Hostel Accommodation (Optional)</Label>
+                    {application?.hostel_fee_paid && (
+                      <p className="text-xs text-muted-foreground mt-0.5">Hostel fee has been paid — this cannot be changed.</p>
+                    )}
+                  </div>
                 </div>
               )}
 

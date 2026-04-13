@@ -816,13 +816,13 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Full Name</label>
-              <input value={editName} onChange={e => setEditName(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" placeholder="Your full name" />
+              <input value={editName || '—'} disabled
+                className="w-full h-10 px-3 rounded-xl border text-sm bg-muted text-muted-foreground cursor-not-allowed" />
             </div>
             <div>
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Phone Number</label>
-              <input value={editPhone} onChange={e => setEditPhone(e.target.value)}
-                className="w-full h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" placeholder="Phone number" />
+              <input value={editPhone || '—'} disabled
+                className="w-full h-10 px-3 rounded-xl border text-sm bg-muted text-muted-foreground cursor-not-allowed" />
             </div>
           </div>
           <div>
@@ -830,11 +830,7 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
             <input value={user?.email || ''} disabled
               className="w-full h-10 px-3 rounded-xl border text-sm bg-muted text-muted-foreground cursor-not-allowed" />
           </div>
-          <button onClick={handleSaveProfile} disabled={savingProfile}
-            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-xl hover:bg-primary/90 disabled:opacity-60 transition-colors">
-            {savingProfile ? <Loader2 size={14} className="animate-spin" /> : <Pencil size={14} />}
-            Save Changes
-          </button>
+          <p className="text-xs text-muted-foreground">Name and phone are set from your application form and cannot be changed here.</p>
         </div>
       ),
     },

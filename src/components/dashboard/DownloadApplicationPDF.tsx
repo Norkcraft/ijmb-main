@@ -127,10 +127,10 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       win.document.write(html);
       win.document.close();
       win.focus();
-      // Wait for passport image (signed URL) and fonts to load before printing
+      // Wait for passport image (signed URL) to load before printing
       setTimeout(() => {
         win.print();
-      }, 1500);
+      }, 800);
     } catch (err) {
       console.error('PDF generation error:', err);
       alert('Failed to generate PDF. Please try again.');

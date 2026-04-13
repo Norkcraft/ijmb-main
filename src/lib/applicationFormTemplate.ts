@@ -87,10 +87,8 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>IJMB Student Registration Slip</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;600;700&family=Roboto+Mono:wght@400;600&display=swap');
-
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Source Sans 3',sans-serif;background:#d6d0c4;display:flex;justify-content:center;padding:20px 16px;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:#d6d0c4;display:flex;justify-content:center;padding:20px 16px;}
 
 .page{width:210mm;height:297mm;background:#fff;position:relative;overflow:hidden;box-shadow:0 6px 32px rgba(0,0,0,0.22);display:flex;flex-direction:column;}
 
@@ -112,13 +110,13 @@ body{font-family:'Source Sans 3',sans-serif;background:#d6d0c4;display:flex;just
 
 .hdr-center{flex:1;text-align:center}
 .hdr-center .republic{font-size:7.5px;letter-spacing:2.5px;color:#81c784;text-transform:uppercase;font-weight:600}
-.hdr-center .board{font-family:'Libre Baskerville',serif;font-size:14.5px;font-weight:700;color:#fff;margin:3px 0 2px;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,0.4)}
+.hdr-center .board{font-family:Georgia,'Times New Roman',serif;font-size:14.5px;font-weight:700;color:#fff;margin:3px 0 2px;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,0.4)}
 .hdr-center .slip-type{font-size:8.5px;color:#b9e0bb;letter-spacing:0.6px}
 .hdr-center .session{display:inline-block;margin-top:3px;font-size:8px;color:#d4a017;letter-spacing:1.5px;text-transform:uppercase;border-top:1px solid rgba(212,160,23,0.4);border-bottom:1px solid rgba(212,160,23,0.4);padding:2px 8px}
 
 .reg-badge{background:rgba(255,255,255,0.08);border:1.5px solid #d4a017;border-radius:3px;padding:5px 10px;text-align:center}
 .reg-badge .rb-label{font-size:6.5px;letter-spacing:1.5px;text-transform:uppercase;color:#81c784;font-weight:600;display:block}
-.reg-badge .rb-value{font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;color:#f5cc5a;display:block;margin-top:2px;letter-spacing:1.5px}
+.reg-badge .rb-value{font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:600;color:#f5cc5a;display:block;margin-top:2px;letter-spacing:1.5px}
 
 /* RIBBON */
 .ribbon{background:#1a3a00;display:flex;align-items:stretch;flex-shrink:0}
@@ -160,7 +158,7 @@ table td{border-bottom:1px solid #eeeee6;border-right:1px solid #eeeee6;padding:
 table td:last-child{border-right:none}
 table tr:last-child td{border-bottom:none}
 table tr:nth-child(even) td{background:rgba(0,61,0,0.02)}
-.nc{color:#003d00;font-weight:700;width:20px;text-align:center;font-family:'Roboto Mono',monospace;font-size:8.5px}
+.nc{color:#003d00;font-weight:700;width:20px;text-align:center;font-family:'Courier New',Courier,monospace;font-size:8.5px}
 .ol-nc{color:#1a3a00!important}
 
 /* SIDEBAR */
@@ -178,11 +176,11 @@ table tr:nth-child(even) td{background:rgba(0,61,0,0.02)}
 .reg-box{background:#003d00;width:100%;border-radius:2px;padding:7px 8px;text-align:center;position:relative;overflow:hidden}
 .reg-box::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#8b6914,#d4a017,#f5cc5a,#d4a017,#8b6914)}
 .reg-box .rl{font-size:6.5px;text-transform:uppercase;letter-spacing:1.2px;color:#81c784;font-weight:700}
-.reg-box .rv{font-family:'Roboto Mono',monospace;font-size:11px;font-weight:600;color:#f5cc5a;letter-spacing:2px;display:block;margin-top:2px}
+.reg-box .rv{font-family:'Courier New',Courier,monospace;font-size:11px;font-weight:600;color:#f5cc5a;letter-spacing:2px;display:block;margin-top:2px}
 
 .app-box{background:#f5f5f0;border:1px solid #deded4;border-top:2.5px solid #003d00;width:100%;padding:5px 8px;text-align:center}
 .app-box .al{font-size:6.5px;text-transform:uppercase;letter-spacing:1.2px;color:#999;font-weight:700}
-.app-box .av{font-family:'Roboto Mono',monospace;font-size:9.5px;font-weight:600;color:#333;margin-top:1px}
+.app-box .av{font-family:'Courier New',Courier,monospace;font-size:9.5px;font-weight:600;color:#333;margin-top:1px}
 
 .qr-box{width:100%;background:#fff;border:1px solid #deded4;border-top:2.5px solid #d4a017;padding:5px 8px;text-align:center}
 .qr-box .ql{font-size:6.5px;text-transform:uppercase;letter-spacing:1.2px;color:#999;font-weight:700;margin-bottom:4px}
