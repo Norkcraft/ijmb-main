@@ -263,13 +263,42 @@ export const useStudentDashboard = () => {
 
       setUploading(type);
 
+      // Compress images before upload (passport photos are often 2-5MB; we only need ~300KB)
+      let uploadFile: File | Blob = file;
+      let uploadMime = file.type;
+      if (file.type === 'image/jpeg' || file.type === 'image/png') {
+        try {
+          const compressed = await new Promise<Blob>((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+              const MAX = 1024;
+              let { width, height } = img;
+              if (width > MAX || height > MAX) {
+                if (width > height) { height = Math.round(height * MAX / width); width = MAX; }
+                else { width = Math.round(width * MAX / height); height = MAX; }
+              }
+              const canvas = document.createElement('canvas');
+              canvas.width = width; canvas.height = height;
+              canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+              canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('Compression failed')), 'image/jpeg', 0.82);
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(file);
+          });
+          uploadFile = compressed;
+          uploadMime = 'image/jpeg';
+        } catch {
+          // If compression fails, upload original
+        }
+      }
+
       // Upload directly from browser to Supabase Storage (session already available in browser client)
-      const ext = file.type === 'image/jpeg' ? 'jpg' : file.type === 'image/png' ? 'png' : 'pdf';
+      const ext = uploadMime === 'image/jpeg' ? 'jpg' : uploadMime === 'image/png' ? 'png' : 'pdf';
       const path = `${user.id}/${type}.${ext}`;
 
       const { error: uploadError } = await supabase.storage
         .from('student-documents')
-        .upload(path, file, { contentType: file.type, upsert: true });
+        .upload(path, uploadFile, { contentType: uploadMime, upsert: true });
 
       if (uploadError) {
         toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
