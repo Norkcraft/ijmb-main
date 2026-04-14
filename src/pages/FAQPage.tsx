@@ -54,7 +54,7 @@ const FAQPage = () => (
       </div>
     </section>
 
-    <FAQSection faqs={allFaqs} title="All IJMB Questions & Answers" />
+    <FAQSection faqs={allFaqs} title="All IJMB Questions & Answers" showSchema={false} />
     <CTASection />
   </>
 );
