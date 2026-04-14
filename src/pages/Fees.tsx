@@ -50,10 +50,7 @@ const Fees = () => (
               {[
                 { label: "Registration Form", price: "₦5,500" },
                 { label: "Tuition Fee", price: "₦350,000" },
-                { label: "Examination Fee", price: "₦15,000 – ₦25,000" },
-                { label: "Study Materials", price: "₦5,000 – ₦10,000" },
-                { label: "Administrative Charges", price: "₦5,000 – ₦10,000" },
-                { label: "ID Card & Handbook", price: "₦2,000 – ₦5,000" },
+                { label: "Hostel Accommodation (optional)", price: "₦150,000" },
               ].map((item, i) => (
                 <div key={i} className="flex justify-between items-center py-2 border-b last:border-0">
                   <span className="text-muted-foreground">{item.label}</span>
@@ -74,14 +71,14 @@ const Fees = () => (
               <p className="text-sm opacity-90 mb-8">tuition per session</p>
 
               <div className="space-y-2 text-sm text-left mx-auto max-w-xs mb-8">
-                <div className="flex items-center gap-2"><CheckCircle size={16} /> Includes Tuition</div>
-                <div className="flex items-center gap-2"><CheckCircle size={16} /> Includes Exam Fees</div>
-                <div className="flex items-center gap-2"><CheckCircle size={16} /> Includes Study Materials</div>
+                <div className="flex items-center gap-2"><CheckCircle size={16} /> Registration Form: ₦5,500</div>
+                <div className="flex items-center gap-2"><CheckCircle size={16} /> Tuition: ₦350,000</div>
+                <div className="flex items-center gap-2"><CheckCircle size={16} /> Hostel (optional): ₦150,000</div>
                 <div className="flex items-center gap-2"><CheckCircle size={16} /> Direct Entry Admission</div>
               </div>
 
               <div className="bg-white/20 rounded-lg p-3 text-sm">
-                * Accommodation & Feeding excluded
+                Total with hostel: ₦505,500
               </div>
             </div>
           </div>
@@ -89,29 +86,10 @@ const Fees = () => (
 
         <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg mb-8">
           <p className="text-sm text-muted-foreground">
-            <strong>Note:</strong> These are estimated fees and may vary by centre. Some centres in Lagos and Abuja may charge higher
-            fees than centres in other locations. Contact us for the most current IJMB fees for your preferred centre.
+            <strong>Note:</strong> The hostel fee is optional. Students who do not require accommodation only pay the registration form fee (₦5,500) and tuition fee (₦350,000).
           </p>
         </div>
 
-        <h2 className="text-2xl font-heading font-bold mt-10 mb-4">Additional Costs to Consider</h2>
-        <p className="text-muted-foreground leading-relaxed mb-4">
-          Beyond the IJMB programme fees, students should budget for these additional expenses:
-        </p>
-        <div className="space-y-3 mb-8">
-          {[
-            "Accommodation (Hostel): ₦150,000 per session",
-            "Feeding: ₦30,000 – ₦60,000 per session (estimated)",
-            "Transportation: Varies by centre location",
-            "JAMB Direct Entry Registration: ₦3,500 (required after IJMB completion)",
-            "Textbooks and additional study materials: ₦10,000 – ₦20,000",
-          ].map((item, i) => (
-            <div key={i} className="flex gap-3 items-start">
-              <CheckCircle size={18} className="text-primary flex-shrink-0 mt-1" />
-              <p className="text-muted-foreground">{item}</p>
-            </div>
-          ))}
-        </div>
 
         <h2 className="text-2xl font-heading font-bold mt-10 mb-4">How to Pay IJMB Fees</h2>
         <p className="text-muted-foreground leading-relaxed mb-4">

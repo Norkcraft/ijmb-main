@@ -244,27 +244,32 @@ export const blogPosts: BlogPost[] = [
     title: 'IJMB Form Price & Fee Breakdown 2026',
     excerpt: 'Detailed breakdown of IJMB fees for 2026 including form price, tuition, acceptance fees, and hostel accommodation. Plan your budget effectively.',
     content: `
-      <h2>Understanding IJMB Fees (2026)</h2>
-      <p>Budgeting for your education is crucial. Here is a transparent breakdown of all fees associated with the IJMB programme for the 2026 session.</p>
+      <h2>IJMB Fees 2026 – Full Breakdown</h2>
+      <p>Here is a clear and transparent breakdown of all fees for the IJMB programme for the 2026/2027 session.</p>
 
       <h3>1. Registration Form Fee</h3>
-      <p><strong>Cost: ₦8,500</strong> (One-time payment)</p>
+      <p><strong>₦5,500</strong> (one-time, paid online at registration)</p>
       <p>This is the fee paid to purchase the application form and create your student profile on the portal.</p>
 
-      <h3>2. Acceptance Fee</h3>
-      <p><strong>Cost: ₦20,000 - ₦30,000</strong> (Varies by Centre)</p>
-      <p>Paid after admission is offered to confirm your acceptance of the provisional admission. This fee often covers administrative setup and ID card processing.</p>
+      <h3>2. Tuition Fee</h3>
+      <p><strong>₦350,000</strong> per session</p>
+      <p>Covers the full 9-month academic programme including lectures and internal examinations. Most centres allow instalment payments.</p>
 
-      <h3>3. Tuition Fees</h3>
-      <p><strong>₦350,000</strong></p>
-      <p>This covers lectures, textbooks, and internal examinations for the entire 9-month duration. Most centres allow payment in installments (e.g., 50% upfront, then 25% + 25%).</p>
+      <h3>3. Hostel Accommodation</h3>
+      <p><strong>₦150,000</strong> per session (optional)</p>
+      <p>For students who require on-campus accommodation. Students living off-campus do not pay this fee.</p>
 
-      <h3>4. Hostel Accommodation</h3>
-      <p><strong>₦150,000</strong> (Optional)</p>
-      <p>If you choose to stay in the school hostel, this fee applies. It usually covers accommodation for the full session.</p>
-
-      <h3>Total Estimated Cost</h3>
-      <p>A student should budget approximately <strong>₦500,000 – ₦505,500</strong> for the full programme (form fee + tuition + hostel), which is significantly cheaper than a year in many private universities.</p>
+      <h3>Total Cost Summary</h3>
+      <table>
+        <thead><tr><th>Fee</th><th>Amount</th></tr></thead>
+        <tbody>
+          <tr><td>Registration Form</td><td>₦5,500</td></tr>
+          <tr><td>Tuition Fee</td><td>₦350,000</td></tr>
+          <tr><td>Hostel (optional)</td><td>₦150,000</td></tr>
+          <tr><td><strong>Total (without hostel)</strong></td><td><strong>₦355,500</strong></td></tr>
+          <tr><td><strong>Total (with hostel)</strong></td><td><strong>₦505,500</strong></td></tr>
+        </tbody>
+      </table>
     `,
     author: 'Bursary Department',
     date: '2026-03-10',
