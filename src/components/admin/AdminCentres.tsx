@@ -106,7 +106,7 @@ export default function AdminCentres() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <CardTitle>Manage Study Centres</CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -156,39 +156,41 @@ export default function AdminCentres() {
         </Dialog>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>State</TableHead>
-              <TableHead>Tuition</TableHead>
-              <TableHead>Hostel</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {centres.map(c => (
-              <TableRow key={c.id}>
-                <TableCell className="font-medium">
-                  {c.name}
-                  <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={10} /> {c.location}</div>
-                </TableCell>
-                <TableCell>{c.state}</TableCell>
-                <TableCell>₦{c.tuition_fee?.toLocaleString() || '0'}</TableCell>
-                <TableCell>₦{c.hostel_fee?.toLocaleString() || '0'}</TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" onClick={() => toggleStatus(c)} className={c.active ? 'text-green-600' : 'text-red-600'}>
-                    {c.active ? 'Active' : 'Inactive'}
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm" onClick={() => openModal(c)}><Edit size={14} /></Button>
-                </TableCell>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>State</TableHead>
+                <TableHead>Tuition</TableHead>
+                <TableHead className="hidden sm:table-cell">Hostel</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {centres.map(c => (
+                <TableRow key={c.id}>
+                  <TableCell className="font-medium">
+                    {c.name}
+                    <div className="text-xs text-muted-foreground flex items-center gap-1"><MapPin size={10} /> {c.location}</div>
+                  </TableCell>
+                  <TableCell>{c.state}</TableCell>
+                  <TableCell>₦{c.tuition_fee?.toLocaleString() || '0'}</TableCell>
+                  <TableCell className="hidden sm:table-cell">₦{c.hostel_fee?.toLocaleString() || '0'}</TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" onClick={() => toggleStatus(c)} className={c.active ? 'text-green-600' : 'text-red-600'}>
+                      {c.active ? 'Active' : 'Inactive'}
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" onClick={() => openModal(c)}><Edit size={14} /></Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

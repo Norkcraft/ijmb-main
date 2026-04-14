@@ -91,7 +91,7 @@ const AdminDashboard = () => {
                 </div>
               )}
 
-              <div className={currentTab !== 'overview' ? "bg-white rounded-2xl border shadow-sm overflow-hidden" : ""}>
+              <div className={currentTab !== 'overview' ? "bg-white rounded-2xl border shadow-sm" : ""}>
                 {currentTab === 'overview' && <AdminDashboardOverview />}
                 {currentTab === 'applications' && <AdminApplications />}
                 {currentTab === 'payments' && <AdminPayments />}

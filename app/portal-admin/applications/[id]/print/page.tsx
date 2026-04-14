@@ -11,6 +11,7 @@ export default function AdminApplicationPrint() {
   const id = params?.id as string;
   const [data, setData] = useState<any>(null);
   const [passportUrl, setPassportUrl] = useState<string | null>(null);
+  const [passportReady, setPassportReady] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,11 +46,24 @@ export default function AdminApplicationPrint() {
 
   useEffect(() => {
     if (!loading && data) {
-      // Auto-print after a short delay to allow images to load
-      const timer = setTimeout(() => window.print(), 800);
-      return () => clearTimeout(timer);
+      // If no passport, print immediately after short delay
+      if (!data.passport_path) {
+        const timer = setTimeout(() => window.print(), 500);
+        return () => clearTimeout(timer);
+      }
+      // Passport exists — wait for it to load via passportReady state,
+      // but also set a 4 second hard fallback in case the signed URL is slow
+      const hardFallback = setTimeout(() => setPassportReady(true), 4000);
+      return () => clearTimeout(hardFallback);
     }
   }, [loading, data]);
+
+  useEffect(() => {
+    if (passportReady) {
+      const timer = setTimeout(() => window.print(), 300);
+      return () => clearTimeout(timer);
+    }
+  }, [passportReady]);
 
   if (loading) {
     return (
@@ -176,7 +190,13 @@ export default function AdminApplicationPrint() {
           <div className="col-span-1 space-y-4">
             <div className="w-full aspect-square border-2 border-gray-300 p-1 bg-gray-50 rounded shadow-sm">
               {passportUrl ? (
-                <img src={passportUrl} alt="Passport" className="w-full h-full object-cover rounded-sm" />
+                <img
+                  src={passportUrl}
+                  alt="Passport"
+                  className="w-full h-full object-cover rounded-sm"
+                  onLoad={() => setPassportReady(true)}
+                  onError={() => setPassportReady(true)}
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs text-center p-4">
                   Passport Not Uploaded

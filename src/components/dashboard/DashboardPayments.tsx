@@ -14,7 +14,7 @@ const PaymentButton = dynamic(() => import('@/components/PaymentButton'), { ssr:
 interface DashboardPaymentsProps {
   user: any;
   application: any;
-  onFeePaymentSuccess: (feeName: string) => Promise<void>;
+  onFeePaymentSuccess: (feeName: string, amount?: number) => Promise<void>;
 }
 
 export const DashboardPayments = ({
@@ -241,9 +241,9 @@ export const DashboardPayments = ({
                                     paymentType={name}
                                     label={isPartPaid ? `Pay Balance (₦${balance.toLocaleString()})` : `Pay ₦${amount.toLocaleString()} Now`}
                                     disabled={blocked || notConfigured}
-                                    onSuccess={async ({ paymentType }) => {
+                                    onSuccess={async ({ paymentType, amount }) => {
                                       setOptimisticPaid(prev => new Set([...prev, paymentType]));
-                                      await onFeePaymentSuccess(paymentType);
+                                      await onFeePaymentSuccess(paymentType, amount);
                                       await fetchData();
                                     }}
                                   />

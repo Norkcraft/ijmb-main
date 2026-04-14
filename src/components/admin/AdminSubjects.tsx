@@ -104,7 +104,7 @@ export default function AdminSubjects() {
   return (
     <Card>
       <Tabs defaultValue="combos" className="w-full">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
           <CardTitle>Manage Subjects & Combinations</CardTitle>
           <TabsList>
             <TabsTrigger value="combos">Combinations</TabsTrigger>
@@ -118,14 +118,15 @@ export default function AdminSubjects() {
             <div className="flex justify-end">
               <Button onClick={() => openComboModal()}><Plus size={16} className="mr-2" /> Add Combination</Button>
             </div>
+            <div className="overflow-x-auto">
             <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Track</TableHead><TableHead>Subjects</TableHead><TableHead>Status</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead className="hidden sm:table-cell">Track</TableHead><TableHead className="hidden sm:table-cell">Subjects</TableHead><TableHead>Status</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
               <TableBody>
                 {combos.map(c => (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.name}</TableCell>
-                    <TableCell><Badge variant="outline">{c.track}</Badge></TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{[c.subject1, c.subject2, c.subject3].filter(Boolean).join(' · ')}</TableCell>
+                    <TableCell className="hidden sm:table-cell"><Badge variant="outline">{c.track}</Badge></TableCell>
+                    <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{[c.subject1, c.subject2, c.subject3].filter(Boolean).join(' · ')}</TableCell>
                     <TableCell>
                       <button onClick={() => toggleComboStatus(c)}>
                         <Badge className={c.active ? 'bg-green-600 hover:bg-green-700 cursor-pointer' : 'bg-red-500 hover:bg-red-600 cursor-pointer'}>{c.active ? 'Active' : 'Inactive'}</Badge>
@@ -137,6 +138,7 @@ export default function AdminSubjects() {
                 {combos.length === 0 && <TableRow><TableCell colSpan={5} className="text-center text-muted-foreground py-8">No combinations yet.</TableCell></TableRow>}
               </TableBody>
             </Table>
+            </div>
 
             <Dialog open={openCombo} onOpenChange={(o) => { if (!o) resetComboForm(); setOpenCombo(o); }}>
               <DialogContent className="max-w-md">
@@ -185,19 +187,21 @@ export default function AdminSubjects() {
             <div className="flex justify-end">
               <Button variant="outline" onClick={() => openSubModal()}><Plus size={16} className="mr-2" /> Add Subject</Button>
             </div>
-            <Table>
-              <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Code</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
-              <TableBody>
-                {subjects.map(s => (
-                  <TableRow key={s.id}>
-                    <TableCell className="font-medium">{s.name}</TableCell>
-                    <TableCell className="text-muted-foreground">{s.code || '—'}</TableCell>
-                    <TableCell><Button variant="ghost" size="sm" onClick={() => openSubModal(s)}><Edit size={14} /></Button></TableCell>
-                  </TableRow>
-                ))}
-                {subjects.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-8">No subjects yet.</TableCell></TableRow>}
-              </TableBody>
-            </Table>
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Code</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+                <TableBody>
+                  {subjects.map(s => (
+                    <TableRow key={s.id}>
+                      <TableCell className="font-medium">{s.name}</TableCell>
+                      <TableCell className="text-muted-foreground">{s.code || '—'}</TableCell>
+                      <TableCell><Button variant="ghost" size="sm" onClick={() => openSubModal(s)}><Edit size={14} /></Button></TableCell>
+                    </TableRow>
+                  ))}
+                  {subjects.length === 0 && <TableRow><TableCell colSpan={3} className="text-center text-muted-foreground py-8">No subjects yet.</TableCell></TableRow>}
+                </TableBody>
+              </Table>
+            </div>
             <Dialog open={openSub} onOpenChange={setOpenSub}>
               <DialogContent>
                 <DialogHeader><DialogTitle>{editingSub ? 'Edit Subject' : 'Add Subject'}</DialogTitle></DialogHeader>

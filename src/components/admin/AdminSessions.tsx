@@ -92,7 +92,7 @@ export default function AdminSessions() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <CardTitle>Manage Academic Sessions</CardTitle>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
@@ -132,28 +132,30 @@ export default function AdminSessions() {
         </Dialog>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader><TableRow><TableHead>Name</TableHead><TableHead>Code</TableHead><TableHead>Period</TableHead><TableHead>Status</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
-          <TableBody>
-            {sessions.map(s => (
-              <TableRow key={s.id}>
-                <TableCell className="font-medium">{s.name}</TableCell>
-                <TableCell>{s.code}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {s.start_date ? new Date(s.start_date).toLocaleDateString() : '?'} — {s.end_date ? new Date(s.end_date).toLocaleDateString() : '?'}
-                </TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" onClick={() => toggleStatus(s)} className={s.status === 'open' ? 'text-green-600' : 'text-red-600'}>
-                    {s.status.toUpperCase()}
-                  </Button>
-                </TableCell>
-                <TableCell>
-                  <Button variant="ghost" size="sm" onClick={() => openModal(s)}><Edit size={14} /></Button>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader><TableRow><TableHead>Name</TableHead><TableHead className="hidden sm:table-cell">Code</TableHead><TableHead className="hidden sm:table-cell">Period</TableHead><TableHead>Status</TableHead><TableHead>Actions</TableHead></TableRow></TableHeader>
+            <TableBody>
+              {sessions.map(s => (
+                <TableRow key={s.id}>
+                  <TableCell className="font-medium">{s.name}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{s.code}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">
+                    {s.start_date ? new Date(s.start_date).toLocaleDateString() : '?'} — {s.end_date ? new Date(s.end_date).toLocaleDateString() : '?'}
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" onClick={() => toggleStatus(s)} className={s.status === 'open' ? 'text-green-600' : 'text-red-600'}>
+                      {s.status.toUpperCase()}
+                    </Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="ghost" size="sm" onClick={() => openModal(s)}><Edit size={14} /></Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

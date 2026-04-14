@@ -880,10 +880,14 @@ const Dashboard = () => {
   const isDraft = !application || application.status === 'draft' || !application.status;
 
   const handlePrint = () => {
+    // Only wait for images that have a real src and haven't loaded yet
     const images = document.querySelectorAll('img');
-    const pending = Array.from(images).filter(img => !img.complete);
+    const pending = Array.from(images).filter(img => !img.complete && !!img.src && img.src !== window.location.href);
     if (pending.length > 0) {
-      Promise.all(pending.map(img => new Promise(r => { img.onload = r; img.onerror = r; }))).then(() => window.print());
+      // Wait for images but max 2 seconds — then print anyway
+      const timeout = new Promise<void>(r => setTimeout(r, 2000));
+      const loaded = Promise.all(pending.map(img => new Promise<void>(r => { img.onload = () => r(); img.onerror = () => r(); })));
+      Promise.race([loaded, timeout]).then(() => window.print());
     } else {
       window.print();
     }
@@ -978,8 +982,8 @@ const Dashboard = () => {
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-5">Your Journey</p>
               <ProgressTracker status="payment_pending" />
             </div>
-            <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName) => {
-              if (feeName === 'form_fee') await handlePaymentSuccess();
+            <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName, amount) => {
+              await handlePaymentSuccess(feeName, amount);
             }} />
           </div>
         </DashboardShell>
@@ -1065,15 +1069,8 @@ const Dashboard = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-800">
                 Acceptance, Tuition, and Hostel fees become available after your admission is approved.
               </div>
-              <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName) => {
-                if (feeName === 'form_fee') {
-                  await handlePaymentSuccess();
-                } else {
-                  // Application status is updated by the Paystack webhook (service role bypasses RLS).
-                  // Re-fetch immediately to reflect any changes, then again after 5s to catch the webhook.
-                  await fetchData();
-                  setTimeout(() => fetchData(), 5000);
-                }
+              <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName, amount) => {
+                await handlePaymentSuccess(feeName, amount);
               }} />
             </div>
           )}

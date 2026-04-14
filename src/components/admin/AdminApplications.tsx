@@ -77,7 +77,7 @@ export default function AdminApplications() {
   if (loading) return <div className="p-4 text-center">Loading applications...</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card><CardContent className="pt-6 text-center">
@@ -133,70 +133,72 @@ export default function AdminApplications() {
       {/* Table */}
       <Card>
         <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>App ID</TableHead>
-                <TableHead>Student</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Centre</TableHead>
-                <TableHead>Tuition</TableHead>
-                <TableHead>Form</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">No applications found.</TableCell></TableRow>
-              ) : (
-                filtered.map(app => (
-                  <TableRow key={app.id}>
-                    <TableCell className="font-mono text-xs">{app.application_number || app.id.split('-')[0].toUpperCase()}</TableCell>
-                    <TableCell className="font-medium">{app.surname ? `${app.surname} ${app.first_name}` : (app.profiles?.full_name || '—')}</TableCell>
-                    <TableCell className="text-sm">{app.profiles?.email || '—'}</TableCell>
-                    <TableCell>{app.guardian_phone || app.profiles?.phone || '—'}</TableCell>
-                    <TableCell>{app.preferred_centre?.name || '—'}</TableCell>
-                    <TableCell>
-                      {app.tuition_payment_status === 'fully_paid' ? (
-                        <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Paid</Badge>
-                      ) : app.tuition_payment_status === 'part_paid' ? (
-                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Part</Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-xs">Pending</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {app.application_form_url ? (
-                         <Button
-                           variant="link"
-                           size="sm"
-                           className="h-auto p-0 text-blue-600"
-                           onClick={(e) => {
-                             e.stopPropagation();
-                             window.open(app.application_form_url, '_blank');
-                           }}
-                         >
-                           View Form
-                         </Button>
-                      ) : (
-                         <span className="text-xs text-muted-foreground italic">Not Generated</span>
-                      )}
-                    </TableCell>
-                    <TableCell><Badge className={STATUS_COLORS[app.status] || ''}>{app.status.replace('_', ' ')}</Badge></TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{new Date(app.created_at).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Link href={`/portal-admin/applications/${app.id}`}>
-                        <Button size="sm" variant="outline">View</Button>
-                      </Link>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>App ID</TableHead>
+                  <TableHead>Student</TableHead>
+                  <TableHead className="hidden sm:table-cell">Email</TableHead>
+                  <TableHead className="hidden sm:table-cell">Phone</TableHead>
+                  <TableHead className="hidden md:table-cell">Centre</TableHead>
+                  <TableHead className="hidden md:table-cell">Tuition</TableHead>
+                  <TableHead className="hidden lg:table-cell">Form</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden sm:table-cell">Date</TableHead>
+                  <TableHead></TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.length === 0 ? (
+                  <TableRow><TableCell colSpan={10} className="text-center text-muted-foreground py-8">No applications found.</TableCell></TableRow>
+                ) : (
+                  filtered.map(app => (
+                    <TableRow key={app.id}>
+                      <TableCell className="font-mono text-xs">{app.application_number || app.id.split('-')[0].toUpperCase()}</TableCell>
+                      <TableCell className="font-medium">{app.surname ? `${app.surname} ${app.first_name}` : (app.profiles?.full_name || '—')}</TableCell>
+                      <TableCell className="text-sm hidden sm:table-cell">{app.profiles?.email || '—'}</TableCell>
+                      <TableCell className="hidden sm:table-cell">{app.guardian_phone || app.profiles?.phone || '—'}</TableCell>
+                      <TableCell className="hidden md:table-cell">{app.preferred_centre?.name || '—'}</TableCell>
+                      <TableCell className="hidden md:table-cell">
+                        {app.tuition_payment_status === 'fully_paid' ? (
+                          <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">Paid</Badge>
+                        ) : app.tuition_payment_status === 'part_paid' ? (
+                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">Part</Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-xs">Pending</span>
+                        )}
+                      </TableCell>
+                      <TableCell className="hidden lg:table-cell">
+                        {app.application_form_url ? (
+                          <Button
+                            variant="link"
+                            size="sm"
+                            className="h-auto p-0 text-blue-600"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(app.application_form_url, '_blank');
+                            }}
+                          >
+                            View Form
+                          </Button>
+                        ) : (
+                          <span className="text-xs text-muted-foreground italic">Not Generated</span>
+                        )}
+                      </TableCell>
+                      <TableCell><Badge className={STATUS_COLORS[app.status] || ''}>{app.status.replace('_', ' ')}</Badge></TableCell>
+                      <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{new Date(app.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <Link href={`/portal-admin/applications/${app.id}`}>
+                          <Button size="sm" variant="outline">View</Button>
+                        </Link>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

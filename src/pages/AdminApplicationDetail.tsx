@@ -32,12 +32,13 @@ function DocBadge({ status }: { status: string }) {
   return <Badge variant="outline" className="text-amber-600 border-amber-400">Pending Review</Badge>;
 }
 
-async function sendEmail(type: string, data: Record<string, string>) {
-  await fetch('/api/send-email', {
+function sendEmail(type: string, data: Record<string, string>) {
+  // Fire-and-forget — never block UI on email delivery
+  fetch('/api/send-email', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '' },
     body: JSON.stringify({ type, data }),
-  });
+  }).catch(() => {});
 }
 
 // ── component ──────────────────────────────────────────────────────────────
@@ -105,38 +106,38 @@ const AdminApplicationDetail = () => {
   const saveStatus = async () => {
     if (!app) return;
     setSaving(true);
-    const wasAdmittedBefore = ['admitted', 'fees_pending', 'active'].includes(app.status);
-    const isAdmitting = status === 'admitted' && !wasAdmittedBefore;
-    const isRejecting = status === 'rejected' && app.status !== 'rejected';
+    try {
+      const wasAdmittedBefore = ['admitted', 'fees_pending', 'active'].includes(app.status);
+      const isAdmitting = status === 'admitted' && !wasAdmittedBefore;
+      const isRejecting = status === 'rejected' && app.status !== 'rejected';
 
-    const { error } = await supabase.from('applications').update({
-      status,
-      assigned_centre_id: assignedCentreId || null,
-      admission_granted: ['admitted', 'fees_pending', 'active'].includes(status),
-      installments_allowed: installmentsAllowed,
-      updated_at: new Date().toISOString(),
-    }).eq('id', app.id);
+      const { error } = await supabase.from('applications').update({
+        status,
+        assigned_centre_id: assignedCentreId || null,
+        admission_granted: ['admitted', 'fees_pending', 'active'].includes(status),
+        installments_allowed: installmentsAllowed,
+        updated_at: new Date().toISOString(),
+      }).eq('id', app.id);
 
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-      setSaving(false);
-      return;
-    }
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        return;
+      }
 
-    setApp((prev: any) => ({ ...prev, status, assigned_centre_id: assignedCentreId, installments_allowed: installmentsAllowed }));
-    toast({ title: 'Status updated' });
+      setApp((prev: any) => ({ ...prev, status, assigned_centre_id: assignedCentreId, installments_allowed: installmentsAllowed }));
+      toast({ title: 'Status updated' });
 
-    const studentEmail = app.profiles?.email;
-    const studentName = app.first_name
-      ? `${app.first_name} ${app.surname}`
-      : (app.profiles?.full_name || 'Student');
-    const appId = app.application_number || app.id.split('-')[0].toUpperCase();
-    const centreName = centres.find(c => c.id === (assignedCentreId || app.preferred_centre_id))?.name
-      || app.preferred_centre?.name || 'To be confirmed';
+      const studentEmail = app.profiles?.email;
+      const studentName = app.first_name
+        ? `${app.first_name} ${app.surname}`
+        : (app.profiles?.full_name || 'Student');
+      const appId = app.application_number || app.id.split('-')[0].toUpperCase();
+      const centreName = centres.find(c => c.id === (assignedCentreId || app.preferred_centre_id))?.name
+        || app.preferred_centre?.name || 'To be confirmed';
 
-    if (studentEmail && isAdmitting) {
-      try {
-        await sendEmail('admission_offer', {
+      // Fire-and-forget — never await email sends so they can't block the UI
+      if (studentEmail && isAdmitting) {
+        sendEmail('admission_offer', {
           email: studentEmail,
           fullName: studentName,
           applicationId: appId,
@@ -144,92 +145,92 @@ const AdminApplicationDetail = () => {
           resumptionDate: 'As communicated by your centre',
           subjects: app.subject_combo?.name || 'As selected',
         });
-      } catch {
-        toast({ title: 'Warning', description: 'Admitted but email failed to send.', variant: 'destructive' });
       }
-    }
 
-    if (studentEmail && isRejecting) {
-      try {
-        await sendEmail('account_update', {
+      if (studentEmail && isRejecting) {
+        sendEmail('account_update', {
           email: studentEmail,
           fullName: studentName,
           changeDescription: `Your IJMB application (ID: ${appId}) has been reviewed and was not successful at this time. Please contact support for further guidance.`,
         });
-      } catch { /* non-blocking */ }
+      }
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
+    } finally {
+      setSaving(false);
     }
-
-    setSaving(false);
   };
 
   // ── save passport doc review ───────────────────────────────────────────
   const savePassportReview = async (newStatus: string, msg?: string) => {
     if (!app?.passport_path) return;
     setSavingPassport(true);
-    const finalMsg = newStatus === 'rejected' ? (msg ?? passportMsg) : null;
+    try {
+      const finalMsg = newStatus === 'rejected' ? (msg ?? passportMsg) : null;
 
-    const { error } = await supabase.from('applications').update({
-      passport_status: newStatus,
-      passport_msg: finalMsg,
-      updated_at: new Date().toISOString(),
-    }).eq('id', app.id);
+      const { error } = await supabase.from('applications').update({
+        passport_status: newStatus,
+        passport_msg: finalMsg,
+        updated_at: new Date().toISOString(),
+      }).eq('id', app.id);
 
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-      setSavingPassport(false);
-      return;
-    }
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        return;
+      }
 
-    setPassportStatus(newStatus);
-    setApp((prev: any) => ({ ...prev, passport_status: newStatus, passport_msg: finalMsg }));
-    toast({ title: newStatus === 'approved' ? 'Passport approved' : 'Passport rejected' });
+      setPassportStatus(newStatus);
+      setApp((prev: any) => ({ ...prev, passport_status: newStatus, passport_msg: finalMsg }));
+      toast({ title: newStatus === 'approved' ? 'Passport approved' : 'Passport rejected' });
 
-    if (newStatus === 'rejected' && finalMsg && app.profiles?.email) {
-      try {
-        await sendEmail('account_update', {
+      if (newStatus === 'rejected' && finalMsg && app.profiles?.email) {
+        sendEmail('account_update', {
           email: app.profiles.email,
           fullName: app.first_name ? `${app.first_name} ${app.surname}` : (app.profiles.full_name || 'Student'),
           changeDescription: `Your passport photograph was rejected. Reason: ${finalMsg}. Please log in and re-upload a new photo.`,
         });
-      } catch { /* non-blocking */ }
+      }
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
+    } finally {
+      setSavingPassport(false);
     }
-
-    setSavingPassport(false);
   };
 
   // ── save o-level doc review ────────────────────────────────────────────
   const saveOlevelReview = async (newStatus: string, msg?: string) => {
     if (!app?.olevel_path) return;
     setSavingOlevel(true);
-    const finalMsg = newStatus === 'rejected' ? (msg ?? olevelMsg) : null;
+    try {
+      const finalMsg = newStatus === 'rejected' ? (msg ?? olevelMsg) : null;
 
-    const { error } = await supabase.from('applications').update({
-      olevel_status: newStatus,
-      olevel_msg: finalMsg,
-      updated_at: new Date().toISOString(),
-    }).eq('id', app.id);
+      const { error } = await supabase.from('applications').update({
+        olevel_status: newStatus,
+        olevel_msg: finalMsg,
+        updated_at: new Date().toISOString(),
+      }).eq('id', app.id);
 
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-      setSavingOlevel(false);
-      return;
-    }
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        return;
+      }
 
-    setOlevelStatus(newStatus);
-    setApp((prev: any) => ({ ...prev, olevel_status: newStatus, olevel_msg: finalMsg }));
-    toast({ title: newStatus === 'approved' ? 'O-Level result approved' : 'O-Level result rejected' });
+      setOlevelStatus(newStatus);
+      setApp((prev: any) => ({ ...prev, olevel_status: newStatus, olevel_msg: finalMsg }));
+      toast({ title: newStatus === 'approved' ? 'O-Level result approved' : 'O-Level result rejected' });
 
-    if (newStatus === 'rejected' && finalMsg && app.profiles?.email) {
-      try {
-        await sendEmail('account_update', {
+      if (newStatus === 'rejected' && finalMsg && app.profiles?.email) {
+        sendEmail('account_update', {
           email: app.profiles.email,
           fullName: app.first_name ? `${app.first_name} ${app.surname}` : (app.profiles.full_name || 'Student'),
           changeDescription: `Your O-Level result was rejected. Reason: ${finalMsg}. Please log in and re-upload a clear copy of your result.`,
         });
-      } catch { /* non-blocking */ }
+      }
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
+    } finally {
+      setSavingOlevel(false);
     }
-
-    setSavingOlevel(false);
   };
 
   const openDoc = async (path: string) => {

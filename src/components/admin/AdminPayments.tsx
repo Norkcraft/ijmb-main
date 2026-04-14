@@ -65,7 +65,7 @@ export default function AdminPayments() {
   if (loading) return <div className="p-4 text-center"><Loader2 className="animate-spin inline mr-2" /> Loading payments...</div>;
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {Object.entries(FEE_LABELS).map(([key, label]) => (
@@ -105,48 +105,50 @@ export default function AdminPayments() {
             </select>
           </div>
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Reference</TableHead>
-                <TableHead>Student</TableHead>
-                <TableHead>Fee Type</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Date</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No payments found.</TableCell></TableRow>
-              ) : (
-                filtered.map(p => {
-                  const feeType = p.metadata?.payment_type || p.fee_type || '';
-                  return (
-                    <TableRow key={p.id}>
-                      <TableCell className="font-mono text-xs">{p.reference}</TableCell>
-                      <TableCell>
-                        <div className="font-medium">{p.profiles?.full_name || 'Unknown'}</div>
-                        <div className="text-xs text-muted-foreground">{p.profiles?.phone}</div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={FEE_COLORS[feeType] || 'bg-gray-100 text-gray-700'}>
-                          {FEE_LABELS[feeType] || feeType || 'Unknown'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="font-semibold">₦{Number(p.amount).toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge variant={p.status === 'success' ? 'default' : 'destructive'} className={p.status === 'success' ? 'bg-green-600' : ''}>
-                          {p.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{new Date(p.created_at).toLocaleString()}</TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Reference</TableHead>
+                  <TableHead>Student</TableHead>
+                  <TableHead>Fee Type</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead className="hidden sm:table-cell">Date</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.length === 0 ? (
+                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No payments found.</TableCell></TableRow>
+                ) : (
+                  filtered.map(p => {
+                    const feeType = p.metadata?.payment_type || p.fee_type || '';
+                    return (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-mono text-xs">{p.reference}</TableCell>
+                        <TableCell>
+                          <div className="font-medium">{p.profiles?.full_name || 'Unknown'}</div>
+                          <div className="text-xs text-muted-foreground">{p.profiles?.phone}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge className={FEE_COLORS[feeType] || 'bg-gray-100 text-gray-700'}>
+                            {FEE_LABELS[feeType] || feeType || 'Unknown'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="font-semibold">₦{Number(p.amount).toLocaleString()}</TableCell>
+                        <TableCell>
+                          <Badge variant={p.status === 'success' ? 'default' : 'destructive'} className={p.status === 'success' ? 'bg-green-600' : ''}>
+                            {p.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{new Date(p.created_at).toLocaleString()}</TableCell>
+                      </TableRow>
+                    );
+                  })
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

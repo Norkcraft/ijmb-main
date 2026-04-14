@@ -336,16 +336,34 @@ export const useStudentDashboard = () => {
     }
   };
 
-  const handlePaymentSuccess = async () => {
-    if (application?.id) {
-       await supabase.from('applications').update({
-         form_fee_paid: true,
-         status: 'submitted', // Update status to submitted upon payment success
-         updated_at: new Date().toISOString()
-       }).eq('id', application.id);
-       queryClient.invalidateQueries({ queryKey: ['dashboard-user', user?.id] });
+  const handlePaymentSuccess = async (paymentType: string = 'form_fee', amountPaid?: number) => {
+    if (!application?.id) return;
+
+    const updates: Record<string, any> = { updated_at: new Date().toISOString() };
+
+    if (paymentType === 'form_fee') {
+      updates.form_fee_paid = true;
+      updates.status = 'submitted';
+    } else if (paymentType === 'acceptance_fee') {
+      updates.status = 'fees_pending';
+    } else if (paymentType === 'tuition_fee') {
+      updates.tuition_payment_status = 'fully_paid';
+      if (amountPaid) updates.tuition_amount_paid = amountPaid;
+      updates.status = 'active';
+    } else if (paymentType === 'hostel_fee') {
+      updates.hostel_fee_paid = true;
     }
-    toast({ title: "Payment Successful", description: "Your application has been submitted and is now under review." });
+
+    await supabase.from('applications').update(updates).eq('id', application.id);
+    queryClient.invalidateQueries({ queryKey: ['dashboard-user', user?.id] });
+
+    const messages: Record<string, string> = {
+      form_fee: 'Your application has been submitted and is now under review.',
+      acceptance_fee: 'Acceptance confirmed. You can now pay your programme fees.',
+      tuition_fee: 'Tuition fee paid. You are now an active student!',
+      hostel_fee: 'Hostel fee confirmed.',
+    };
+    toast({ title: 'Payment Successful!', description: messages[paymentType] || 'Payment recorded successfully.' });
   };
 
   const fetchData = async () => {
