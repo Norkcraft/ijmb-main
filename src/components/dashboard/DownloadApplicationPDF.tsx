@@ -108,38 +108,39 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       document.head.appendChild(styleEl);
 
       container = document.createElement('div');
-      container.style.cssText = 'position:fixed;left:-9999px;top:0;width:794px;height:1123px;overflow:hidden;background:#fff;z-index:-1;';
+      container.style.cssText = 'position:absolute;left:-9999px;top:0;width:794px;height:1123px;overflow:visible;background:#fff;';
       container.innerHTML = bodyContent;
       document.body.appendChild(container);
 
-      // Wait for images inside the container to load
+      // Wait for all images to load
       const images = Array.from(container.querySelectorAll('img'));
       await Promise.all(
         images.map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; }))
       );
-      // Extra settle time for CSS rendering
-      await new Promise(r => setTimeout(r, 400));
+      // Allow CSS to settle
+      await new Promise(r => setTimeout(r, 600));
 
-      // 6. Capture the .page element with html2canvas
+      // 6. Capture with html2canvas — target first child (the form root div)
       const { default: html2canvas } = await import('html2canvas');
-      const pageEl = (container.querySelector('.page') as HTMLElement) || container;
+      const pageEl = (container.firstElementChild as HTMLElement) || container;
 
       const canvas = await html2canvas(pageEl, {
-        scale: 2,
+        scale: 1.5,
         useCORS: true,
         allowTaint: true,
         width: 794,
         height: 1123,
-        windowWidth: 794,
-        windowHeight: 1123,
+        scrollX: 0,
+        scrollY: 0,
         backgroundColor: '#ffffff',
         logging: false,
+        imageTimeout: 5000,
       });
 
       // 7. Build PDF and trigger download
       const { default: jsPDF } = await import('jspdf');
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const imgData = canvas.toDataURL('image/jpeg', 0.95);
+      const imgData = canvas.toDataURL('image/jpeg', 0.97);
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
       pdf.save(`IJMB-Application-${data.applicationId}.pdf`);
 
