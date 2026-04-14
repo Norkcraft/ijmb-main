@@ -55,14 +55,14 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
         .map(
           (s, i) =>
             `<tr>
-              <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#003d00;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">${i + 1}</td>
+              <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#006400;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">${i + 1}</td>
               <td style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">${esc(s)}</td>
               <td style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;">IJMB Core Subject</td>
             </tr>`
         )
         .join('')
     : `<tr>
-        <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#003d00;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">1</td>
+        <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#006400;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">1</td>
         <td colspan="2" style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;">${esc(data.subjectCombination) || '&mdash;'}</td>
       </tr>`;
 
@@ -74,7 +74,7 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
           .map((r, i) => {
             const bg = i % 2 === 1 ? 'background:#f5f8f5;' : '';
             return `<tr>
-              <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#003d00;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${i + 1}</td>
+              <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#006400;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${i + 1}</td>
               <td style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${esc(r.subject)}</td>
               <td style="width:44px;font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${esc(r.grade)}</td>
               <td style="width:52px;font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${esc(r.examYear)}</td>
@@ -107,10 +107,10 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 
   /* ── Section header helper ────────────────────────────────────── */
   const secHdr = (letter: string, title: string) =>
-    `<div style="background:#003d00;display:flex;align-items:center;gap:6px;padding:3px 8px;margin-bottom:5px;position:relative;">
-      <div style="width:15px;height:15px;border-radius:50%;background:#c9950f;color:#003d00;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;">${letter}</div>
+    `<div style="background:#006400;display:flex;align-items:center;gap:6px;padding:3px 8px;margin-bottom:5px;position:relative;">
+      <div style="width:15px;height:15px;border-radius:50%;background:#ffd700;color:#006400;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;">${letter}</div>
       <span style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">${title}</span>
-      <div style="position:absolute;right:0;top:0;bottom:0;width:3px;background:#c9950f;"></div>
+      <div style="position:absolute;right:0;top:0;bottom:0;width:3px;background:#ffd700;"></div>
     </div>`;
 
   /* ── Field helper ─────────────────────────────────────────────── */
@@ -122,9 +122,9 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 
   /* ── Table header row helper ──────────────────────────────────── */
   const thStyle =
-    'background:#003d00;color:#fff;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 5px;text-align:left;border-right:1px solid rgba(255,255,255,0.15);';
+    'background:#006400;color:#fff;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 5px;text-align:left;border-right:1px solid rgba(255,255,255,0.15);';
   const thStyleLast =
-    'background:#003d00;color:#fff;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 5px;text-align:left;';
+    'background:#006400;color:#fff;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 5px;text-align:left;';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -141,52 +141,52 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#ccc;display:flex;justif
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- OUTER DOCUMENT BORDER — double-line frame                      -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<div style="width:794px;height:1123px;border:4px double #003d00;padding:8px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.28);position:relative;overflow:hidden;">
+<div style="width:794px;height:1123px;border:4px double #006400;padding:8px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.28);position:relative;overflow:hidden;">
 
   <!-- WATERMARK — faint logo centered behind content -->
   <img src="${logoSrc}" alt="" aria-hidden="true"
     style="position:absolute;top:50%;left:50%;width:340px;height:340px;object-fit:contain;opacity:0.06;filter:grayscale(1);transform:translate(-50%,-50%) rotate(-20deg);pointer-events:none;z-index:0;"/>
 
   <!-- INNER BORDER -->
-  <div style="position:relative;z-index:1;width:100%;height:100%;border:1.5px solid #003d00;display:flex;flex-direction:column;overflow:hidden;">
+  <div style="position:relative;z-index:1;width:100%;height:100%;border:1.5px solid #006400;display:flex;flex-direction:column;overflow:hidden;">
 
     <!-- ══════════════════════════════════════════════════════════ -->
     <!-- HEADER BAND                                               -->
     <!-- ══════════════════════════════════════════════════════════ -->
-    <div style="background:#003d00;flex-shrink:0;">
+    <div style="background:#006400;flex-shrink:0;">
 
       <!-- Gold top accent stripe -->
-      <div style="height:3px;background:linear-gradient(90deg,#6b500e,#c9950f,#f0c040,#c9950f,#6b500e);"></div>
+      <div style="height:3px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);"></div>
 
       <!-- Header content row -->
       <div style="display:flex;align-items:center;gap:10px;padding:8px 14px 10px;min-height:90px;">
 
         <!-- Logo circle -->
-        <div style="flex-shrink:0;width:60px;height:60px;border-radius:50%;background:#fff;border:2px solid #c9950f;padding:2px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <div style="flex-shrink:0;width:60px;height:60px;border-radius:50%;background:#fff;border:2px solid #ffd700;padding:2px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
           <img src="${logoSrc}" alt="IJMB" style="width:54px;height:54px;border-radius:50%;object-fit:cover;display:block;"/>
         </div>
 
         <!-- Centre text block -->
         <div style="flex:1;text-align:center;">
-          <div style="font-size:7px;letter-spacing:2px;color:#7ec47e;text-transform:uppercase;font-weight:600;">Federal Republic of Nigeria</div>
+          <div style="font-size:7px;letter-spacing:2px;color:#8fd68f;text-transform:uppercase;font-weight:600;">Federal Republic of Nigeria</div>
           <div style="font-family:Georgia,'Times New Roman',serif;font-size:14px;font-weight:700;color:#fff;margin:3px 0 2px;line-height:1.2;">Interim Joint Matriculation Board (IJMB)</div>
-          <div style="font-size:8px;color:#aad4aa;letter-spacing:0.5px;">P.M.B. 1026, Ahmadu Bello University, Zaria &mdash; ijmb.info</div>
-          <div style="display:inline-block;margin-top:5px;font-size:11px;font-weight:700;color:#f0c040;letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(201,149,15,0.5);border-bottom:1px solid rgba(201,149,15,0.5);padding:2px 10px;">
+          <div style="font-size:8px;color:#b8e0b8;letter-spacing:0.5px;">P.M.B. 1026, Ahmadu Bello University, Zaria — ijmb.info</div>
+          <div style="display:inline-block;margin-top:5px;font-size:11px;font-weight:700;color:#ffe55c;letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(255,221,0,0.5);border-bottom:1px solid rgba(255,221,0,0.5);padding:2px 10px;">
             STUDENT REGISTRATION SLIP
           </div>
-          <div style="margin-top:3px;font-size:7px;color:#c9950f;letter-spacing:1.5px;text-transform:uppercase;">Academic Session: ${esc(data.academicSession)}</div>
+          <div style="margin-top:3px;font-size:7px;color:#ffd700;letter-spacing:1.5px;text-transform:uppercase;">Academic Session: ${esc(data.academicSession)}</div>
         </div>
 
         <!-- Registration number badge -->
-        <div style="flex-shrink:0;background:rgba(255,255,255,0.07);border:1.5px solid #c9950f;border-radius:4px;padding:6px 10px;text-align:center;min-width:95px;">
-          <span style="display:block;font-size:6px;letter-spacing:1.2px;text-transform:uppercase;color:#7ec47e;font-weight:700;">Reg. Number</span>
-          <span style="display:block;font-family:'Courier New',monospace;font-size:11px;font-weight:700;color:#f0c040;letter-spacing:1.5px;margin-top:3px;">${esc(data.applicationId)}</span>
+        <div style="flex-shrink:0;background:rgba(255,255,255,0.07);border:1.5px solid #ffd700;border-radius:4px;padding:6px 10px;text-align:center;min-width:95px;">
+          <span style="display:block;font-size:6px;letter-spacing:1.2px;text-transform:uppercase;color:#8fd68f;font-weight:700;">Reg. Number</span>
+          <span style="display:block;font-family:'Courier New',monospace;font-size:11px;font-weight:700;color:#ffe55c;letter-spacing:1.5px;margin-top:3px;">${esc(data.applicationId)}</span>
         </div>
 
       </div><!-- /header content row -->
 
       <!-- Gold bottom accent stripe -->
-      <div style="height:3px;background:linear-gradient(90deg,#6b500e,#c9950f,#f0c040,#c9950f,#6b500e);"></div>
+      <div style="height:3px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);"></div>
     </div><!-- /header band -->
 
     <!-- ══════════════════════════════════════════════════════════ -->
@@ -291,27 +291,38 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#ccc;display:flex;justif
       <!-- ────────────────────────────────────────────────────── -->
       <!-- SIDEBAR                                                -->
       <!-- ────────────────────────────────────────────────────── -->
-      <div style="width:120px;flex-shrink:0;padding:6px;display:flex;flex-direction:column;gap:6px;align-items:center;background:#fafaf7;overflow:hidden;">
+      <div style="width:120px;flex-shrink:0;padding:6px;display:flex;flex-direction:column;gap:6px;align-items:center;background:#fafaf7;overflow:hidden;border-left:1px solid #d8d8d0;position:relative;">
 
-        <!-- Passport photo -->
-        <div style="width:100px;height:120px;border:1.5px solid #bbb;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#f0f0eb;">
+        <!-- Vertical CANDIDATE COPY badge -->
+        <div style="position:absolute;top:10px;right:-24px;width:60px;background:#006400;color:#ffd700;font-size:7px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);padding:8px 4px;text-align:center;transform-origin:center;line-height:1.4;border-top:1px solid #ffd700;border-bottom:1px solid #ffd700;">Candidate Copy</div>
+
+        <!-- Passport photo with corner brackets -->
+        <div style="width:100px;height:120px;border:1.5px solid #bbb;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#f0f0eb;position:relative;">
           ${passportHtml}
+          <!-- Top-left corner bracket -->
+          <div style="position:absolute;top:3px;left:3px;width:10px;height:10px;border-top:2px solid #006400;border-left:2px solid #006400;"></div>
+          <!-- Top-right corner bracket -->
+          <div style="position:absolute;top:3px;right:3px;width:10px;height:10px;border-top:2px solid #006400;border-right:2px solid #006400;"></div>
+          <!-- Bottom-left corner bracket -->
+          <div style="position:absolute;bottom:3px;left:3px;width:10px;height:10px;border-bottom:2px solid #006400;border-left:2px solid #006400;"></div>
+          <!-- Bottom-right corner bracket -->
+          <div style="position:absolute;bottom:3px;right:3px;width:10px;height:10px;border-bottom:2px solid #006400;border-right:2px solid #006400;"></div>
         </div>
         <!-- Photo label -->
-        <div style="width:100px;background:#003d00;color:#fff;font-size:6px;font-weight:700;text-align:center;padding:3px;letter-spacing:0.7px;text-transform:uppercase;border-top:2px solid #c9950f;flex-shrink:0;">
+        <div style="width:100px;background:#006400;color:#fff;font-size:6px;font-weight:700;text-align:center;padding:3px;letter-spacing:0.7px;text-transform:uppercase;border-top:2px solid #ffd700;flex-shrink:0;">
           Passport Photo
         </div>
 
         <!-- Registration number box -->
-        <div style="width:100%;background:#003d00;border-radius:3px;padding:5px 6px;text-align:center;flex-shrink:0;overflow:hidden;">
-          <div style="font-size:6px;text-transform:uppercase;letter-spacing:1px;color:#7ec47e;font-weight:700;">Registration No.</div>
-          <div style="font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#f0c040;letter-spacing:1px;display:block;margin-top:2px;word-break:break-all;">${esc(data.applicationId)}</div>
+        <div style="width:100%;background:#006400;border-radius:3px;padding:5px 6px;text-align:center;flex-shrink:0;overflow:hidden;">
+          <div style="font-size:6px;text-transform:uppercase;letter-spacing:1px;color:#8fd68f;font-weight:700;">Registration No.</div>
+          <div style="font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#ffe55c;letter-spacing:1px;display:block;margin-top:2px;word-break:break-all;">${esc(data.applicationId)}</div>
           <!-- Gold accent line at bottom -->
-          <div style="height:2px;background:linear-gradient(90deg,#6b500e,#c9950f,#f0c040,#c9950f,#6b500e);margin-top:4px;border-radius:1px;"></div>
+          <div style="height:2px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);margin-top:4px;border-radius:1px;"></div>
         </div>
 
         <!-- QR code box -->
-        <div style="width:100%;background:#fff;border:1px solid #ddd;border-top:2px solid #c9950f;padding:4px 5px;text-align:center;flex-shrink:0;">
+        <div style="width:100%;background:#fff;border:1px solid #ddd;border-top:2px solid #ffd700;padding:4px 5px;text-align:center;flex-shrink:0;">
           <div style="font-size:6px;text-transform:uppercase;letter-spacing:0.8px;color:#aaa;font-weight:700;margin-bottom:3px;">Scan to Verify</div>
           <div style="display:flex;justify-content:center;">
             ${qrHtml}
@@ -319,8 +330,8 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#ccc;display:flex;justif
         </div>
 
         <!-- Instructions box -->
-        <div style="width:100%;border:1px solid #ddd;border-left:2.5px solid #003d00;background:#fff;padding:5px 6px;flex-shrink:0;">
-          <span style="font-size:6px;font-weight:700;color:#003d00;text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #e0e0d4;">Instructions</span>
+        <div style="width:100%;border:1px solid #ddd;border-left:2.5px solid #006400;background:#fff;padding:5px 6px;flex-shrink:0;">
+          <span style="font-size:6px;font-weight:700;color:#006400;text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #e0e0d4;">Instructions</span>
           <ul style="font-size:6px;color:#555;line-height:1.9;padding-left:9px;">
             <li>Keep this slip safe</li>
             <li>Bring on exam day</li>
@@ -339,12 +350,12 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#ccc;display:flex;justif
     <!-- ══════════════════════════════════════════════════════════ -->
     <!-- FOOTER                                                    -->
     <!-- ══════════════════════════════════════════════════════════ -->
-    <div style="background:#1a3300;flex-shrink:0;">
-      <div style="height:2px;background:linear-gradient(90deg,#6b500e,#c9950f,#f0c040,#c9950f,#6b500e);"></div>
+    <div style="background:#003300;flex-shrink:0;">
+      <div style="height:2px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);"></div>
       <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 14px;">
-        <span style="font-size:6px;color:#5e9e5e;letter-spacing:0.3px;">This document is an official IJMB registration slip. Any alterations render it void.</span>
-        <div style="background:#c9950f;color:#1a3300;font-size:6px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 10px;border-radius:20px;white-space:nowrap;">Candidate Copy</div>
-        <span style="font-size:6px;color:#5e9e5e;white-space:nowrap;">Printed: ${printDate}</span>
+        <span style="font-size:6px;color:#6fa86f;letter-spacing:0.3px;">This document is an official IJMB registration slip. Any alterations render it void.</span>
+        <div style="background:#ffd700;color:#003300;font-size:6px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 10px;border-radius:20px;white-space:nowrap;">Candidate Copy</div>
+        <span style="font-size:6px;color:#6fa86f;white-space:nowrap;">Printed: ${printDate}</span>
       </div>
     </div><!-- /footer -->
 
