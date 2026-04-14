@@ -25,7 +25,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const cityPages = cities.map((city) => ({
-    url: `${BASE_URL}/ijmb-in-${city}`,
+    url: `${BASE_URL}/ijmb-city/${city}`,
     priority: 0.75,
     changeFrequency: 'monthly' as const,
   }));
