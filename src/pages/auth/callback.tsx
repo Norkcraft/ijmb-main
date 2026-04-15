@@ -12,16 +12,16 @@ export default function AuthCallback() {
     // from the URL hash/query. We just listen for the session to be ready.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session) {
-        router.replace('/dashboard');
+        router.replace('/login');
       } else if (event === 'USER_UPDATED' && session) {
-        router.replace('/dashboard');
+        router.replace('/login');
       }
     });
 
     // Fallback: if session already exists by the time this mounts, redirect immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        router.replace('/dashboard');
+        router.replace('/login');
       }
     });
 
