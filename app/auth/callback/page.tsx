@@ -12,20 +12,20 @@ export default function AuthCallback() {
     const code = url.searchParams.get('code');
 
     // Safety net: redirect to dashboard after 10 seconds no matter what
-    const fallback = setTimeout(() => router.replace('/dashboard'), 10000);
+    const fallback = setTimeout(() => router.replace('/login'), 10000);
 
     if (code) {
       // PKCE flow: code is a query param
       supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
         clearTimeout(fallback);
-        router.replace(error ? '/login?error=verification_failed' : '/dashboard');
+        router.replace(error ? '/login?error=verification_failed' : '/login');
       });
     } else {
       // Implicit flow: check if session already exists first
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) {
           clearTimeout(fallback);
-          router.replace('/dashboard');
+          router.replace('/login');
           return;
         }
 
@@ -34,7 +34,7 @@ export default function AuthCallback() {
           if (event === 'SIGNED_IN' && session) {
             clearTimeout(fallback);
             subscription.unsubscribe();
-            router.replace('/dashboard');
+            router.replace('/login');
           }
         });
       });
