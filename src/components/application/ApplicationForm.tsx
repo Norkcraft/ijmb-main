@@ -68,6 +68,7 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
   const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
+  const [nextLoading, setNextLoading] = useState(false);
   
   // Extended State
   const [olevels, setOlevels] = useState<OLevelResult[]>(initialOlevels || []);
@@ -225,83 +226,88 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
   };
 
   const nextStep = async () => {
-    // Validate current step fields before moving
-    let fieldsToValidate: any[] = [];
-    if (step === 1) {
-      fieldsToValidate = ['surname', 'first_name', 'middle_name', 'gender', 'date_of_birth', 'state_of_origin', 'lga', 'residential_address', 'guardian_phone'];
-      const basicValid = await form.trigger(fieldsToValidate);
-      
-      // Basic age validation logic (must be at least 14 years old)
-      const dob = form.getValues('date_of_birth');
-      if (dob) {
-        const birthDate = new Date(dob);
-        const today = new Date();
-        let age = today.getFullYear() - birthDate.getFullYear();
-        const m = today.getMonth() - birthDate.getMonth();
-        if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    setNextLoading(true);
+    try {
+      // Validate current step fields before moving
+      let fieldsToValidate: any[] = [];
+      if (step === 1) {
+        fieldsToValidate = ['surname', 'first_name', 'middle_name', 'gender', 'date_of_birth', 'state_of_origin', 'lga', 'residential_address', 'guardian_phone'];
+        const basicValid = await form.trigger(fieldsToValidate);
+
+        // Basic age validation logic (must be at least 14 years old)
+        const dob = form.getValues('date_of_birth');
+        if (dob) {
+          const birthDate = new Date(dob);
+          const today = new Date();
+          let age = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
             age--;
+          }
+          if (age < 14) {
+            form.setError('date_of_birth', { type: 'manual', message: 'You must be at least 14 years old' });
+            return;
+          }
         }
-        if (age < 14) {
-          form.setError('date_of_birth', { type: 'manual', message: 'You must be at least 14 years old' });
-          return;
-        }
-      }
 
-      if (!basicValid) return;
-      await handleAutoSave();
-      setStep(step + 1);
-      return;
-    }
-    
-    if (step === 2) {
-      fieldsToValidate = ['olevel_awaiting'];
-      const basicValid = await form.trigger(fieldsToValidate);
-      if (!basicValid) return;
-
-      const isAwaiting = form.getValues('olevel_awaiting');
-      if (!isAwaiting) {
-        let hasError = false;
-        if (!form.getValues('olevel_exam_type')) {
-          form.setError('olevel_exam_type', { type: 'manual', message: 'Exam type is required' });
-          hasError = true;
-        }
-        if (!form.getValues('olevel_exam_year')) {
-          form.setError('olevel_exam_year', { type: 'manual', message: 'Exam year is required' });
-          hasError = true;
-        }
-        if (!form.getValues('olevel_exam_number')) {
-          form.setError('olevel_exam_number', { type: 'manual', message: 'Exam number is required' });
-          hasError = true;
-        }
-        
-        if (hasError) return;
-        
-        // Custom Validation for O-Levels
-        if (olevels.length < 5) {
-          toast({ title: "Insufficient Subjects", description: "You must add at least 5 subjects.", variant: "destructive" });
-          return;
-        }
-        const hasMath = olevels.some(o => o.subject.toLowerCase().includes('mathematics'));
-        const hasEng = olevels.some(o => o.subject.toLowerCase().includes('english'));
-        
-        if (!hasMath || !hasEng) {
-          toast({ title: "Required Subjects Missing", description: "Mathematics and English Language are required.", variant: "destructive" });
-          return;
-        }
-      }
-      await handleAutoSave();
-      setStep(step + 1);
-      return;
-    }
-    
-    if (step === 3) {
-      fieldsToValidate = ['intended_course', 'session_id', 'preferred_centre_id', 'subject_combination_id'];
-      const isValid = await form.trigger(fieldsToValidate);
-      if (isValid) {
+        if (!basicValid) return;
         await handleAutoSave();
         setStep(step + 1);
+        return;
       }
-      return;
+
+      if (step === 2) {
+        fieldsToValidate = ['olevel_awaiting'];
+        const basicValid = await form.trigger(fieldsToValidate);
+        if (!basicValid) return;
+
+        const isAwaiting = form.getValues('olevel_awaiting');
+        if (!isAwaiting) {
+          let hasError = false;
+          if (!form.getValues('olevel_exam_type')) {
+            form.setError('olevel_exam_type', { type: 'manual', message: 'Exam type is required' });
+            hasError = true;
+          }
+          if (!form.getValues('olevel_exam_year')) {
+            form.setError('olevel_exam_year', { type: 'manual', message: 'Exam year is required' });
+            hasError = true;
+          }
+          if (!form.getValues('olevel_exam_number')) {
+            form.setError('olevel_exam_number', { type: 'manual', message: 'Exam number is required' });
+            hasError = true;
+          }
+
+          if (hasError) return;
+
+          // Custom Validation for O-Levels
+          if (olevels.length < 5) {
+            toast({ title: "Insufficient Subjects", description: "You must add at least 5 subjects.", variant: "destructive" });
+            return;
+          }
+          const hasMath = olevels.some(o => o.subject.toLowerCase().includes('mathematics'));
+          const hasEng = olevels.some(o => o.subject.toLowerCase().includes('english'));
+
+          if (!hasMath || !hasEng) {
+            toast({ title: "Required Subjects Missing", description: "Mathematics and English Language are required.", variant: "destructive" });
+            return;
+          }
+        }
+        await handleAutoSave();
+        setStep(step + 1);
+        return;
+      }
+
+      if (step === 3) {
+        fieldsToValidate = ['intended_course', 'session_id', 'preferred_centre_id', 'subject_combination_id'];
+        const isValid = await form.trigger(fieldsToValidate);
+        if (isValid) {
+          await handleAutoSave();
+          setStep(step + 1);
+        }
+        return;
+      }
+    } finally {
+      setNextLoading(false);
     }
   };
 
@@ -769,7 +775,7 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
             {/* Navigation Buttons */}
             <div className="flex justify-between mt-6">
               {step > 1 ? (
-                <Button type="button" variant="outline" onClick={prevStep} disabled={saving}>
+                <Button type="button" variant="outline" onClick={prevStep} disabled={saving || nextLoading}>
                   <ArrowLeft className="mr-2" size={16} /> Previous
                 </Button>
               ) : (
@@ -778,13 +784,14 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
 
               <div className="flex gap-2">
                 {!readOnly && step < 4 && (
-                  <Button type="button" variant="ghost" onClick={handleAutoSave} disabled={saving}>
+                  <Button type="button" variant="ghost" onClick={handleAutoSave} disabled={saving || nextLoading}>
                     {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} className="mr-2" />} Save Draft
                   </Button>
                 )}
                 
                 {step < 4 ? (
-                  <Button type="button" onClick={nextStep}>
+                  <Button type="button" onClick={nextStep} disabled={nextLoading}>
+                    {nextLoading ? <Loader2 className="animate-spin mr-2" size={16} /> : null}
                     Next <ArrowRight className="ml-2" size={16} />
                   </Button>
                 ) : (
