@@ -104,12 +104,14 @@ export async function POST(request: NextRequest) {
 
     const result = await sendEmail({ to: data.email, subject: email.subject, html: email.html });
     if (!result.success) {
-      return NextResponse.json({ message: 'Failed to send email' }, { status: 500 });
+      const errMsg = typeof result.error === 'object'
+        ? JSON.stringify(result.error)
+        : String(result.error ?? 'Unknown Resend error');
+      return NextResponse.json({ message: errMsg }, { status: 500 });
     }
 
     return NextResponse.json({ message: 'Email sent' });
-  } catch (err) {
-    console.error('[send-email route] Error:', err);
-    return NextResponse.json({ message: 'Internal server error' }, { status: 500 });
+  } catch (err: any) {
+    return NextResponse.json({ message: err?.message || String(err) }, { status: 500 });
   }
 }
