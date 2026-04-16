@@ -41,7 +41,11 @@
       "Bash(find 'C:\\\\Users\\\\not found\\\\OneDrive\\\\Desktop\\\\ijmb-main/app' -type f \\\\\\(-name *.ts -o -name *.tsx \\\\\\))",
       "Bash(find 'C:\\\\Users\\\\not found\\\\OneDrive\\\\Desktop\\\\ijmb-main' -type f -name *.ts -o -name *.tsx)",
       "Bash(grep -n \"subject_combo\\\\|subject_combination\\\\|subject1\\\\|subject2\\\\|subject3\" app/portal-admin/applications/[id]/print/page.tsx)",
-      "Bash(cat app/ijmb-city/[city]/page.tsx)"
+      "Bash(cat app/ijmb-city/[city]/page.tsx)",
+      "Bash(grep -iv \"//.*callback\\\\|import\\\\|className\\\\|verifyUrl\\\\|qr\\\\|application\")",
+      "Bash(find . -path ./node_modules -prune -o -path ./.next -prune -o -name paystack* -print)",
+      "WebFetch(domain:www.ijmb.info)",
+      "Bash(xargs ls:*)"
     ]
   }
 }
