@@ -32,13 +32,23 @@ function DocBadge({ status }: { status: string }) {
   return <Badge variant="outline" className="text-amber-600 border-amber-400">Pending Review</Badge>;
 }
 
-function sendEmail(type: string, data: Record<string, string>) {
+async function sendEmail(type: string, data: Record<string, string>) {
   // Fire-and-forget — never block UI on email delivery
-  fetch('/api/send-email', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '' },
-    body: JSON.stringify({ type, data }),
-  }).catch(() => {});
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const token = session?.access_token;
+    if (!token) return;
+    fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ type, data }),
+    }).catch(() => {});
+  } catch {
+    // silent
+  }
 }
 
 // ── component ──────────────────────────────────────────────────────────────

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/resendClient';
 import {
   welcomeEmail,
@@ -41,20 +40,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Too many requests' }, { status: 429 });
   }
 
-  // Auth — must be a logged-in user to trigger emails
-  const cookieStore = cookies();
-  const supabase = createServerClient(
+  // Auth — Bearer token from client session
+  const token = request.headers.get('authorization')?.replace('Bearer ', '');
+  if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll() {},
-      },
-    }
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser(token);
   if (!user) {
     return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
