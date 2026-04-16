@@ -33,16 +33,12 @@ const AdminLogin = () => {
       }
 
       if (data?.user) {
-        console.log('User ID:', data.user.id);
-
         // Check if user is actually an admin
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('role')
           .eq('id', data.user.id)
           .single();
-
-        console.log('Profile Role Check:', profile, profileError);
 
         const adminRoles = ['super_admin', 'coordinator'];
         if (!profile || !adminRoles.includes(profile.role)) {

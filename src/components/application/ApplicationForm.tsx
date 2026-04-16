@@ -220,8 +220,8 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
       // Update form state with latest values so react-hook-form knows they are "saved"
       // This prevents defaultValues from overwriting current values on re-render if we were to reset
       form.reset(values);
-    } catch (error) {
-      console.error("Auto-save failed", error);
+    } catch {
+      // Auto-save failures are silent — user can still proceed
     }
   };
 

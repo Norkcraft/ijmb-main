@@ -35,7 +35,6 @@ export async function sendEmail({
       return { success: false, error };
     }
 
-    console.log('[Resend] Email sent:', data?.id, '→', to);
     return { success: true, id: data?.id };
   } catch (err) {
     console.error('[Resend] Unexpected error:', err);
