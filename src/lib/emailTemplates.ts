@@ -232,7 +232,37 @@ export function admissionOfferEmail(
   };
 }
 
-// ─── 5. PASSWORD RESET (CUSTOM) ────────────────────────────────────────────
+// ─── 5. ADMISSION LETTER AVAILABLE ────────────────────────────────────────
+export function admissionLetterEmail(fullName: string, applicationId: string) {
+  const body = `
+    ${header('Your Admission Letter is Ready')}
+    <div style="padding:36px 32px">
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-size:48px;margin-bottom:8px">📄</div>
+        <h1 style="color:#1a3c6e;margin:0;font-size:24px">Your Admission Letter is Ready</h1>
+        <p style="color:#475569;margin:8px 0 0">Hi <strong>${esc(fullName)}</strong>, your admission letter has been uploaded and is now available for download.</p>
+      </div>
+      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
+        <tbody>
+          ${infoRow('Application ID', esc(applicationId))}
+          ${infoRow('Status', '<span style="color:#16a34a;font-weight:bold">✓ Letter Available</span>')}
+        </tbody>
+      </table>
+      <div style="background:#fffbeb;border-left:4px solid #f59e0b;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px">
+        <p style="margin:0;font-size:14px;color:#92400e;font-weight:bold">Next step: Log in to your dashboard and download your admission letter.</p>
+        <p style="margin:6px 0 0;font-size:13px;color:#92400e">Bring a printed copy when you report to your assigned centre on resumption day.</p>
+      </div>
+      ${ctaButton('Download My Admission Letter', `${SITE}/student-dashboard`)}
+    </div>
+    ${footer()}
+  `;
+  return {
+    html: wrapper(body),
+    subject: `Your IJMB Admission Letter is Ready — ${esc(applicationId)}`
+  };
+}
+
+// ─── 6. PASSWORD RESET (CUSTOM) ────────────────────────────────────────────
 export function passwordResetEmail(resetLink: string) {
   const body = `
     ${header('Reset Your Password')}

@@ -7,6 +7,7 @@ import {
   applicationSubmittedEmail,
   accountUpdateEmail,
   admissionOfferEmail,
+  admissionLetterEmail,
 } from '@/lib/emailTemplates';
 
 // Simple in-memory rate limiter (per-IP, resets on server restart)
@@ -65,17 +66,20 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Missing type or data' }, { status: 400 });
   }
 
-  // Admission offer emails are admin-only
-  if (type === 'admission_offer') {
-    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
-    if (!profile || !['super_admin', 'coordinator', 'admin'].includes(profile.role)) {
+  // Check if caller is an admin (needed for several permission checks below)
+  const { data: callerProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  const isAdmin = callerProfile && ['super_admin', 'coordinator', 'admin'].includes(callerProfile.role);
+
+  // Admission offer and admission_letter emails are admin-only
+  if (['admission_offer', 'admission_letter'].includes(type)) {
+    if (!isAdmin) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
   }
 
-  // For welcome/account_update, only allow sending to own email
+  // For welcome/account_update, allow admins to send to any email; non-admins can only send to own email
   if (['welcome', 'account_update'].includes(type)) {
-    if (data.email !== user.email) {
+    if (!isAdmin && data.email !== user.email) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
   }
@@ -95,6 +99,9 @@ export async function POST(request: NextRequest) {
         break;
       case 'admission_offer':
         email = admissionOfferEmail(data.fullName, data.applicationId, data.centre, data.resumptionDate, data.subjects);
+        break;
+      case 'admission_letter':
+        email = admissionLetterEmail(data.fullName, data.applicationId);
         break;
       default:
         return NextResponse.json({ message: `Unknown email type: ${type}` }, { status: 400 });

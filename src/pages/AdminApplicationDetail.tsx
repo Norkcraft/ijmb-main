@@ -261,6 +261,20 @@ const AdminApplicationDetail = () => {
       setApp((prev: any) => ({ ...prev, admission_letter_path: json.path }));
       setLetterFile(null);
       toast({ title: 'Admission letter uploaded', description: 'Student can now download it from their dashboard.' });
+
+      // Notify student by email
+      const studentEmail = app.profiles?.email;
+      const studentName = app.first_name
+        ? `${app.first_name} ${app.surname}`
+        : (app.profiles?.full_name || 'Student');
+      const appId = app.application_number || app.id.split('-')[0].toUpperCase();
+      if (studentEmail) {
+        sendEmail('admission_letter', {
+          email: studentEmail,
+          fullName: studentName,
+          applicationId: appId,
+        });
+      }
     } catch (err: any) {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
     } finally {
