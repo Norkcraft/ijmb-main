@@ -32,22 +32,28 @@ function DocBadge({ status }: { status: string }) {
   return <Badge variant="outline" className="text-amber-600 border-amber-400">Pending Review</Badge>;
 }
 
-async function sendEmail(type: string, data: Record<string, string>) {
-  // Fire-and-forget — never block UI on email delivery
+async function sendEmail(type: string, data: Record<string, string>, toast?: (opts: any) => void) {
   try {
     const { data: { session } } = await supabase.auth.getSession();
     const token = session?.access_token;
-    if (!token) return;
-    fetch('/api/send-email', {
+    if (!token) {
+      toast?.({ title: 'Email skipped', description: 'No session token found.', variant: 'destructive' });
+      return;
+    }
+    const res = await fetch('/api/send-email', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({ type, data }),
-    }).catch(() => {});
-  } catch {
-    // silent
+    });
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      toast?.({ title: `Email failed (${res.status})`, description: json.message || 'Unknown error', variant: 'destructive' });
+    }
+  } catch (err: any) {
+    toast?.({ title: 'Email error', description: err?.message || 'Unknown error', variant: 'destructive' });
   }
 }
 
@@ -154,7 +160,7 @@ const AdminApplicationDetail = () => {
           centre: centreName,
           resumptionDate: 'As communicated by your centre',
           subjects: app.subject_combo?.name || 'As selected',
-        });
+        }, toast);
       }
 
       if (studentEmail && isRejecting) {
@@ -162,7 +168,7 @@ const AdminApplicationDetail = () => {
           email: studentEmail,
           fullName: studentName,
           changeDescription: `Your IJMB application (ID: ${appId}) has been reviewed and was not successful at this time. Please contact support for further guidance.`,
-        });
+        }, toast);
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
@@ -198,7 +204,7 @@ const AdminApplicationDetail = () => {
           email: app.profiles.email,
           fullName: app.first_name ? `${app.first_name} ${app.surname}` : (app.profiles.full_name || 'Student'),
           changeDescription: `Your passport photograph was rejected. Reason: ${finalMsg}. Please log in and re-upload a new photo.`,
-        });
+        }, toast);
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
@@ -234,7 +240,7 @@ const AdminApplicationDetail = () => {
           email: app.profiles.email,
           fullName: app.first_name ? `${app.first_name} ${app.surname}` : (app.profiles.full_name || 'Student'),
           changeDescription: `Your O-Level result was rejected. Reason: ${finalMsg}. Please log in and re-upload a clear copy of your result.`,
-        });
+        }, toast);
       }
     } catch (err: any) {
       toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
@@ -283,7 +289,7 @@ const AdminApplicationDetail = () => {
           email: studentEmail,
           fullName: studentName,
           applicationId: appId,
-        });
+        }, toast);
       }
     } catch (err: any) {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
