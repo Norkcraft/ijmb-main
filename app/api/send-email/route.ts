@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { supabaseServer } from '@/lib/supabaseServer';
 import { sendEmail } from '@/lib/resendClient';
 import {
   welcomeEmail,
@@ -61,8 +62,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Missing type or data' }, { status: 400 });
   }
 
-  // Check if caller is an admin (needed for several permission checks below)
-  const { data: callerProfile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  // Check if caller is an admin — use service role client to bypass RLS
+  const { data: callerProfile } = await supabaseServer.from('profiles').select('role').eq('id', user.id).single();
   const isAdmin = callerProfile && ['super_admin', 'coordinator', 'admin'].includes(callerProfile.role);
 
   // Admission offer and admission_letter emails are admin-only
