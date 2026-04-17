@@ -11,30 +11,48 @@ export default function AuthCallback() {
     const url = new URL(window.location.href);
     const code = url.searchParams.get('code');
 
-    // Safety net: redirect to dashboard after 10 seconds no matter what
     const fallback = setTimeout(() => router.replace('/login'), 10000);
 
+    const handleSession = async (userId: string) => {
+      // Check if this user already has a profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('id, role')
+        .eq('id', userId)
+        .maybeSingle();
+
+      clearTimeout(fallback);
+
+      if (!profile) {
+        // New user — needs to complete their profile
+        router.replace('/complete-profile');
+      } else if (profile.role === 'super_admin' || profile.role === 'coordinator') {
+        router.replace('/portal-admin');
+      } else {
+        router.replace('/dashboard');
+      }
+    };
+
     if (code) {
-      // PKCE flow: code is a query param
-      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-        clearTimeout(fallback);
-        router.replace(error ? '/login?error=verification_failed' : '/login');
+      supabase.auth.exchangeCodeForSession(code).then(async ({ data, error }) => {
+        if (error || !data.user) {
+          clearTimeout(fallback);
+          router.replace('/login?error=verification_failed');
+          return;
+        }
+        await handleSession(data.user.id);
       });
     } else {
-      // Implicit flow: check if session already exists first
-      supabase.auth.getSession().then(({ data: { session } }) => {
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
         if (session) {
-          clearTimeout(fallback);
-          router.replace('/login');
+          await handleSession(session.user.id);
           return;
         }
 
-        // Listen for auth state change
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           if (event === 'SIGNED_IN' && session) {
-            clearTimeout(fallback);
             subscription.unsubscribe();
-            router.replace('/login');
+            await handleSession(session.user.id);
           }
         });
       });
@@ -47,7 +65,7 @@ export default function AuthCallback() {
     <div className="min-h-screen flex items-center justify-center text-muted-foreground">
       <div className="flex items-center gap-3">
         <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-        Verifying your email…
+        Signing you in…
       </div>
     </div>
   );
