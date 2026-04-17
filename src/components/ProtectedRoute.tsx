@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -14,11 +14,16 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       router.push('/login');
       return;
     }
-    if (!user.email_confirmed_at && !user.app_metadata?.provider?.includes('google')) {
-      // If email not confirmed (and not a social login which usually auto-confirms), redirect
+    const provider = user.app_metadata?.provider;
+    const emailVerified = !!user.email_confirmed_at || provider === 'google' || provider === 'phone';
+    if (!emailVerified) {
       router.push('/verify-email');
+      return;
     }
-  }, [user, loading, router]);
+    if (!profile) {
+      router.push('/complete-profile');
+    }
+  }, [user, profile, loading, router]);
 
   if (loading) {
     return (
@@ -30,9 +35,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
   if (!user) return null;
 
-  if (!user.email_confirmed_at && !user.app_metadata?.provider?.includes('google')) {
-    return null;
-  }
+  const provider = user.app_metadata?.provider;
+  const emailVerified = !!user.email_confirmed_at || provider === 'google' || provider === 'phone';
+
+  if (!emailVerified) return null;
+  if (!profile) return null;
 
   return <>{children}</>;
 };

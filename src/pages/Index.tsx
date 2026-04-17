@@ -14,7 +14,8 @@ import graduateMale from "@/assets/graduate-male.jpeg";
 import studentLibrary from "@/assets/student-library.jpeg";
 import studentsLaptop from "@/assets/students-laptop.jpeg";
 import { useScrollReveal, useCountUp } from "@/hooks/useScrollReveal";
-import { GraduationCap, CheckCircle, BookOpen, Users, ArrowRight, MapPin, Star, ChevronLeft, ChevronRight } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { GraduationCap, CheckCircle, BookOpen, Users, ArrowRight, MapPin, Star, ChevronLeft, ChevronRight, LayoutDashboard } from "lucide-react";
 
 const yr = new Date().getFullYear();
 const YEAR = `${yr}/${yr + 1}`;
@@ -71,6 +72,10 @@ const StatItem = ({ value, suffix, label }: { value: number; suffix: string; lab
 };
 
 const Index = () => {
+  const { user, profile } = useAuth();
+  const isStudent = user && profile?.role !== 'super_admin' && profile?.role !== 'coordinator';
+  const displayName = profile?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || 'there';
+
   const heroRef = useRef<HTMLDivElement>(null);
   const benefitsRef = useScrollReveal<HTMLDivElement>({ children: true, stagger: 0.12 });
   const stepsRef = useScrollReveal<HTMLDivElement>({ children: true, stagger: 0.15 });
@@ -180,6 +185,25 @@ const Index = () => {
         schema={schema}
       />
 
+      {/* Logged-in student banner */}
+      {isStudent && (
+        <div className="bg-primary text-primary-foreground px-4 py-3">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div className="flex items-center gap-2 text-sm font-medium">
+              <span className="text-lg">🎓</span>
+              <span>Welcome back, <strong>{displayName}</strong>! You're logged in as a student.</span>
+            </div>
+            <Link
+              href="/dashboard"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent text-accent-foreground text-sm font-bold hover:opacity-90 transition-opacity shrink-0"
+            >
+              <LayoutDashboard size={15} />
+              Go to My Dashboard
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Hero */}
       <section className="relative min-h-[85vh] flex items-center">
         <div className="absolute inset-0">
@@ -200,12 +224,21 @@ const Index = () => {
               Skip UTME, enter 200 level, and join 50,000+ students who have already gained admission through IJMB.
             </p>
             <div className="hero-btns flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/register"
-                className="px-8 py-4 font-bold text-base rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2"
-              >
-                Register Now <ArrowRight size={18} />
-              </Link>
+              {isStudent ? (
+                <Link
+                  href="/dashboard"
+                  className="px-8 py-4 font-bold text-base rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2"
+                >
+                  <LayoutDashboard size={18} /> Go to My Dashboard
+                </Link>
+              ) : (
+                <Link
+                  href="/register"
+                  className="px-8 py-4 font-bold text-base rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity inline-flex items-center justify-center gap-2"
+                >
+                  Register Now <ArrowRight size={18} />
+                </Link>
+              )}
               <Link
                 href="/ijmb-admission-requirements"
                 className="px-8 py-4 font-bold text-base rounded-lg border-2 border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10 transition-colors inline-flex items-center justify-center"
