@@ -108,6 +108,7 @@ const Register = () => {
         id: data.user.id,
         full_name: fullName,
         phone: fullPhone,
+        email,
       });
 
       // Send welcome email (fire-and-forget)

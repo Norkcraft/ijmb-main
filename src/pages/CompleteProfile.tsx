@@ -71,6 +71,7 @@ const CompleteProfile = () => {
       id: user!.id,
       full_name: fullName,
       phone: fullPhone,
+      email: user!.email,
     });
 
     if (error) {
