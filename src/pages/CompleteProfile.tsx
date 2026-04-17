@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -9,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Loader2 } from 'lucide-react';
+import { UserPlus, Loader2, AlertTriangle } from 'lucide-react';
 
 const COUNTRY_CODES = [
   { code: '+234', flag: '🇳🇬' },
@@ -19,7 +20,7 @@ const COUNTRY_CODES = [
 ];
 
 const CompleteProfile = () => {
-  const { user, profile, loading, refreshProfile } = useAuth();
+  const { user, profile, loading, refreshProfile, signOut } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -27,6 +28,7 @@ const CompleteProfile = () => {
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+234');
   const [submitting, setSubmitting] = useState(false);
+  const [emailConflict, setEmailConflict] = useState(false);
 
   useEffect(() => {
     if (loading) return;
@@ -35,11 +37,10 @@ const CompleteProfile = () => {
       return;
     }
     if (profile) {
-      // Profile already complete — send them to dashboard
       router.replace('/dashboard');
       return;
     }
-    // Pre-fill name from OAuth provider metadata (Google sends full_name or name)
+    // Pre-fill name from OAuth provider metadata
     const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
     setFullName(name);
   }, [user, profile, loading, router]);
@@ -48,41 +49,68 @@ const CompleteProfile = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    const fullPhone = `${countryCode}${phone.replace(/^0+/, '')}`;
+    try {
+      const fullPhone = `${countryCode}${phone.replace(/^0+/, '')}`;
 
-    // Check phone uniqueness
-    const { data: existingPhone } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('phone', fullPhone)
-      .maybeSingle();
+      // Check if this email is already registered to a different account
+      const { data: existingEmail } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', user!.email)
+        .maybeSingle();
 
-    if (existingPhone) {
-      toast({
-        title: 'Phone already in use',
-        description: 'An account with this phone number already exists. Please use a different number.',
-        variant: 'destructive',
+      if (existingEmail && existingEmail.id !== user!.id) {
+        // Email belongs to a different account — sign out this Google session
+        // and tell the user to log in with their original account
+        setEmailConflict(true);
+        await signOut();
+        setSubmitting(false);
+        return;
+      }
+
+      // Check phone uniqueness
+      const { data: existingPhone } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('phone', fullPhone)
+        .maybeSingle();
+
+      if (existingPhone) {
+        toast({
+          title: 'Phone already in use',
+          description: 'An account with this phone number already exists. Please use a different number.',
+          variant: 'destructive',
+        });
+        setSubmitting(false);
+        return;
+      }
+
+      const { error } = await supabase.from('profiles').upsert({
+        id: user!.id,
+        full_name: fullName,
+        phone: fullPhone,
+        email: user!.email,
       });
+
+      if (error) {
+        // Catch email unique constraint violation as a fallback
+        if (error.message?.includes('email') && error.message?.includes('unique')) {
+          setEmailConflict(true);
+          await signOut();
+          setSubmitting(false);
+          return;
+        }
+        toast({ title: 'Failed to save profile', description: error.message, variant: 'destructive' });
+        setSubmitting(false);
+        return;
+      }
+
+      await refreshProfile();
+      router.push('/dashboard');
+    } catch {
+      toast({ title: 'Something went wrong', description: 'Please try again or log in with your email and password.', variant: 'destructive' });
       setSubmitting(false);
-      return;
     }
-
-    const { error } = await supabase.from('profiles').upsert({
-      id: user!.id,
-      full_name: fullName,
-      phone: fullPhone,
-      email: user!.email,
-    });
-
-    if (error) {
-      toast({ title: 'Failed to save profile', description: error.message, variant: 'destructive' });
-      setSubmitting(false);
-      return;
-    }
-
-    await refreshProfile();
-    router.push('/dashboard');
-    setSubmitting(false);
   };
 
   if (loading) {
@@ -90,6 +118,31 @@ const CompleteProfile = () => {
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
       </div>
+    );
+  }
+
+  // Email already registered — show a clear message instead of crashing
+  if (emailConflict) {
+    return (
+      <section className="section-padding min-h-[60vh] flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertTriangle className="text-amber-600" size={28} />
+            </div>
+            <CardTitle className="font-heading">Account Already Exists</CardTitle>
+            <CardDescription>
+              An account with this email address already exists. You registered previously with email and password.
+              Please log in with your email and password instead.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <Link href="/login">
+              <Button className="w-full cta-gradient">Go to Login</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </section>
     );
   }
 
