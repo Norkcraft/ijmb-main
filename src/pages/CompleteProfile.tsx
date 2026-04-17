@@ -30,42 +30,20 @@ const CompleteProfile = () => {
   const [submitting, setSubmitting] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const [emailConflict, setEmailConflict] = useState(false);
-  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     if (loading) return;
-
     if (!user) {
       router.replace('/register');
       return;
     }
-
     if (profile) {
-      // Profile already exists — go to dashboard (do NOT loop back from dashboard)
       router.replace('/dashboard');
       return;
     }
-
-    // Check immediately on load if this email belongs to a different account
-    const checkEmail = async () => {
-      setChecking(true);
-      const { data: existingEmail } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', user.email)
-        .maybeSingle();
-
-      if (existingEmail && existingEmail.id !== user.id) {
-        setEmailConflict(true);
-      } else {
-        // Pre-fill name from OAuth provider metadata
-        const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
-        setFullName(name);
-      }
-      setChecking(false);
-    };
-
-    checkEmail();
+    // Pre-fill name from OAuth provider metadata
+    const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
+    setFullName(name);
   }, [user, profile, loading, router]);
 
   const handleSignOut = async () => {
@@ -137,8 +115,7 @@ const CompleteProfile = () => {
     }
   };
 
-  // Loading states
-  if (loading || checking) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
