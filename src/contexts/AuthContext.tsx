@@ -52,26 +52,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (isMounted) setLoading(false);
     }, 6000);
 
-    // Single initialisation — getSession + fetchProfile in parallel
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (!isMounted) return;
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        await fetchProfile(session.user.id);
-      }
-      setLoading(false);
-      clearTimeout(timeout);
-    });
-
-    // Auth state listener handles subsequent changes (login, logout, token refresh)
+    // onAuthStateChange is the single source of truth.
+    // INITIAL_SESSION fires on mount (replaces the old getSession() call),
+    // which is required when using createBrowserClient from @supabase/ssr.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return;
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
-          if (event === 'SIGNED_IN' || event === 'USER_UPDATED') {
+          if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
             await fetchProfile(session.user.id);
           }
         } else {
