@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Loader2, AlertTriangle } from 'lucide-react';
+import { UserPlus, Loader2, AlertTriangle, LogOut } from 'lucide-react';
 
 const COUNTRY_CODES = [
   { code: '+234', flag: '🇳🇬' },
@@ -28,22 +28,51 @@ const CompleteProfile = () => {
   const [phone, setPhone] = useState('');
   const [countryCode, setCountryCode] = useState('+234');
   const [submitting, setSubmitting] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [emailConflict, setEmailConflict] = useState(false);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     if (loading) return;
+
     if (!user) {
       router.replace('/register');
       return;
     }
+
     if (profile) {
+      // Profile already exists — go to dashboard (do NOT loop back from dashboard)
       router.replace('/dashboard');
       return;
     }
-    // Pre-fill name from OAuth provider metadata
-    const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
-    setFullName(name);
+
+    // Check immediately on load if this email belongs to a different account
+    const checkEmail = async () => {
+      setChecking(true);
+      const { data: existingEmail } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', user.email)
+        .maybeSingle();
+
+      if (existingEmail && existingEmail.id !== user.id) {
+        setEmailConflict(true);
+      } else {
+        // Pre-fill name from OAuth provider metadata
+        const name = user.user_metadata?.full_name || user.user_metadata?.name || '';
+        setFullName(name);
+      }
+      setChecking(false);
+    };
+
+    checkEmail();
   }, [user, profile, loading, router]);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    await signOut();
+    router.replace('/login');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,22 +80,6 @@ const CompleteProfile = () => {
 
     try {
       const fullPhone = `${countryCode}${phone.replace(/^0+/, '')}`;
-
-      // Check if this email is already registered to a different account
-      const { data: existingEmail } = await supabase
-        .from('profiles')
-        .select('id')
-        .eq('email', user!.email)
-        .maybeSingle();
-
-      if (existingEmail && existingEmail.id !== user!.id) {
-        // Email belongs to a different account — sign out this Google session
-        // and tell the user to log in with their original account
-        setEmailConflict(true);
-        await signOut();
-        setSubmitting(false);
-        return;
-      }
 
       // Check phone uniqueness
       const { data: existingPhone } = await supabase
@@ -93,10 +106,8 @@ const CompleteProfile = () => {
       });
 
       if (error) {
-        // Catch email unique constraint violation as a fallback
-        if (error.message?.includes('email') && error.message?.includes('unique')) {
+        if (error.message?.includes('email') || error.message?.includes('unique')) {
           setEmailConflict(true);
-          await signOut();
           setSubmitting(false);
           return;
         }
@@ -105,15 +116,29 @@ const CompleteProfile = () => {
         return;
       }
 
+      // Verify the profile was actually saved before navigating
+      const { data: savedProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user!.id)
+        .maybeSingle();
+
+      if (!savedProfile) {
+        toast({ title: 'Something went wrong', description: 'Profile could not be saved. Please try again.', variant: 'destructive' });
+        setSubmitting(false);
+        return;
+      }
+
       await refreshProfile();
       router.push('/dashboard');
     } catch {
-      toast({ title: 'Something went wrong', description: 'Please try again or log in with your email and password.', variant: 'destructive' });
+      toast({ title: 'Something went wrong', description: 'Please try again or sign out and log in with email and password.', variant: 'destructive' });
       setSubmitting(false);
     }
   };
 
-  if (loading) {
+  // Loading states
+  if (loading || checking) {
     return (
       <div className="flex items-center justify-center min-h-[50vh]">
         <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -121,7 +146,7 @@ const CompleteProfile = () => {
     );
   }
 
-  // Email already registered — show a clear message instead of crashing
+  // Email already belongs to a different account
   if (emailConflict) {
     return (
       <section className="section-padding min-h-[60vh] flex items-center justify-center">
@@ -132,14 +157,18 @@ const CompleteProfile = () => {
             </div>
             <CardTitle className="font-heading">Account Already Exists</CardTitle>
             <CardDescription>
-              An account with this email address already exists. You registered previously with email and password.
-              Please log in with your email and password instead.
+              You already have an account with this email address registered using email and password.
+              Please sign out and log in with your email and password instead.
             </CardDescription>
           </CardHeader>
-          <CardContent className="text-center">
-            <Link href="/login">
-              <Button className="w-full cta-gradient">Go to Login</Button>
-            </Link>
+          <CardContent className="space-y-3">
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="w-full flex items-center justify-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-bold rounded-lg hover:opacity-90 transition-opacity disabled:opacity-60"
+            >
+              {signingOut ? <><Loader2 size={15} className="animate-spin" /> Signing Out...</> : <><LogOut size={15} /> Sign Out & Go to Login</>}
+            </button>
           </CardContent>
         </Card>
       </section>
@@ -196,6 +225,17 @@ const CompleteProfile = () => {
               {submitting ? <><Loader2 className="animate-spin mr-2" size={16} /> Saving...</> : 'Save & Continue'}
             </Button>
           </form>
+
+          {/* Always-visible escape hatch */}
+          <div className="mt-4 pt-4 border-t">
+            <button
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-destructive transition-colors disabled:opacity-60"
+            >
+              {signingOut ? <><Loader2 size={13} className="animate-spin" /> Signing Out...</> : <><LogOut size={13} /> Sign out and use a different account</>}
+            </button>
+          </div>
         </CardContent>
       </Card>
     </section>

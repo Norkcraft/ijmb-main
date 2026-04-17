@@ -1,12 +1,13 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, profile, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (loading) return;
@@ -20,10 +21,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       router.push('/verify-email');
       return;
     }
-    if (!profile) {
+    // Only redirect to complete-profile if not already there — prevents redirect loop
+    if (!profile && pathname !== '/complete-profile') {
       router.push('/complete-profile');
     }
-  }, [user, profile, loading, router]);
+  }, [user, profile, loading, router, pathname]);
 
   if (loading) {
     return (
