@@ -92,6 +92,8 @@ function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid
   status?: string;
 }) {
   const statusInfo = STATUS_MAP[status || 'draft'] || STATUS_MAP.draft;
+  const [signingOut, setSigningOut] = useState(false);
+  const handleSignOutClick = async () => { setSigningOut(true); await onSignOut(); };
   const firstName = profile?.full_name?.split(' ')[0] || 'Student';
   const initials = (profile?.full_name || 'S').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
 
@@ -157,11 +159,13 @@ function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid
       {/* Sign out */}
       <div className="px-3 py-4 border-t border-white/10">
         <button
-          onClick={onSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all"
+          onClick={handleSignOutClick}
+          disabled={signingOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all disabled:opacity-60"
         >
-          <LogOut size={18} />
-          Sign Out
+          {signingOut
+            ? <><Loader2 size={18} className="animate-spin" /> Signing Out...</>
+            : <><LogOut size={18} /> Sign Out</>}
         </button>
       </div>
     </aside>
@@ -222,6 +226,8 @@ function MobileBottomNav({ currentTab, onNavigate }: { currentTab: string; onNav
 // ── Mobile drawer ─────────────────────────────────────────────────────────────
 function MobileDrawer({ open, onClose, profile, user, currentTab, onNavigate, onSignOut, status }: any) {
   const statusInfo = STATUS_MAP[status || 'draft'] || STATUS_MAP.draft;
+  const [signingOut, setSigningOut] = useState(false);
+  const handleSignOutClick = async () => { setSigningOut(true); await onSignOut(); };
   const firstName = profile?.full_name?.split(' ')[0] || 'Student';
   const initials = (profile?.full_name || 'S').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
   const navItems = [
@@ -265,8 +271,10 @@ function MobileDrawer({ open, onClose, profile, user, currentTab, onNavigate, on
           })}
         </nav>
         <div className="px-3 py-4 border-t border-white/10">
-          <button onClick={onSignOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all">
-            <LogOut size={18} />Sign Out
+          <button onClick={handleSignOutClick} disabled={signingOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-white/70 hover:bg-red-500/20 hover:text-red-300 transition-all disabled:opacity-60">
+            {signingOut
+              ? <><Loader2 size={18} className="animate-spin" /> Signing Out...</>
+              : <><LogOut size={18} /> Sign Out</>}
           </button>
         </div>
       </div>
@@ -693,6 +701,8 @@ function DocumentsTab({ application, sessions, centres, combos }: {
 // ── Profile tab ───────────────────────────────────────────────────────────────
 function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPhone, updateProfile, handleSignOut }: any) {
   const [savingProfile, setSavingProfile] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const handleSignOutClick = async () => { setSigningOut(true); await handleSignOut(); };
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -821,9 +831,11 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
           <h3 className="font-bold text-sm text-red-700">Sign Out</h3>
         </div>
         <p className="text-sm text-muted-foreground mb-4">You will be signed out of your account on this device.</p>
-        <button onClick={handleSignOut}
-          className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition-colors">
-          <LogOut size={14} /> Sign Out
+        <button onClick={handleSignOutClick} disabled={signingOut}
+          className="flex items-center gap-2 px-5 py-2.5 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition-colors disabled:opacity-60">
+          {signingOut
+            ? <><Loader2 size={14} className="animate-spin" /> Signing Out...</>
+            : <><LogOut size={14} /> Sign Out</>}
         </button>
       </div>
     </div>

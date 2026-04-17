@@ -5,8 +5,9 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar,
-  DollarSign, LogOut, Bell, Users, FileText, ChevronRight
+  DollarSign, LogOut, Bell, Users, FileText, ChevronRight, Loader2
 } from "lucide-react";
+import { useState } from "react";
 
 const sidebarItems = [
   { icon: LayoutDashboard, label: "Overview",     href: "/portal-admin",                    id: 'overview' },
@@ -29,6 +30,12 @@ interface AdminSidebarProps {
 export function AdminSidebar({ className, user, signOut, newNotifications }: AdminSidebarProps) {
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get('tab') || 'overview';
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    await signOut();
+  };
 
   return (
     <aside className={cn("hidden lg:flex w-64 flex-col h-screen shrink-0", className)}
@@ -86,11 +93,13 @@ export function AdminSidebar({ className, user, signOut, newNotifications }: Adm
           </div>
         </div>
         <button
-          onClick={signOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all"
+          onClick={handleSignOut}
+          disabled={signingOut}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all disabled:opacity-60"
         >
-          <LogOut size={16} />
-          Sign Out
+          {signingOut
+            ? <><Loader2 size={16} className="animate-spin" /> Signing Out...</>
+            : <><LogOut size={16} /> Sign Out</>}
         </button>
       </div>
     </aside>

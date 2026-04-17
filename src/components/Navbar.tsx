@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Bell, LogOut, LayoutDashboard, User, ChevronDown, ShieldCheck } from "lucide-react";
+import { Menu, X, Bell, LogOut, LayoutDashboard, User, ChevronDown, ShieldCheck, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Image from "next/image";
 import ijmbLogo from "@/assets/ijmb-logo.jpeg";
@@ -39,12 +39,14 @@ const getInitials = (name: string | null | undefined, email: string | null | und
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user, profile, signOut } = useAuth();
   const isAdmin = profile?.role === 'super_admin' || profile?.role === 'coordinator';
 
   const handleSignOut = async () => {
+    setSigningOut(true);
     await signOut();
     router.push('/');
   };
@@ -165,9 +167,12 @@ const Navbar = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleSignOut}
+                      disabled={signingOut}
                       className="text-destructive focus:text-destructive cursor-pointer"
                     >
-                      <LogOut size={15} className="mr-2" /> Sign Out
+                      {signingOut
+                        ? <><Loader2 size={15} className="mr-2 animate-spin" /> Signing Out...</>
+                        : <><LogOut size={15} className="mr-2" /> Sign Out</>}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -258,9 +263,12 @@ const Navbar = () => {
                 )}
                 <button
                   onClick={() => { setOpen(false); handleSignOut(); }}
-                  className="flex items-center gap-2 w-full px-3 py-2.5 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                  disabled={signingOut}
+                  className="flex items-center gap-2 w-full px-3 py-2.5 text-sm font-medium rounded-md text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-60"
                 >
-                  <LogOut size={16} /> Sign Out
+                  {signingOut
+                    ? <><Loader2 size={16} className="animate-spin" /> Signing Out...</>
+                    : <><LogOut size={16} /> Sign Out</>}
                 </button>
               </div>
             ) : (

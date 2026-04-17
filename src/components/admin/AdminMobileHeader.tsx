@@ -1,6 +1,7 @@
 'use client';
 
-import { Menu, X, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign, FileText, Users, ChevronRight } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign, FileText, Users, ChevronRight, Loader2 } from "lucide-react";
+import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
@@ -30,6 +31,12 @@ export const AdminMobileHeader = ({
 }: AdminMobileHeaderProps) => {
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get('tab') || 'overview';
+  const [signingOut, setSigningOut] = useState(false);
+
+  const handleSignOut = async () => {
+    setSigningOut(true);
+    await signOut();
+  };
 
   return (
     <>
@@ -75,11 +82,13 @@ export const AdminMobileHeader = ({
           </nav>
           <div className="px-3 pb-4 border-t border-white/10 pt-3">
             <button
-              onClick={signOut}
-              className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all"
+              onClick={handleSignOut}
+              disabled={signingOut}
+              className="w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium text-white/60 hover:bg-red-500/20 hover:text-red-300 transition-all disabled:opacity-60"
             >
-              <LogOut size={16} />
-              Sign Out
+              {signingOut
+                ? <><Loader2 size={16} className="animate-spin" /> Signing Out...</>
+                : <><LogOut size={16} /> Sign Out</>}
             </button>
           </div>
         </div>
