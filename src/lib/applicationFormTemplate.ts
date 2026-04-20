@@ -48,320 +48,557 @@ export interface ApplicationFormData {
 export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
   const logoSrc = data.logoBase64 || '';
 
-  /* ── Subject rows ─────────────────────────────────────────────── */
-  const subjects = [data.subject1, data.subject2, data.subject3].filter(Boolean);
-  const subjectRows = subjects.length
-    ? subjects
-        .map(
-          (s, i) =>
-            `<tr>
-              <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#006400;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">${i + 1}</td>
-              <td style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">${esc(s)}</td>
-              <td style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;">IJMB Core Subject</td>
-            </tr>`
-        )
-        .join('')
-    : `<tr>
-        <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#006400;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;">1</td>
-        <td colspan="2" style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;">${esc(data.subjectCombination) || '&mdash;'}</td>
-      </tr>`;
+  const isMale = data.gender?.toLowerCase() === 'male';
+  const isFemale = data.gender?.toLowerCase() === 'female';
 
-  /* ── O-Level rows ─────────────────────────────────────────────── */
-  const olevelRows =
-    data.olevelResults && data.olevelResults.length
-      ? data.olevelResults
-          .slice(0, 9)
-          .map((r, i) => {
-            const bg = i % 2 === 1 ? 'background:#f5f8f5;' : '';
-            return `<tr>
-              <td style="width:22px;text-align:center;font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#006400;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${i + 1}</td>
-              <td style="font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${esc(r.subject)}</td>
-              <td style="width:44px;font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${esc(r.grade)}</td>
-              <td style="width:52px;font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;border-right:1px solid #e0e0d8;${bg}">${esc(r.examYear)}</td>
-              <td style="width:60px;font-size:8px;color:#222;padding:4px 5px;border-bottom:1px solid #e0e0d8;${bg}">${esc(r.examType)}</td>
-            </tr>`;
-          })
-          .join('')
-      : `<tr>
-          <td style="text-align:center;font-size:7px;color:#bbb;font-style:italic;padding:6px 5px;border-bottom:1px solid #e0e0d8;" colspan="5">O-Level results not yet uploaded</td>
-        </tr>`;
-
-  /* ── Passport photo HTML ──────────────────────────────────────── */
+  /* ── Passport photo ───────────────────────────────────────────── */
   const passportHtml = data.passportPhotoBase64
-    ? `<img src="${data.passportPhotoBase64}" alt="Passport" style="width:100px;height:120px;object-fit:cover;display:block;"/>`
-    : `<div style="width:100px;height:120px;background:#f0f0eb;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="1.2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-        <span style="font-size:6px;color:#bbb;text-transform:uppercase;letter-spacing:0.5px;">No Photo</span>
-      </div>`;
+    ? `<img src="${data.passportPhotoBase64}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Passport"/>`
+    : `<div class="passport-icon">&#128100;</div><span>PASTE PASSPORT<br>PHOTO HERE</span>`;
 
-  /* ── QR code HTML ─────────────────────────────────────────────── */
+  /* ── QR code ──────────────────────────────────────────────────── */
   const qrHtml = data.qrCodeBase64
-    ? `<img src="${data.qrCodeBase64}" alt="QR Code" style="width:76px;height:76px;display:block;"/>`
-    : `<div style="width:76px;height:76px;background:#eee;display:flex;align-items:center;justify-content:center;font-size:7px;color:#bbb;">No QR</div>`;
+    ? `<img src="${data.qrCodeBase64}" alt="QR Code" style="width:55px;height:55px;display:block;margin-top:6px;"/>`
+    : '';
+
+  /* ── O-Level rows (padded to 9) ───────────────────────────────── */
+  const olevelData = data.olevelResults || [];
+  const olevelRows = Array.from({ length: 9 }, (_, i) => {
+    const r = olevelData[i];
+    return `<tr>
+      <td class="rn">${i + 1}</td>
+      <td>${r ? esc(r.subject) : '&nbsp;'}</td>
+      <td>${r ? esc(r.grade) : '&nbsp;'}</td>
+      <td>${r ? esc(r.examYear) : '&nbsp;'}</td>
+      <td>${r ? esc(r.examType) : '&nbsp;'}</td>
+    </tr>`;
+  }).join('');
 
   const printDate = new Date().toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
+    day: '2-digit', month: 'short', year: 'numeric',
   });
-
-  /* ── Section header helper ────────────────────────────────────── */
-  const secHdr = (letter: string, title: string) =>
-    `<div style="background:#006400;display:flex;align-items:center;gap:6px;padding:3px 8px;margin-bottom:5px;position:relative;">
-      <div style="width:15px;height:15px;border-radius:50%;background:#ffd700;color:#006400;font-size:8px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;">${letter}</div>
-      <span style="font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;">${title}</span>
-      <div style="position:absolute;right:0;top:0;bottom:0;width:3px;background:#ffd700;"></div>
-    </div>`;
-
-  /* ── Field helper ─────────────────────────────────────────────── */
-  const field = (label: string, value: string) =>
-    `<div style="display:flex;flex-direction:column;gap:1px;">
-      <span style="font-size:6px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.7px;">${label}</span>
-      <div style="font-size:8px;font-weight:700;color:#111;padding:2px 0 3px;border-bottom:1px solid #dcdcd4;min-height:14px;">${value || '&mdash;'}</div>
-    </div>`;
-
-  /* ── Table header row helper ──────────────────────────────────── */
-  const thStyle =
-    'background:#006400;color:#fff;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 5px;text-align:left;border-right:1px solid rgba(255,255,255,0.15);';
-  const thStyleLast =
-    'background:#006400;color:#fff;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 5px;text-align:left;';
 
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<title>IJMB Student Registration Slip</title>
+<meta charset="UTF-8">
+<title>IJMB Registration Form ${esc(data.academicSession)}</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#ccc;display:flex;justify-content:center;padding:16px;font-size:8px;line-height:1.3;}
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  @page { size: A4; margin: 0; }
+
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10.5px;
+    background: #ccc;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
+
+  .page {
+    width: 210mm;
+    min-height: 297mm;
+    background: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+  }
+
+  .watermark {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 370px;
+    height: 370px;
+    opacity: 0.065;
+    z-index: 0;
+    pointer-events: none;
+  }
+  .watermark img { width: 100%; height: 100%; object-fit: contain; }
+
+  .content { position: relative; z-index: 1; }
+
+  .top-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 12mm;
+    font-size: 8.5px;
+    font-weight: bold;
+    background: #1a6b3a;
+    color: #fff;
+    letter-spacing: 0.3px;
+  }
+
+  .header {
+    display: grid;
+    grid-template-columns: 88px 1fr 130px;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12mm 4px;
+  }
+
+  .passport-box {
+    width: 82px;
+    height: 100px;
+    border: 1.5px solid #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 8.5px;
+    text-align: center;
+    color: #555;
+    font-weight: bold;
+    line-height: 1.6;
+    background: #fafafa;
+    overflow: hidden;
+  }
+  .passport-box .passport-icon { font-size: 22px; margin-bottom: 2px; opacity: 0.3; }
+
+  .header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .header-center img { width: 80px; height: 80px; object-fit: contain; }
+
+  .form-no-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-start;
+    padding-top: 4px;
+    gap: 3px;
+  }
+  .form-no-box .fn-label { font-size: 8.5px; font-weight: bold; text-transform: uppercase; color: #333; }
+  .form-no-box .fn-value {
+    font-family: 'Courier New', monospace;
+    font-size: 10px;
+    font-weight: bold;
+    color: #1a6b3a;
+    width: 115px;
+    text-align: right;
+    border-bottom: 1.5px solid #333;
+    min-height: 15px;
+    padding-bottom: 1px;
+  }
+
+  .form-title {
+    text-align: center;
+    padding: 5px 12mm 6px;
+    border-bottom: 2px dashed #888;
+    margin: 0 12mm;
+  }
+  .form-title h1 { font-size: 20px; font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase; line-height: 1.2; }
+  .form-title h2 { font-size: 9px; font-weight: normal; color: #444; letter-spacing: 0.4px; margin-top: 3px; }
+
+  .form-body { padding: 6px 12mm 0; }
+
+  .section { margin-bottom: 8px; }
+
+  .section-header {
+    background-color: #1a6b3a;
+    color: #fff;
+    font-weight: bold;
+    font-size: 10px;
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 6px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  .section-letter {
+    background: #fff;
+    color: #1a6b3a;
+    font-weight: 900;
+    font-size: 9.5px;
+    width: 17px;
+    height: 17px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+
+  .field-row { display: flex; gap: 10px; margin-bottom: 6px; align-items: flex-end; }
+  .field { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .field label {
+    font-size: 8px;
+    font-weight: bold;
+    color: #222;
+    margin-bottom: 1px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+  }
+  .field .underline {
+    border-bottom: 1px dotted #555;
+    height: 15px;
+    width: 100%;
+    padding-bottom: 1px;
+    font-size: 9px;
+    color: #111;
+    font-weight: bold;
+  }
+
+  .inline-field { display: flex; align-items: flex-end; gap: 5px; flex: 1; min-width: 0; }
+  .inline-field .lbl {
+    font-size: 8px;
+    font-weight: bold;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: #222;
+    padding-bottom: 1px;
+    flex-shrink: 0;
+  }
+  .inline-field .underline {
+    flex: 1;
+    border-bottom: 1px dotted #555;
+    height: 15px;
+    min-width: 30px;
+    font-size: 9px;
+    color: #111;
+    font-weight: bold;
+    padding-bottom: 1px;
+  }
+
+  .cb-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 6px;
+    font-size: 8.5px;
+  }
+  .cb-label { font-weight: bold; text-transform: uppercase; white-space: nowrap; color: #222; font-size: 8px; }
+  .cb-item { display: flex; align-items: center; gap: 3px; font-weight: bold; font-size: 8.5px; white-space: nowrap; }
+  .cb-item input[type="checkbox"] { width: 10px; height: 10px; margin: 0; accent-color: #1a6b3a; flex-shrink: 0; }
+  .cb-divider { flex: 1; }
+
+  .olevel-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9px; }
+  .olevel-table th {
+    background: #1a6b3a;
+    color: #fff;
+    font-weight: bold;
+    padding: 4px 6px;
+    border: 1px solid #1a6b3a;
+    text-align: left;
+    font-size: 8.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.2px;
+  }
+  .olevel-table td { border: 1px solid #ccc; padding: 3px 6px; height: 18px; font-size: 9px; }
+  .olevel-table tr:nth-child(even) td { background: #f7fbf9; }
+  .olevel-table .rn { color: #777; font-weight: bold; text-align: center; font-size: 8px; width: 18px; }
+
+  .declaration {
+    border: 1.5px solid #1a6b3a;
+    padding: 7px 12px;
+    margin-bottom: 8px;
+    background: #f6fcf8;
+    text-align: center;
+    font-style: italic;
+    font-size: 9px;
+    color: #222;
+    line-height: 1.5;
+    border-radius: 2px;
+  }
+
+  .sig-row { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 7px; }
+  .sig-field { display: flex; align-items: flex-end; gap: 5px; flex: 1; min-width: 0; }
+  .sig-field .lbl { font-size: 8px; font-weight: bold; text-transform: uppercase; white-space: nowrap; padding-bottom: 1px; flex-shrink: 0; }
+  .sig-field .underline { flex: 1; border-bottom: 1px dotted #555; height: 13px; min-width: 40px; }
+
+  .date-group { display: flex; align-items: flex-end; gap: 3px; flex-shrink: 0; }
+  .date-group .lbl { font-size: 8px; font-weight: bold; text-transform: uppercase; padding-bottom: 2px; white-space: nowrap; }
+  .date-group .dbox { border-bottom: 1px dotted #555; height: 13px; }
+  .date-group .dbox.dd { width: 20px; }
+  .date-group .dbox.mm { width: 20px; }
+  .date-group .dbox.yyyy { width: 34px; }
+  .date-group .dsep { font-size: 9px; font-weight: bold; padding-bottom: 2px; }
+
+  .official-box { border: 1.5px solid #1a6b3a; padding: 6px 10px 8px; margin-top: 2px; border-radius: 2px; }
+  .official-title { font-size: 8.5px; font-weight: 900; text-transform: uppercase; color: #1a6b3a; text-decoration: underline; margin-bottom: 7px; letter-spacing: 0.5px; }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 6px 12mm;
+    border-top: 1.5px solid #1a6b3a;
+    margin-top: 8px;
+    background: #f5f5f5;
+  }
+  .footer .website { color: #1a6b3a; font-weight: bold; font-size: 9.5px; letter-spacing: 0.5px; text-align: center; }
+
+  @media print { body { background: none; padding: 0; } .page { box-shadow: none; } }
 </style>
 </head>
 <body>
+<div class="page">
 
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- OUTER DOCUMENT BORDER — double-line frame                      -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<div style="width:794px;height:1123px;border:4px double #006400;padding:8px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.28);position:relative;overflow:hidden;">
+  <!-- WATERMARK -->
+  <div class="watermark">
+    <img src="${logoSrc}" alt="">
+  </div>
 
-  <!-- WATERMARK — faint logo centered behind content -->
-  <img src="${logoSrc}" alt="" aria-hidden="true"
-    style="position:absolute;top:50%;left:50%;width:340px;height:340px;object-fit:contain;opacity:0.06;filter:grayscale(1);transform:translate(-50%,-50%) rotate(-20deg);pointer-events:none;z-index:0;"/>
+  <div class="content">
 
-  <!-- INNER BORDER -->
-  <div style="position:relative;z-index:1;width:100%;height:100%;border:1.5px solid #006400;display:flex;flex-direction:column;overflow:hidden;">
+    <!-- TOP STRIP -->
+    <div class="top-strip">
+      <span>FEDERAL REPUBLIC OF NIGERIA</span>
+      <span>MINISTRY OF EDUCATION</span>
+    </div>
 
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!-- HEADER BAND                                               -->
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <div style="background:#006400;flex-shrink:0;">
+    <!-- HEADER -->
+    <div class="header">
 
-      <!-- Gold top accent stripe -->
-      <div style="height:3px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);"></div>
-
-      <!-- Header content row -->
-      <div style="display:flex;align-items:center;gap:10px;padding:8px 14px 10px;min-height:90px;">
-
-        <!-- Logo circle -->
-        <div style="flex-shrink:0;width:60px;height:60px;border-radius:50%;background:#fff;border:2px solid #ffd700;padding:2px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-          <img src="${logoSrc}" alt="IJMB" style="width:54px;height:54px;border-radius:50%;object-fit:cover;display:block;"/>
-        </div>
-
-        <!-- Centre text block -->
-        <div style="flex:1;text-align:center;">
-          <div style="font-size:7px;letter-spacing:2px;color:#8fd68f;text-transform:uppercase;font-weight:600;">Federal Republic of Nigeria</div>
-          <div style="font-family:Georgia,'Times New Roman',serif;font-size:14px;font-weight:700;color:#fff;margin:3px 0 2px;line-height:1.2;">Interim Joint Matriculation Board (IJMB)</div>
-          <div style="font-size:8px;color:#b8e0b8;letter-spacing:0.5px;">P.M.B. 1026, Ahmadu Bello University, Zaria — ijmb.info</div>
-          <div style="display:inline-block;margin-top:5px;font-size:11px;font-weight:700;color:#ffe55c;letter-spacing:2px;text-transform:uppercase;border-top:1px solid rgba(255,221,0,0.5);border-bottom:1px solid rgba(255,221,0,0.5);padding:2px 10px;">
-            STUDENT REGISTRATION SLIP
-          </div>
-          <div style="margin-top:3px;font-size:7px;color:#ffd700;letter-spacing:1.5px;text-transform:uppercase;">Academic Session: ${esc(data.academicSession)}</div>
-        </div>
-
-        <!-- Registration number badge -->
-        <div style="flex-shrink:0;background:rgba(255,255,255,0.07);border:1.5px solid #ffd700;border-radius:4px;padding:6px 10px;text-align:center;min-width:95px;">
-          <span style="display:block;font-size:6px;letter-spacing:1.2px;text-transform:uppercase;color:#8fd68f;font-weight:700;">Reg. Number</span>
-          <span style="display:block;font-family:'Courier New',monospace;font-size:11px;font-weight:700;color:#ffe55c;letter-spacing:1.5px;margin-top:3px;">${esc(data.applicationId)}</span>
-        </div>
-
-      </div><!-- /header content row -->
-
-      <!-- Gold bottom accent stripe -->
-      <div style="height:3px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);"></div>
-    </div><!-- /header band -->
-
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!-- BODY — main + sidebar                                     -->
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <div style="display:flex;flex-direction:row;flex:1;overflow:hidden;min-height:0;">
-
-      <!-- ────────────────────────────────────────────────────── -->
-      <!-- MAIN CONTENT                                           -->
-      <!-- ────────────────────────────────────────────────────── -->
-      <div style="flex:1;padding:8px 10px;overflow:hidden;min-height:0;border-right:1px solid #d8d8d0;">
-
-        <!-- SECTION A: Personal Details -->
-        <div style="margin-bottom:6px;">
-          ${secHdr('A', 'Personal Details')}
-          <!-- Row 1: Name (3 cols) -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 10px;margin-bottom:4px;">
-            ${field('Surname', esc(data.surname))}
-            ${field('First Name', esc(data.firstName))}
-            ${field('Middle Name', esc(data.middleName) || '&mdash;')}
-          </div>
-          <!-- Row 2: DOB / Gender / State / LGA (4 cols) -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:4px 8px;margin-bottom:4px;">
-            ${field('Date of Birth', esc(data.dateOfBirth))}
-            ${field('Gender', esc(data.gender))}
-            ${field('State of Origin', esc(data.stateOfOrigin))}
-            ${field('L.G.A.', esc(data.lga))}
-          </div>
-          <!-- Row 3: Phone / Email / Nationality (3 cols) -->
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 10px;margin-bottom:4px;">
-            ${field('Phone Number', esc(data.phoneNumber))}
-            ${field('Email Address', esc(data.email))}
-            ${field('Nationality', 'Nigerian')}
-          </div>
-          <!-- Row 4: Address (full width) -->
-          <div style="margin-bottom:2px;">
-            ${field('Residential Address', esc(data.residentialAddress))}
-          </div>
-        </div>
-
-        <!-- SECTION B: Programme & Centre -->
-        <div style="margin-bottom:6px;">
-          ${secHdr('B', 'Programme &amp; Centre')}
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-bottom:4px;">
-            ${field('Study Centre', esc(data.centreOfStudy))}
-            ${field('Programme', 'Direct Entry Programme')}
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;margin-bottom:2px;">
-            ${field('Course of Choice', esc(data.courseOfChoice))}
-            ${field('Subject Combination', esc(data.subjectCombination))}
-          </div>
-        </div>
-
-        <!-- SECTION C: IJMB Subject Choices -->
-        <div style="margin-bottom:6px;">
-          ${secHdr('C', 'IJMB Subject Choices')}
-          <table style="width:100%;border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th style="width:22px;${thStyle}">#</th>
-                <th style="${thStyle}">Subject</th>
-                <th style="${thStyleLast}">Category</th>
-              </tr>
-            </thead>
-            <tbody>${subjectRows}</tbody>
-          </table>
-        </div>
-
-        <!-- SECTION D: O-Level Results -->
-        <div style="margin-bottom:6px;">
-          ${secHdr('D', "O'Level Results")}
-          <table style="width:100%;border-collapse:collapse;">
-            <thead>
-              <tr>
-                <th style="width:22px;${thStyle}">#</th>
-                <th style="${thStyle}">Subject</th>
-                <th style="width:44px;${thStyle}">Grade</th>
-                <th style="width:52px;${thStyle}">Year</th>
-                <th style="width:60px;${thStyleLast}">Exam Body</th>
-              </tr>
-            </thead>
-            <tbody>${olevelRows}</tbody>
-          </table>
-        </div>
-
-        <!-- SECTION E: Payment & Registration -->
-        <div style="margin-bottom:4px;">
-          ${secHdr('E', 'Payment &amp; Registration')}
-          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px 10px;margin-bottom:4px;">
-            ${field('Payment Reference', esc(data.paymentReference) || '&mdash;')}
-            ${field('Payment Date', esc(data.paymentDate) || '&mdash;')}
-            ${field('Amount Paid', esc(data.amountPaid) || '&mdash;')}
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 10px;">
-            ${field('Application ID', esc(data.applicationId))}
-            ${field('Registration Date', esc(data.registrationDate))}
-          </div>
-        </div>
-
-      </div><!-- /main -->
-
-      <!-- ────────────────────────────────────────────────────── -->
-      <!-- SIDEBAR                                                -->
-      <!-- ────────────────────────────────────────────────────── -->
-      <div style="width:120px;flex-shrink:0;padding:6px;display:flex;flex-direction:column;gap:6px;align-items:center;background:#fafaf7;overflow:hidden;border-left:1px solid #d8d8d0;position:relative;">
-
-        <!-- Vertical CANDIDATE COPY badge -->
-        <div style="position:absolute;top:10px;right:-24px;width:60px;background:#006400;color:#ffd700;font-size:7px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);padding:8px 4px;text-align:center;transform-origin:center;line-height:1.4;border-top:1px solid #ffd700;border-bottom:1px solid #ffd700;">Candidate Copy</div>
-
-        <!-- Passport photo with corner brackets -->
-        <div style="width:100px;height:120px;border:1.5px solid #bbb;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#f0f0eb;position:relative;">
-          ${passportHtml}
-          <!-- Top-left corner bracket -->
-          <div style="position:absolute;top:3px;left:3px;width:10px;height:10px;border-top:2px solid #006400;border-left:2px solid #006400;"></div>
-          <!-- Top-right corner bracket -->
-          <div style="position:absolute;top:3px;right:3px;width:10px;height:10px;border-top:2px solid #006400;border-right:2px solid #006400;"></div>
-          <!-- Bottom-left corner bracket -->
-          <div style="position:absolute;bottom:3px;left:3px;width:10px;height:10px;border-bottom:2px solid #006400;border-left:2px solid #006400;"></div>
-          <!-- Bottom-right corner bracket -->
-          <div style="position:absolute;bottom:3px;right:3px;width:10px;height:10px;border-bottom:2px solid #006400;border-right:2px solid #006400;"></div>
-        </div>
-        <!-- Photo label -->
-        <div style="width:100px;background:#006400;color:#fff;font-size:6px;font-weight:700;text-align:center;padding:3px;letter-spacing:0.7px;text-transform:uppercase;border-top:2px solid #ffd700;flex-shrink:0;">
-          Passport Photo
-        </div>
-
-        <!-- Registration number box -->
-        <div style="width:100%;background:#006400;border-radius:3px;padding:5px 6px;text-align:center;flex-shrink:0;overflow:hidden;">
-          <div style="font-size:6px;text-transform:uppercase;letter-spacing:1px;color:#8fd68f;font-weight:700;">Registration No.</div>
-          <div style="font-family:'Courier New',monospace;font-size:8px;font-weight:700;color:#ffe55c;letter-spacing:1px;display:block;margin-top:2px;word-break:break-all;">${esc(data.applicationId)}</div>
-          <!-- Gold accent line at bottom -->
-          <div style="height:2px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);margin-top:4px;border-radius:1px;"></div>
-        </div>
-
-        <!-- QR code box -->
-        <div style="width:100%;background:#fff;border:1px solid #ddd;border-top:2px solid #ffd700;padding:4px 5px;text-align:center;flex-shrink:0;">
-          <div style="font-size:6px;text-transform:uppercase;letter-spacing:0.8px;color:#aaa;font-weight:700;margin-bottom:3px;">Scan to Verify</div>
-          <div style="display:flex;justify-content:center;">
-            ${qrHtml}
-          </div>
-        </div>
-
-        <!-- Instructions box -->
-        <div style="width:100%;border:1px solid #ddd;border-left:2.5px solid #006400;background:#fff;padding:5px 6px;flex-shrink:0;">
-          <span style="font-size:6px;font-weight:700;color:#006400;text-transform:uppercase;letter-spacing:0.6px;display:block;margin-bottom:3px;padding-bottom:2px;border-bottom:1px solid #e0e0d4;">Instructions</span>
-          <ul style="font-size:6px;color:#555;line-height:1.9;padding-left:9px;">
-            <li>Keep this slip safe</li>
-            <li>Bring on exam day</li>
-            <li>No alterations allowed</li>
-            <li>Present valid ID</li>
-            <li>Arrive 30 mins early</li>
-            <li>No phones in hall</li>
-            <li>Biometrics compulsory</li>
-          </ul>
-        </div>
-
-      </div><!-- /sidebar -->
-
-    </div><!-- /body -->
-
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <!-- FOOTER                                                    -->
-    <!-- ══════════════════════════════════════════════════════════ -->
-    <div style="background:#003300;flex-shrink:0;">
-      <div style="height:2px;background:linear-gradient(90deg,#4a5600,#ffd700,#ffe55c,#ffd700,#4a5600);"></div>
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 14px;">
-        <span style="font-size:6px;color:#6fa86f;letter-spacing:0.3px;">This document is an official IJMB registration slip. Any alterations render it void.</span>
-        <div style="background:#ffd700;color:#003300;font-size:6px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:2px 10px;border-radius:20px;white-space:nowrap;">Candidate Copy</div>
-        <span style="font-size:6px;color:#6fa86f;white-space:nowrap;">Printed: ${printDate}</span>
+      <!-- Passport photo (left) -->
+      <div class="passport-box">
+        ${passportHtml}
       </div>
-    </div><!-- /footer -->
 
-  </div><!-- /inner border -->
-</div><!-- /outer border -->
+      <!-- Logo + title (center) -->
+      <div class="header-center">
+        <img src="${logoSrc}" alt="IJMB">
+        <div style="text-align:center;font-weight:900;font-size:12px;text-transform:uppercase;line-height:1.2;margin-top:2px;">Interim Joint Matriculation Board</div>
+        <div style="text-align:center;font-size:9px;font-weight:bold;">(IJMB)</div>
+        <div style="text-align:center;font-size:8px;color:#555;">Permanent Secretary, ABU, Zaria</div>
+        <div style="text-align:center;font-size:8px;color:#1a6b3a;font-weight:bold;">www.ijmb.info</div>
+      </div>
 
+      <!-- Form number + QR (right) -->
+      <div class="form-no-box">
+        <span class="fn-label">Form Number</span>
+        <div class="fn-value">${esc(data.applicationId)}</div>
+        ${qrHtml}
+      </div>
+
+    </div><!-- /header -->
+
+    <!-- FORM TITLE -->
+    <div class="form-title">
+      <h1>Student Registration Form</h1>
+      <h2>Academic Session ${esc(data.academicSession)} &mdash; Direct Entry Programme</h2>
+    </div>
+
+    <!-- FORM BODY -->
+    <div class="form-body">
+
+      <!-- SECTION A: Personal Information -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-letter">A</div>
+          Personal Information
+        </div>
+
+        <!-- Name row -->
+        <div class="field-row">
+          <div class="field">
+            <label>Surname</label>
+            <div class="underline">${esc(data.surname)}</div>
+          </div>
+          <div class="field">
+            <label>First Name</label>
+            <div class="underline">${esc(data.firstName)}</div>
+          </div>
+          <div class="field">
+            <label>Middle Name</label>
+            <div class="underline">${esc(data.middleName)}</div>
+          </div>
+        </div>
+
+        <!-- Gender / DOB / Nationality -->
+        <div class="cb-row">
+          <span class="cb-label">Gender:</span>
+          <div class="cb-item"><input type="checkbox" ${isMale ? 'checked' : ''}/> Male</div>
+          <div class="cb-item"><input type="checkbox" ${isFemale ? 'checked' : ''}/> Female</div>
+          <div class="cb-divider"></div>
+          <div class="inline-field">
+            <span class="lbl">Date of Birth:</span>
+            <div class="underline">${esc(data.dateOfBirth)}</div>
+          </div>
+          <div class="inline-field">
+            <span class="lbl">Nationality:</span>
+            <div class="underline">Nigerian</div>
+          </div>
+        </div>
+
+        <!-- State / LGA / Phone -->
+        <div class="field-row">
+          <div class="field">
+            <label>State of Origin</label>
+            <div class="underline">${esc(data.stateOfOrigin)}</div>
+          </div>
+          <div class="field">
+            <label>L.G.A.</label>
+            <div class="underline">${esc(data.lga)}</div>
+          </div>
+          <div class="field">
+            <label>Phone Number</label>
+            <div class="underline">${esc(data.phoneNumber)}</div>
+          </div>
+        </div>
+
+        <!-- Email / Address -->
+        <div class="field-row">
+          <div class="field">
+            <label>Email Address</label>
+            <div class="underline">${esc(data.email)}</div>
+          </div>
+          <div class="field" style="flex:2">
+            <label>Residential Address</label>
+            <div class="underline">${esc(data.residentialAddress)}</div>
+          </div>
+        </div>
+      </div><!-- /section A -->
+
+      <!-- SECTION B: Programme & Centre -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-letter">B</div>
+          Programme &amp; Centre
+        </div>
+
+        <div class="field-row">
+          <div class="field" style="flex:2">
+            <label>Centre of Study</label>
+            <div class="underline">${esc(data.centreOfStudy)}</div>
+          </div>
+          <div class="field" style="flex:2">
+            <label>Subject Combination</label>
+            <div class="underline">${esc(data.subjectCombination)}</div>
+          </div>
+          <div class="field">
+            <label>Academic Session</label>
+            <div class="underline">${esc(data.academicSession)}</div>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field" style="flex:2">
+            <label>Intended Course / Department</label>
+            <div class="underline">${esc(data.courseOfChoice)}</div>
+          </div>
+          <div class="field">
+            <label>Programme Type</label>
+            <div class="underline">Direct Entry</div>
+          </div>
+          <div class="field">
+            <label>Registration Date</label>
+            <div class="underline">${esc(data.registrationDate)}</div>
+          </div>
+        </div>
+      </div><!-- /section B -->
+
+      <!-- SECTION C: O'Level Results -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-letter">C</div>
+          O&apos;Level Results
+        </div>
+        <table class="olevel-table">
+          <thead>
+            <tr>
+              <th class="rn">#</th>
+              <th>Subject</th>
+              <th>Grade</th>
+              <th>Year</th>
+              <th>Exam Body</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${olevelRows}
+          </tbody>
+        </table>
+      </div><!-- /section C -->
+
+      <!-- SECTION D: Payment Information -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-letter">D</div>
+          Payment Information
+        </div>
+        <div class="field-row">
+          <div class="field" style="flex:2">
+            <label>Payment Reference</label>
+            <div class="underline">${esc(data.paymentReference) || '&mdash;'}</div>
+          </div>
+          <div class="field">
+            <label>Date of Payment</label>
+            <div class="underline">${esc(data.paymentDate) || '&mdash;'}</div>
+          </div>
+          <div class="field">
+            <label>Amount Paid</label>
+            <div class="underline">${esc(data.amountPaid) || '&mdash;'}</div>
+          </div>
+        </div>
+      </div><!-- /section D -->
+
+      <!-- DECLARATION -->
+      <div class="declaration">
+        I hereby declare that all information provided on this form is correct and truthful to the best of my knowledge.
+        I understand that any false declaration will result in immediate disqualification and possible prosecution.
+        I agree to abide by all rules and regulations of the Interim Joint Matriculation Board (IJMB).
+      </div>
+
+      <!-- SIGNATURE ROW -->
+      <div class="sig-row">
+        <div class="sig-field">
+          <span class="lbl">Applicant&apos;s Signature:</span>
+          <div class="underline"></div>
+        </div>
+        <div class="date-group">
+          <span class="lbl">Date:</span>
+          <div class="dbox dd"></div>
+          <span class="dsep">/</span>
+          <div class="dbox mm"></div>
+          <span class="dsep">/</span>
+          <div class="dbox yyyy"></div>
+        </div>
+      </div>
+
+      <!-- OFFICIAL USE BOX -->
+      <div class="official-box">
+        <div class="official-title">For Official Use Only</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Verified By</label>
+            <div class="underline" style="height:28px;"></div>
+          </div>
+          <div class="field">
+            <label>Date Verified</label>
+            <div class="underline" style="height:28px;"></div>
+          </div>
+          <div class="field">
+            <label>Official Stamp</label>
+            <div class="underline" style="height:28px;"></div>
+          </div>
+          <div class="field">
+            <label>Remarks</label>
+            <div class="underline" style="height:28px;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-body -->
+
+    <!-- FOOTER -->
+    <div class="footer">
+      <span class="website">www.ijmb.info &nbsp;&bull;&nbsp; IJMB Registration Form ${esc(data.academicSession)} &nbsp;&bull;&nbsp; Printed: ${printDate}</span>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /page -->
 </body>
 </html>`;
 };
