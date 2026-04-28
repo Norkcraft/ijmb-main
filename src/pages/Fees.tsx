@@ -11,7 +11,7 @@ const yr = new Date().getFullYear();
 const YEAR = `${yr}/${yr + 1}`;
 
 const faqs = [
-  { question: "How much is IJMB form?", answer: "The IJMB registration form fee is ₦5,500. Tuition fee is ₦350,000 and hostel accommodation is ₦150,000 per session. Contact us for any centre-specific variations." },
+  { question: "How much is IJMB form?", answer: "The IJMB registration form fee is ₦10,000. Tuition fee is ₦350,000 and hostel accommodation is ₦150,000 per session. Contact us for any centre-specific variations." },
   { question: "Can I pay IJMB fees in instalments?", answer: "Some IJMB centres allow instalment payments. Typically, you can pay 60-70% during registration and the balance before resumption. Confirm with your chosen centre." },
   { question: "What does the IJMB fee cover?", answer: "The IJMB fee covers registration, tuition, study materials, examination fees, and administrative charges. Accommodation and feeding are usually separate." },
   { question: "Is IJMB cheaper than going through UTME?", answer: "Yes. When you consider the cost of years of JAMB registration, tutorials, and an extra year in 100 level, IJMB often works out more cost-effective." },
@@ -48,7 +48,7 @@ const Fees = () => (
             </div>
             <div className="p-6 space-y-4">
               {[
-                { label: "Registration Form", price: "₦5,500" },
+                { label: "Registration Form", price: "₦10,000" },
                 { label: "Tuition Fee", price: "₦350,000" },
                 { label: "Hostel Accommodation (optional)", price: "₦150,000" },
               ].map((item, i) => (
@@ -71,14 +71,14 @@ const Fees = () => (
               <p className="text-sm opacity-90 mb-8">tuition per session</p>
 
               <div className="space-y-2 text-sm text-left mx-auto max-w-xs mb-8">
-                <div className="flex items-center gap-2"><CheckCircle size={16} /> Registration Form: ₦5,500</div>
+                <div className="flex items-center gap-2"><CheckCircle size={16} /> Registration Form: ₦10,000</div>
                 <div className="flex items-center gap-2"><CheckCircle size={16} /> Tuition: ₦350,000</div>
                 <div className="flex items-center gap-2"><CheckCircle size={16} /> Hostel (optional): ₦150,000</div>
                 <div className="flex items-center gap-2"><CheckCircle size={16} /> Direct Entry Admission</div>
               </div>
 
               <div className="bg-white/20 rounded-lg p-3 text-sm">
-                Total with hostel: ₦505,500
+                Total with hostel: ₦510,000
               </div>
             </div>
           </div>
@@ -86,7 +86,7 @@ const Fees = () => (
 
         <div className="bg-accent/10 border border-accent/30 p-4 rounded-lg mb-8">
           <p className="text-sm text-muted-foreground">
-            <strong>Note:</strong> The hostel fee is optional. Students who do not require accommodation only pay the registration form fee (₦5,500) and tuition fee (₦350,000).
+            <strong>Note:</strong> The hostel fee is optional. Students who do not require accommodation only pay the registration form fee (₦10,000) and tuition fee (₦350,000).
           </p>
         </div>
 

@@ -78,7 +78,7 @@ export function welcomeEmail(fullName: string, email: string) {
       <ol style="color:#475569;font-size:14px;line-height:2;margin:0 0 24px;padding-left:20px">
         <li>Log in to your dashboard</li>
         <li>Fill in your application form (takes ~10 minutes)</li>
-        <li>Pay the ₦5,500 registration form fee</li>
+        <li>Pay the ₦10,000 registration form fee</li>
         <li>Upload your O-Level result or awaiting slip</li>
         <li>Receive your admission letter and report to your assigned centre</li>
       </ol>

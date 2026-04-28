@@ -267,7 +267,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
     },
     {
       question: `How much is IJMB in ${cityName}?`,
-      answer: `The IJMB registration form fee is ₦5,500 nationwide. Tuition fees vary by centre but are generally affordable — contact us after registering for a full breakdown of costs for your assigned centre in ${cityName}, ${data.state}.`
+      answer: `The IJMB registration form fee is ₦10,000 nationwide. Tuition fees vary by centre but are generally affordable — contact us after registering for a full breakdown of costs for your assigned centre in ${cityName}, ${data.state}.`
     },
     {
       question: `Which universities near ${cityName} accept IJMB?`,
@@ -275,7 +275,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
     },
     {
       question: `Can I register for IJMB online from ${cityName}?`,
-      answer: `Yes. Registration is completed entirely online. After paying the ₦5,500 form fee, our team will assign you to an accredited centre in ${cityName} or the nearest approved centre in ${data.state} State.`
+      answer: `Yes. Registration is completed entirely online. After paying the ₦10,000 form fee, our team will assign you to an accredited centre in ${cityName} or the nearest approved centre in ${data.state} State.`
     },
     {
       question: `What subjects should I take for IJMB in ${cityName}?`,
@@ -504,7 +504,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                   {[
                     { step: "1", title: "Create Your Account", desc: `Visit the registration portal and create an account using your email address.` },
                     { step: "2", title: "Fill Your Application", desc: "Complete your personal details, select your preferred centre in " + cityName + ", and choose your 3 A-Level subjects." },
-                    { step: "3", title: "Pay the Form Fee", desc: "Pay the ₦5,500 IJMB registration form fee securely online via card or bank transfer." },
+                    { step: "3", title: "Pay the Form Fee", desc: "Pay the ₦10,000 IJMB registration form fee securely online via card or bank transfer." },
                     { step: "4", title: "Upload Documents", desc: "Upload your O-Level result (or awaiting result slip) and a clear passport photograph." },
                     { step: "5", title: "Receive Admission Letter", desc: `After review, receive your admission letter and report to your assigned centre in ${cityName} for clearance and resumption.` },
                   ].map((s) => (
@@ -564,7 +564,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                     {YEAR} registration is open. Gain direct entry into 200 level without UTME.
                   </p>
                   <div className="space-y-2 text-sm opacity-80 mb-5">
-                    <p className="flex items-center gap-2"><CheckCircle size={14} /> Form fee: ₦5,500</p>
+                    <p className="flex items-center gap-2"><CheckCircle size={14} /> Form fee: ₦10,000</p>
                     <p className="flex items-center gap-2"><CheckCircle size={14} /> Accredited centres in {cityName}</p>
                     <p className="flex items-center gap-2"><CheckCircle size={14} /> {data.universities.length}+ universities accepting IJMB</p>
                   </div>
@@ -592,7 +592,7 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                     <p className="flex justify-between"><span>State</span><span className="font-medium text-foreground">{data.state}</span></p>
                     <p className="flex justify-between"><span>Region</span><span className="font-medium text-foreground">{data.region}</span></p>
                     <p className="flex justify-between"><span>Nearby Universities</span><span className="font-medium text-foreground">{data.universities.length}+</span></p>
-                    <p className="flex justify-between"><span>Form Fee</span><span className="font-medium text-foreground">₦5,500</span></p>
+                    <p className="flex justify-between"><span>Form Fee</span><span className="font-medium text-foreground">₦10,000</span></p>
                     <p className="flex justify-between"><span>Tuition Fee</span><span className="font-medium text-foreground">₦350,000</span></p>
                     <p className="flex justify-between"><span>Hostel Fee</span><span className="font-medium text-foreground">₦150,000</span></p>
                     <p className="flex justify-between"><span>Programme Duration</span><span className="font-medium text-foreground">9 Months</span></p>

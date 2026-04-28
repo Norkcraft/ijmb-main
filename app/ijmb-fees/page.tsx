@@ -6,20 +6,20 @@ const YEAR = `${yr}/${yr + 1}`;
 
 export const metadata: Metadata = {
   title: `IJMB Form Price & Fees ${YEAR} – Complete Cost Breakdown`,
-  description: 'How much is IJMB form in 2026? IJMB registration form fee is ₦5,500. Tuition fee ₦350,000. Hostel fee ₦150,000. Full cost breakdown for 2026/2027 session.',
+  description: 'How much is IJMB form in 2026? IJMB registration form fee is ₦10,000. Tuition fee ₦350,000. Hostel fee ₦150,000. Full cost breakdown for 2026/2027 session.',
   keywords: ['IJMB form price 2026', 'IJMB fees Nigeria', 'how much is IJMB form', 'IJMB registration fee', 'IJMB tuition fee', 'IJMB cost 2026 2027'],
   alternates: { canonical: 'https://www.ijmb.info/ijmb-fees' },
   robots: { index: true, follow: true, googleBot: { index: true, follow: true, 'max-snippet': -1, 'max-image-preview': 'large' } },
   openGraph: {
     title: `IJMB Form Price & Fees ${YEAR} – Complete Breakdown`,
-    description: `IJMB form fee is ₦5,500. See the complete cost breakdown for the ${YEAR} session including tuition, hostel and exam fees.`,
+    description: `IJMB form fee is ₦10,000. See the complete cost breakdown for the ${YEAR} session including tuition, hostel and exam fees.`,
     url: 'https://www.ijmb.info/ijmb-fees',
     images: [{ url: 'https://www.ijmb.info/ijmb-logo.jpeg', width: 400, height: 400, alt: `IJMB Fees ${YEAR}` }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `IJMB Form Price & Fees ${YEAR}`,
-    description: `IJMB form fee ₦5,500. Full cost breakdown for ${YEAR} session.`,
+    description: `IJMB form fee ₦10,000. Full cost breakdown for ${YEAR} session.`,
     images: ['https://www.ijmb.info/ijmb-logo.jpeg'],
   },
 };

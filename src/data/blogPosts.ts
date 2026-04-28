@@ -248,7 +248,7 @@ export const blogPosts: BlogPost[] = [
       <p>Here is a clear and transparent breakdown of all fees for the IJMB programme for the 2026/2027 session.</p>
 
       <h3>1. Registration Form Fee</h3>
-      <p><strong>₦5,500</strong> (one-time, paid online at registration)</p>
+      <p><strong>₦10,000</strong> (one-time, paid online at registration)</p>
       <p>This is the fee paid to purchase the application form and create your student profile on the portal.</p>
 
       <h3>2. Tuition Fee</h3>
@@ -263,11 +263,11 @@ export const blogPosts: BlogPost[] = [
       <table>
         <thead><tr><th>Fee</th><th>Amount</th></tr></thead>
         <tbody>
-          <tr><td>Registration Form</td><td>₦5,500</td></tr>
+          <tr><td>Registration Form</td><td>₦10,000</td></tr>
           <tr><td>Tuition Fee</td><td>₦350,000</td></tr>
           <tr><td>Hostel (optional)</td><td>₦150,000</td></tr>
-          <tr><td><strong>Total (without hostel)</strong></td><td><strong>₦355,500</strong></td></tr>
-          <tr><td><strong>Total (with hostel)</strong></td><td><strong>₦505,500</strong></td></tr>
+          <tr><td><strong>Total (without hostel)</strong></td><td><strong>₦360,000</strong></td></tr>
+          <tr><td><strong>Total (with hostel)</strong></td><td><strong>₦510,000</strong></td></tr>
         </tbody>
       </table>
     `,
@@ -308,7 +308,7 @@ export const blogPosts: BlogPost[] = [
             <tr><td class="border border-gray-300 px-4 py-2 font-medium">University Acceptance</td><td class="border border-gray-300 px-4 py-2">200+ universities nationwide</td><td class="border border-gray-300 px-4 py-2">100+ mainly UNILAG affiliates</td></tr>
             <tr><td class="border border-gray-300 px-4 py-2 font-medium">Northern Nigeria Acceptance</td><td class="border border-gray-300 px-4 py-2">Excellent — preferred choice</td><td class="border border-gray-300 px-4 py-2">Limited acceptance</td></tr>
             <tr><td class="border border-gray-300 px-4 py-2 font-medium">Certificate Validity</td><td class="border border-gray-300 px-4 py-2">Lifetime (no expiry)</td><td class="border border-gray-300 px-4 py-2">Lifetime (no expiry)</td></tr>
-            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Form Fee</td><td class="border border-gray-300 px-4 py-2">₦5,500</td><td class="border border-gray-300 px-4 py-2">₦10,000–₦15,000</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Form Fee</td><td class="border border-gray-300 px-4 py-2">₦10,000</td><td class="border border-gray-300 px-4 py-2">₦10,000–₦15,000</td></tr>
           </tbody>
         </table>
       </div>
@@ -846,7 +846,7 @@ export const blogPosts: BlogPost[] = [
       <h2>What Are the Fees for IJMB in Abuja?</h2>
       <p>Due to the higher cost of living in Abuja, IJMB programme fees tend to be slightly higher than in other Nigerian cities:</p>
       <ul>
-        <li><strong>Registration Form:</strong> ₦5,500 (standard nationwide)</li>
+        <li><strong>Registration Form:</strong> ₦10,000 (standard nationwide)</li>
         <li><strong>Acceptance Fee:</strong> ₦25,000 – ₦40,000</li>
         <li><strong>Tuition Fee:</strong> ₦350,000 per session</li>
         <li><strong>Hostel:</strong> ₦150,000 per session</li>
@@ -866,7 +866,7 @@ export const blogPosts: BlogPost[] = [
         <li>Visit our <a href="/register" class="text-primary font-medium underline">online registration portal</a> and create an account</li>
         <li>Fill in your personal and academic details</li>
         <li>Select your preferred subject combination</li>
-        <li>Pay the ₦5,500 registration form fee securely online</li>
+        <li>Pay the ₦10,000 registration form fee securely online</li>
         <li>You will be contacted with your centre assignment and resumption date</li>
       </ol>
       <p>You do not need to physically visit any office to start — the entire registration process is online. Once your form fee is confirmed, your admission letter will be processed and sent to you via email.</p>
@@ -1058,7 +1058,7 @@ export const blogPosts: BlogPost[] = [
       <table>
         <thead><tr><th>Fee Type</th><th>Amount</th></tr></thead>
         <tbody>
-          <tr><td>Application/Form Fee</td><td>₦5,500</td></tr>
+          <tr><td>Application/Form Fee</td><td>₦10,000</td></tr>
           <tr><td>Tuition Fee (per session)</td><td>₦350,000</td></tr>
           <tr><td>Hostel Accommodation (optional)</td><td>₦150,000</td></tr>
         </tbody>
@@ -1082,7 +1082,7 @@ export const blogPosts: BlogPost[] = [
         <li>Fill in your personal and academic details</li>
         <li>Select <strong>Anambra City Centre</strong> as your preferred study centre</li>
         <li>Choose your subject combination</li>
-        <li>Pay the form fee of <strong>₦5,500</strong> via Paystack (card, bank transfer, or USSD)</li>
+        <li>Pay the form fee of <strong>₦10,000</strong> via Paystack (card, bank transfer, or USSD)</li>
         <li>Download and print your registration slip</li>
       </ol>
 
@@ -1239,7 +1239,7 @@ export const blogPosts: BlogPost[] = [
         <li>Visit <strong>www.ijmb.info</strong> and create an account</li>
         <li>Select your preferred IJMB study centre</li>
         <li>Choose the <strong>Biology/Chemistry/Physics</strong> subject combination</li>
-        <li>Pay the form fee (₦5,500) and tuition fee</li>
+        <li>Pay the form fee (₦10,000) and tuition fee</li>
         <li>Begin classes at the start of the academic session</li>
       </ol>
     `,

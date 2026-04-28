@@ -139,12 +139,12 @@ const Centres = () => (
                       </tr>
                       <tr className="border-b">
                          <td className="p-3 font-medium">Registration Form Fee</td>
-                         <td className="p-3 font-medium text-primary">₦5,500</td>
+                         <td className="p-3 font-medium text-primary">₦10,000</td>
                          <td className="p-3">—</td>
                       </tr>
                       <tr>
                          <td className="p-3 font-medium">Total (with Hostel)</td>
-                         <td className="p-3 font-bold">₦505,500</td>
+                         <td className="p-3 font-bold">₦510,000</td>
                          <td className="p-3 text-muted-foreground">incl. above</td>
                       </tr>
                    </tbody>

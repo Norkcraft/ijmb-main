@@ -51,7 +51,7 @@ export const useStudentDashboard = () => {
         sessions: sessRes.data || [],
         centres: centreRes.data || [],
         combos: comboRes.data || [],
-        formFee: feeRes.data?.amount ? Number(feeRes.data.amount) : 5500
+        formFee: feeRes.data?.amount ? Number(feeRes.data.amount) : 10000
       };
     },
     staleTime: 1000 * 60 * 60, // 1 hour
@@ -84,7 +84,7 @@ export const useStudentDashboard = () => {
   const sessions = staticData?.sessions || [];
   const centres = staticData?.centres || [];
   const combos = staticData?.combos || [];
-  const formFee = staticData?.formFee || 5500;
+  const formFee = staticData?.formFee || 10000;
 
   // Mutation: Save Application
   const saveMutation = useMutation({

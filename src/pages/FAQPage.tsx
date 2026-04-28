@@ -12,7 +12,7 @@ const allFaqs = [
   { question: "Who can register for IJMB?", answer: "Anyone with at least 5 O-Level credits including English and Mathematics from WAEC, NECO, or NABTEB. Awaiting result candidates may also apply." },
   { question: "How long is the IJMB programme?", answer: "The IJMB programme runs for approximately 9 months (one academic session)." },
   { question: "Do I need JAMB to register for IJMB?", answer: "No. You do not need a JAMB/UTME score to register for IJMB. However, after passing IJMB, you will need JAMB registration for direct entry processing." },
-  { question: "How much does IJMB cost?", answer: "The IJMB registration form fee is ₦5,500. Tuition fee is ₦350,000 per session. Hostel accommodation is ₦150,000 per session." },
+  { question: "How much does IJMB cost?", answer: "The IJMB registration form fee is ₦10,000. Tuition fee is ₦350,000 per session. Hostel accommodation is ₦150,000 per session." },
   { question: "Can I use IJMB for Medicine?", answer: "Yes. Many universities accept IJMB for Medicine, Dentistry, Pharmacy, and other health courses. You typically need high scores (9+ points)." },
   { question: "Where are IJMB centres located?", answer: "IJMB centres are spread across Nigeria including Lagos, Abuja, Ibadan, Kano, Port Harcourt, Ilorin, Jos, Enugu, and many more cities." },
   { question: "Is IJMB better than JAMB?", answer: "IJMB offers a more reliable path to admission with a 95%+ success rate. You enter 200 level directly, save one year, and avoid UTME stress." },
@@ -29,7 +29,7 @@ const allFaqs = [
   { question: "What is the minimum IJMB score for admission?", answer: "Most universities require a minimum of 8 points (out of 15) for competitive courses. Some courses accept 5-6 points. Higher scores give you better chances." },
   { question: "Can I register for IJMB with awaiting result?", answer: "Yes. Candidates awaiting their O-Level results can register for IJMB. However, you must provide your results before writing the IJMB examination." },
   { question: "Is accommodation provided at IJMB centres?", answer: "Some centres provide hostel accommodation while others do not. Check with your preferred centre for accommodation availability and costs." },
-  { question: "How do I pay for IJMB registration?", answer: "You can pay the ₦5,500 registration form fee online through our portal. Programme fees are paid directly to your chosen study centre." },
+  { question: "How do I pay for IJMB registration?", answer: "You can pay the ₦10,000 registration form fee online through our portal. Programme fees are paid directly to your chosen study centre." },
   { question: "Can I transfer my IJMB centre?", answer: "Centre transfers are possible but subject to availability and approval. Contact the admin team if you need to change your study centre." },
   { question: "What if I fail the IJMB examination?", answer: "If you don't achieve the required score, you can re-sit the IJMB examination in the next session. Your registration remains valid." },
 ];

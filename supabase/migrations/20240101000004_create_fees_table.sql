@@ -36,7 +36,7 @@ create policy "Fees are insertable by admins only"
 
 -- Seed default fees
 insert into fees (name, amount, description) values
-  ('form_fee', 5500, 'Registration form fee'),
+  ('form_fee', 10000, 'Registration form fee'),
   ('acceptance_fee', 20000, 'Acceptance fee for admitted students'),
   ('tuition_fee', 80000, 'Standard tuition fee (may vary by centre)'),
   ('hostel_fee', 30000, 'Standard hostel fee (may vary by centre)')

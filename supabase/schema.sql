@@ -366,7 +366,7 @@ CREATE TRIGGER set_app_number
 -- =================================================================
 
 INSERT INTO public.fees (name, amount, description) VALUES
-  ('form_fee',       5500,  'Application form processing fee'),
+  ('form_fee',       10000,  'Application form processing fee'),
   ('tuition_fee',    85000, 'Full tuition fee for one academic session'),
   ('hostel_fee',     45000, 'Hostel accommodation fee per session'),
   ('acceptance_fee', 15000, 'Acceptance fee upon admission')

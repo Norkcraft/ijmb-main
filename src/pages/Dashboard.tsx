@@ -318,7 +318,7 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
     },
     {
       label: 'Registration Fee',
-      value: formFeePaid ? 'Paid ✓' : `₦${(formFee || 5500).toLocaleString()}`,
+      value: formFeePaid ? 'Paid ✓' : `₦${(formFee || 10000).toLocaleString()}`,
       icon: <CreditCard size={18} className={formFeePaid ? 'text-green-600' : 'text-amber-600'} />,
       bg: formFeePaid ? 'bg-green-50' : 'bg-amber-50',
       valueColor: formFeePaid ? 'text-green-700' : 'text-amber-700',

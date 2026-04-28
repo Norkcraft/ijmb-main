@@ -10,7 +10,7 @@ const faqs = [
   { question: "Who can register for IJMB?", answer: "Any candidate with at least 5 O-Level credits including English Language and Mathematics can register for the IJMB programme." },
   { question: "How long is the IJMB programme?", answer: "The IJMB programme runs for approximately 9 months (one academic session). After completion, candidates write the IJMB examination administered by ABU Zaria." },
   { question: "Do I need JAMB for IJMB?", answer: "You do not need to write UTME to register for IJMB. However, you will need a JAMB Direct Entry form to process your university admission after passing the IJMB exams." },
-  { question: "How much is IJMB registration?", answer: "The IJMB registration form fee is ₦5,500. Tuition fee is ₦350,000 per session. Hostel accommodation is ₦150,000 per session." },
+  { question: "How much is IJMB registration?", answer: "The IJMB registration form fee is ₦10,000. Tuition fee is ₦350,000 per session. Hostel accommodation is ₦150,000 per session." },
   { question: "Can I use IJMB for Medicine or Law?", answer: "Yes. Many universities accept IJMB for Medicine, Law, Engineering, Pharmacy, and other competitive courses. You typically need to score 9 points or higher in your IJMB examinations." },
   { question: "Is IJMB the same as JUPEB?", answer: "No. IJMB is administered by Ahmadu Bello University (ABU) Zaria while JUPEB is administered by the University of Lagos (UNILAG). Both offer A-Level qualifications for direct entry but have different curricula and examination bodies." },
 ];
@@ -81,7 +81,7 @@ const jsonLd = {
       },
       offers: {
         "@type": "Offer",
-        price: "5500",
+        price: "10000",
         priceCurrency: "NGN",
         availability: "https://schema.org/InStock",
         url: "https://www.ijmb.info/register",
@@ -112,7 +112,7 @@ const jsonLd = {
 export const metadata: Metadata = {
   title: `IJMB Registration ${YEAR} Nigeria | Direct Entry 200 Level Without UTME`,
   description:
-    `Register for IJMB ${YEAR} in Nigeria. Gain direct entry admission into 200 level without UTME. Accepted by 200+ federal and state universities. Form fee ₦5,500. Apply now.`,
+    `Register for IJMB ${YEAR} in Nigeria. Gain direct entry admission into 200 level without UTME. Accepted by 200+ federal and state universities. Form fee ₦10,000. Apply now.`,
   keywords: [
     "IJMB registration",
     "IJMB 2026",
