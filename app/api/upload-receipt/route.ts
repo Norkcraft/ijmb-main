@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     };
     const ext = extMap[file.type];
     const ref = `MANUAL-${Date.now()}-${user.id.slice(0, 8)}`;
-    const storagePath = `payment-receipts/${user.id}/${ref}.${ext}`;
+    const storagePath = `${user.id}/payment-receipts/${ref}.${ext}`;
 
     // Upload receipt to storage
     const { error: uploadError } = await userClient.storage
