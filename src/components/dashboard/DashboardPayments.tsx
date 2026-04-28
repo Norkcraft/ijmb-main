@@ -10,6 +10,9 @@ import { Label } from '@/components/ui/label';
 import { CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import dynamic from 'next/dynamic';
 const PaymentButton = dynamic(() => import('@/components/PaymentButton'), { ssr: false });
+const BankTransferInfo = dynamic(() => import('@/components/BankTransferInfo'), { ssr: false });
+
+const isManualMode = process.env.NEXT_PUBLIC_PAYMENT_MODE === 'manual';
 
 interface DashboardPaymentsProps {
   user: any;
@@ -232,39 +235,50 @@ export const DashboardPayments = ({
                           ) : (
                             <div className="flex flex-col gap-2 w-full">
                               {user && (
-                                <>
-                                  <PaymentButton
-                                    email={user.email || ''}
+                                isManualMode ? (
+                                  <BankTransferInfo
                                     amount={isPartPaid ? balance : amount}
-                                    userId={user.id}
-                                    applicationId={application?.id}
                                     paymentType={name}
-                                    label={isPartPaid ? `Pay Balance (₦${balance.toLocaleString()})` : `Pay ₦${amount.toLocaleString()} Now`}
+                                    applicationId={application?.id}
+                                    userId={user.id}
                                     disabled={blocked || notConfigured}
-                                    onSuccess={async ({ paymentType, amount }) => {
-                                      setOptimisticPaid(prev => new Set([...prev, paymentType]));
-                                      await onFeePaymentSuccess(paymentType, amount);
-                                      await fetchData();
-                                    }}
+                                    onSuccess={() => fetchData()}
                                   />
-
-                                  {showInstallment && !isPartPaid && (
+                                ) : (
+                                  <>
                                     <PaymentButton
                                       email={user.email || ''}
-                                      amount={amount / 2}
+                                      amount={isPartPaid ? balance : amount}
                                       userId={user.id}
                                       applicationId={application?.id}
                                       paymentType={name}
-                                      label={`Pay Installment (₦${(amount / 2).toLocaleString()})`}
+                                      label={isPartPaid ? `Pay Balance (₦${balance.toLocaleString()})` : `Pay ₦${amount.toLocaleString()} Now`}
                                       disabled={blocked || notConfigured}
-                                      variant="outline"
-                                      onSuccess={async ({ paymentType }) => {
-                                        await onFeePaymentSuccess(paymentType);
+                                      onSuccess={async ({ paymentType, amount }) => {
+                                        setOptimisticPaid(prev => new Set([...prev, paymentType]));
+                                        await onFeePaymentSuccess(paymentType, amount);
                                         await fetchData();
                                       }}
                                     />
-                                  )}
-                                </>
+
+                                    {showInstallment && !isPartPaid && (
+                                      <PaymentButton
+                                        email={user.email || ''}
+                                        amount={amount / 2}
+                                        userId={user.id}
+                                        applicationId={application?.id}
+                                        paymentType={name}
+                                        label={`Pay Installment (₦${(amount / 2).toLocaleString()})`}
+                                        disabled={blocked || notConfigured}
+                                        variant="outline"
+                                        onSuccess={async ({ paymentType }) => {
+                                          await onFeePaymentSuccess(paymentType);
+                                          await fetchData();
+                                        }}
+                                      />
+                                    )}
+                                  </>
+                                )
                               )}
                             </div>
                           )}

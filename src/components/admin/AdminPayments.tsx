@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Loader2, Search } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, Search, ExternalLink, CheckCircle } from 'lucide-react';
 
 const FEE_LABELS: Record<string, string> = {
   form_fee: 'Registration Fee',
@@ -25,6 +26,7 @@ export default function AdminPayments() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterType, setFilterType] = useState('');
+  const [confirming, setConfirming] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -41,6 +43,31 @@ export default function AdminPayments() {
     };
     fetchPayments();
   }, []);
+
+  const confirmPayment = async (paymentId: string) => {
+    setConfirming(paymentId);
+    try {
+      const res = await fetch('/api/admin/confirm-payment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_INTERNAL_API_SECRET}`,
+        },
+        body: JSON.stringify({ paymentId }),
+      });
+      if (res.ok) {
+        setPayments(prev => prev.map(p => p.id === paymentId ? { ...p, status: 'success' } : p));
+      }
+    } finally {
+      setConfirming(null);
+    }
+  };
+
+  const getReceiptUrl = (p: any) => {
+    const path = p.metadata?.receipt_path;
+    if (!path) return null;
+    return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/student-documents/${path}`;
+  };
 
   const filtered = payments.filter(p => {
     const feeType = p.metadata?.payment_type || p.fee_type || '';
@@ -115,11 +142,12 @@ export default function AdminPayments() {
                   <TableHead>Amount</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="hidden sm:table-cell">Date</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filtered.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">No payments found.</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">No payments found.</TableCell></TableRow>
                 ) : (
                   filtered.map(p => {
                     const feeType = p.metadata?.payment_type || p.fee_type || '';
@@ -142,6 +170,36 @@ export default function AdminPayments() {
                           </Badge>
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{new Date(p.created_at).toLocaleString()}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            {getReceiptUrl(p) && (
+                              <a
+                                href={getReceiptUrl(p)!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:underline text-xs flex items-center gap-1"
+                              >
+                                <ExternalLink size={12} /> Receipt
+                              </a>
+                            )}
+                            {p.status === 'pending' && p.metadata?.manual && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-xs h-7 border-green-500 text-green-700 hover:bg-green-50"
+                                disabled={confirming === p.id}
+                                onClick={() => confirmPayment(p.id)}
+                              >
+                                {confirming === p.id ? (
+                                  <Loader2 size={12} className="animate-spin mr-1" />
+                                ) : (
+                                  <CheckCircle size={12} className="mr-1" />
+                                )}
+                                Confirm
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
                       </TableRow>
                     );
                   })
