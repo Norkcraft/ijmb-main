@@ -36,7 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       .from('profiles')
       .select('id, full_name, phone, role, created_at')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
     setProfile(data);
   }, []);
 
@@ -47,14 +47,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let isMounted = true;
 
-    // Safety timeout — if auth hangs for 6s, unblock the UI anyway
-    const timeout = setTimeout(() => {
-      if (isMounted) setLoading(false);
-    }, 6000);
-
     // onAuthStateChange is the single source of truth.
-    // INITIAL_SESSION fires on mount (replaces the old getSession() call),
-    // which is required when using createBrowserClient from @supabase/ssr.
+    // INITIAL_SESSION always fires on mount (even with no session),
+    // so loading will always be cleared — no safety timeout needed.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!isMounted) return;
@@ -68,13 +63,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setProfile(null);
         }
         setLoading(false);
-        clearTimeout(timeout);
       }
     );
 
     return () => {
       isMounted = false;
-      clearTimeout(timeout);
       subscription.unsubscribe();
     };
   }, [fetchProfile]);
