@@ -242,7 +242,11 @@ export const DashboardPayments = ({
                                     applicationId={application?.id}
                                     userId={user.id}
                                     disabled={blocked || notConfigured}
-                                    onSuccess={() => fetchData()}
+                                    onSuccess={async () => {
+                                      setOptimisticPaid(prev => new Set([...prev, name]));
+                                      await onFeePaymentSuccess(name, isPartPaid ? balance : amount);
+                                      await fetchData();
+                                    }}
                                   />
                                 ) : (
                                   <>
