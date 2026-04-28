@@ -132,12 +132,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch student profile for the notification email (fire-and-forget)
-    adminClient
-      .from('profiles')
-      .select('full_name, phone, email')
-      .eq('id', user.id)
-      .single()
-      .then(({ data: profile }) => {
+    Promise.resolve(
+      adminClient
+        .from('profiles')
+        .select('full_name, phone, email')
+        .eq('id', user.id)
+        .single()
+    ).then(({ data: profile }) => {
         const name = profile?.full_name || 'Unknown';
         const phone = profile?.phone || 'N/A';
         const email = profile?.email || user.email || 'N/A';
