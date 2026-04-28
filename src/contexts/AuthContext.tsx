@@ -32,12 +32,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('id, full_name, phone, role, created_at')
-      .eq('id', userId)
-      .maybeSingle();
-    setProfile(data);
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, full_name, phone, role, created_at')
+        .eq('id', userId)
+        .maybeSingle();
+      if (!error) setProfile(data);
+    } catch {
+      // Network error — leave profile state unchanged
+    }
   }, []);
 
   const refreshProfile = useCallback(async () => {
@@ -48,21 +52,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let isMounted = true;
 
     // onAuthStateChange is the single source of truth.
-    // INITIAL_SESSION always fires on mount (even with no session),
-    // so loading will always be cleared — no safety timeout needed.
+    // INITIAL_SESSION always fires on mount (even with no session).
+    // We use a non-async callback + .finally() so setLoading(false) always
+    // fires — even if the profile fetch hangs or errors on a slow connection.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!isMounted) return;
         setSession(session);
         setUser(session?.user ?? null);
-        if (session?.user) {
-          if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
-            await fetchProfile(session.user.id);
-          }
-        } else {
+
+        if (!session?.user) {
           setProfile(null);
+          setLoading(false);
+          return;
         }
-        setLoading(false);
+
+        if (event === 'SIGNED_IN' || event === 'USER_UPDATED' || event === 'INITIAL_SESSION') {
+          // Race the profile fetch against a 6 s timeout so a hung request
+          // can never keep the loading spinner up forever.
+          const timeout = new Promise<void>(resolve => setTimeout(resolve, 6000));
+          Promise.race([fetchProfile(session.user.id), timeout]).finally(() => {
+            if (isMounted) setLoading(false);
+          });
+        } else {
+          setLoading(false);
+        }
       }
     );
 
