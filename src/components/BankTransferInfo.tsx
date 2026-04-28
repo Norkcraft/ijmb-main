@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Upload, CheckCircle, Loader2, Copy, Building2 } from 'lucide-react';
@@ -30,6 +30,7 @@ export default function BankTransferInfo({
   disabled,
   onSuccess,
 }: BankTransferInfoProps) {
+  const { session } = useAuth();
   const { toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
@@ -47,8 +48,7 @@ export default function BankTransferInfo({
 
     setUploading(true);
     try {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
+      const token = session?.access_token;
       if (!token) {
         toast({ title: 'Session expired', description: 'Please log in again.', variant: 'destructive' });
         return;
