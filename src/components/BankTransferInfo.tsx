@@ -68,7 +68,7 @@ export default function BankTransferInfo({
 
       const result = await res.json();
       if (!res.ok) {
-        toast({ title: 'Upload failed', description: result.message, variant: 'destructive' });
+        toast({ title: 'Upload failed', description: result.message || result.error || 'Unknown error', variant: 'destructive' });
         return;
       }
 

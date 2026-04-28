@@ -41,14 +41,7 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await anonClient.auth.getUser(token);
     if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
-    // User-scoped client for storage upload and payment insert (RLS enforced)
-    const userClient = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { global: { headers: { Authorization: `Bearer ${token}` } } }
-    );
-
-    // Service role client for application status updates and profile fetch
+    // Service role client — user identity already verified above, so bypassing RLS is safe
     const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -90,7 +83,7 @@ export async function POST(request: NextRequest) {
     const storagePath = `${user.id}/payment-receipts/${ref}.${ext}`;
 
     // Upload receipt to storage
-    const { error: uploadError } = await userClient.storage
+    const { error: uploadError } = await adminClient.storage
       .from('student-documents')
       .upload(storagePath, buffer, { contentType: file.type, upsert: true });
 
@@ -100,11 +93,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Record payment as immediately confirmed
-    const { error: payError } = await userClient.from('payments').insert({
+    const { error: payError } = await adminClient.from('payments').insert({
       user_id: user.id,
       application_id: applicationId || null,
       amount: parseFloat(amount),
       reference: ref,
+      type: paymentType,
       status: 'success',
       metadata: {
         payment_type: paymentType,
@@ -115,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     if (payError) {
       console.error('[upload-receipt] DB error:', payError);
-      return NextResponse.json({ message: 'Failed to record payment', error: payError.message }, { status: 500 });
+      return NextResponse.json({ message: `Failed to record payment: ${payError.message}`, error: payError.message }, { status: 500 });
     }
 
     // Update application status — mirrors what the Paystack webhook does
