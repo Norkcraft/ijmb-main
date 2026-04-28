@@ -58,7 +58,6 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
             application_id: applicationId,
             amount: amount,
             reference: reference.reference,
-            type: paymentType,
             status: 'success',
             metadata: { ...reference, payment_type: paymentType },
           });

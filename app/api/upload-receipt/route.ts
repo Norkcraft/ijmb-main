@@ -98,7 +98,6 @@ export async function POST(request: NextRequest) {
       application_id: applicationId || null,
       amount: parseFloat(amount),
       reference: ref,
-      type: paymentType,
       status: 'success',
       metadata: {
         payment_type: paymentType,
