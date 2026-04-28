@@ -73,10 +73,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [fetchProfile]);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Clear local state immediately so the UI responds at once,
+    // then revoke the session server-side in the background.
     setUser(null);
     setSession(null);
     setProfile(null);
+    supabase.auth.signOut().catch(() => {});
   };
 
   return (
