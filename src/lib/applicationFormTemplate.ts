@@ -48,9 +48,6 @@ export interface ApplicationFormData {
 export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
   const logoSrc = data.logoBase64 || '';
 
-  const isMale = data.gender?.toLowerCase() === 'male';
-  const isFemale = data.gender?.toLowerCase() === 'female';
-
   /* ── Passport photo ───────────────────────────────────────────── */
   const passportHtml = data.passportPhotoBase64
     ? `<img src="${data.passportPhotoBase64}" style="width:100%;height:100%;object-fit:cover;display:block;" alt="Passport"/>`
@@ -69,14 +66,23 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
       <td class="rn">${i + 1}</td>
       <td>${r ? esc(r.subject) : '&nbsp;'}</td>
       <td>${r ? esc(r.grade) : '&nbsp;'}</td>
-      <td>${r ? esc(r.examYear) : '&nbsp;'}</td>
       <td>${r ? esc(r.examType) : '&nbsp;'}</td>
+      <td>${r ? esc(r.examYear) : '&nbsp;'}</td>
     </tr>`;
   }).join('');
 
   const printDate = new Date().toLocaleDateString('en-GB', {
     day: '2-digit', month: 'short', year: 'numeric',
   });
+
+  /* ── Determine subjects from combination or individual fields ─── */
+  const subjectParts = data.subjectCombination ? data.subjectCombination.split(/[,/]/).map(s => s.trim()) : [];
+  const sub1 = data.subject1 || subjectParts[0] || '';
+  const sub2 = data.subject2 || subjectParts[1] || '';
+  const sub3 = data.subject3 || subjectParts[2] || '';
+
+  /* ── Payment method checkbox ─────────────────────────────────── */
+  const isManualPayment = (data.paymentReference || '').startsWith('MANUAL-');
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -396,199 +402,182 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 
       <!-- SECTION A: Personal Information -->
       <div class="section">
-        <div class="section-header">
-          <div class="section-letter">A</div>
-          Personal Information
+        <div class="section-header"><span class="section-letter">A</span> Personal Information</div>
+
+        <!-- Row 1: Surname | First Name | Middle Name -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:6px;">
+          <div class="field"><label>Surname</label><div class="underline">${esc(data.surname)}</div></div>
+          <div class="field"><label>First Name</label><div class="underline">${esc(data.firstName)}</div></div>
+          <div class="field"><label>Middle Name</label><div class="underline">${esc(data.middleName)}</div></div>
         </div>
 
-        <!-- Name row -->
-        <div class="field-row">
-          <div class="field">
-            <label>Surname</label>
-            <div class="underline">${esc(data.surname)}</div>
-          </div>
-          <div class="field">
-            <label>First Name</label>
-            <div class="underline">${esc(data.firstName)}</div>
-          </div>
-          <div class="field">
-            <label>Middle Name</label>
-            <div class="underline">${esc(data.middleName)}</div>
-          </div>
+        <!-- Row 2: Date of Birth | Nationality -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
+          <div class="field"><label>Date of Birth</label><div class="underline">${esc(data.dateOfBirth)}</div></div>
+          <div class="field"><label>Nationality</label><div class="underline">Nigerian</div></div>
         </div>
 
-        <!-- Gender / DOB / Nationality -->
-        <div class="cb-row">
-          <span class="cb-label">Gender:</span>
-          <div class="cb-item"><input type="checkbox" ${isMale ? 'checked' : ''}/> Male</div>
-          <div class="cb-item"><input type="checkbox" ${isFemale ? 'checked' : ''}/> Female</div>
-          <div class="cb-divider"></div>
-          <div class="inline-field">
-            <span class="lbl">Date of Birth:</span>
-            <div class="underline">${esc(data.dateOfBirth)}</div>
-          </div>
-          <div class="inline-field">
-            <span class="lbl">Nationality:</span>
-            <div class="underline">Nigerian</div>
-          </div>
+        <!-- Row 3: State of Origin | LGA -->
+        <div style="display:grid;grid-template-columns:3fr 2fr;gap:10px;margin-bottom:6px;">
+          <div class="field"><label>State of Origin</label><div class="underline">${esc(data.stateOfOrigin)}</div></div>
+          <div class="field"><label>L.G.A.</label><div class="underline">${esc(data.lga)}</div></div>
         </div>
 
-        <!-- State / LGA / Phone -->
-        <div class="field-row">
-          <div class="field">
-            <label>State of Origin</label>
-            <div class="underline">${esc(data.stateOfOrigin)}</div>
-          </div>
-          <div class="field">
-            <label>L.G.A.</label>
-            <div class="underline">${esc(data.lga)}</div>
-          </div>
-          <div class="field">
-            <label>Phone Number</label>
-            <div class="underline">${esc(data.phoneNumber)}</div>
-          </div>
+        <!-- Row 4: Phone | Email -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
+          <div class="field"><label>Phone Number</label><div class="underline">${esc(data.phoneNumber)}</div></div>
+          <div class="field"><label>Email Address</label><div class="underline">${esc(data.email)}</div></div>
         </div>
 
-        <!-- Email / Address -->
-        <div class="field-row">
-          <div class="field">
-            <label>Email Address</label>
-            <div class="underline">${esc(data.email)}</div>
-          </div>
-          <div class="field" style="flex:2">
-            <label>Residential Address</label>
-            <div class="underline">${esc(data.residentialAddress)}</div>
-          </div>
+        <!-- Row 5: Residential Address full width -->
+        <div style="margin-bottom:6px;">
+          <div class="field"><label>Residential Address</label><div class="underline">${esc(data.residentialAddress)}</div></div>
         </div>
       </div><!-- /section A -->
 
-      <!-- SECTION B: Programme & Centre -->
+      <!-- SECTION B: O'Level Information -->
       <div class="section">
-        <div class="section-header">
-          <div class="section-letter">B</div>
-          Programme &amp; Centre
+        <div class="section-header"><span class="section-letter">B</span> O&apos;Level Information</div>
+
+        <div class="cb-row">
+          <span class="cb-label">Result Status:</span>
+          <div class="cb-item"><input type="checkbox"> Result Available</div>
+          <div class="cb-item"><input type="checkbox"> Awaiting Result</div>
+          <div class="cb-divider"></div>
+          <span class="cb-label">Exam Body:</span>
+          <div class="cb-item"><input type="checkbox"> WAEC</div>
+          <div class="cb-item"><input type="checkbox"> NECO</div>
+          <div class="cb-item"><input type="checkbox"> NABTEB</div>
+          <div class="cb-item"><input type="checkbox"> GCE</div>
+          <span class="cb-label" style="margin-left:6px;">Sittings:</span>
+          <div class="cb-item"><input type="checkbox"> 1</div>
+          <div class="cb-item"><input type="checkbox"> 2</div>
         </div>
 
-        <div class="field-row">
-          <div class="field" style="flex:2">
-            <label>Centre of Study</label>
-            <div class="underline">${esc(data.centreOfStudy)}</div>
-          </div>
-          <div class="field" style="flex:2">
-            <label>Subject Combination</label>
-            <div class="underline">${esc(data.subjectCombination)}</div>
-          </div>
-          <div class="field">
-            <label>Academic Session</label>
-            <div class="underline">${esc(data.academicSession)}</div>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div class="field" style="flex:2">
-            <label>Intended Course / Department</label>
-            <div class="underline">${esc(data.courseOfChoice)}</div>
-          </div>
-          <div class="field">
-            <label>Programme Type</label>
-            <div class="underline">Direct Entry</div>
-          </div>
-          <div class="field">
-            <label>Registration Date</label>
-            <div class="underline">${esc(data.registrationDate)}</div>
-          </div>
-        </div>
-      </div><!-- /section B -->
-
-      <!-- SECTION C: O'Level Results -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-letter">C</div>
-          O&apos;Level Results
-        </div>
         <table class="olevel-table">
           <thead>
             <tr>
               <th class="rn">#</th>
-              <th>Subject</th>
-              <th>Grade</th>
-              <th>Year</th>
-              <th>Exam Body</th>
+              <th style="width:44%;">Subject</th>
+              <th style="width:13%;">Grade</th>
+              <th style="width:24%;">Exam Body</th>
+              <th style="width:14%;">Year</th>
             </tr>
           </thead>
           <tbody>
             ${olevelRows}
           </tbody>
         </table>
-      </div><!-- /section C -->
+      </div><!-- /section B -->
 
-      <!-- SECTION D: Payment Information -->
+      <!-- SECTION C: Programme Information -->
       <div class="section">
-        <div class="section-header">
-          <div class="section-letter">D</div>
-          Payment Information
+        <div class="section-header"><span class="section-letter">C</span> Programme Information</div>
+
+        <div class="field-row">
+          <div class="field" style="flex:3;">
+            <label>Preferred Study Centre</label>
+            <div class="underline">${esc(data.centreOfStudy)}</div>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:5px;flex-shrink:0;">
+            <span style="font-size:8px;font-weight:bold;text-transform:uppercase;padding-bottom:2px;">Academic Session:</span>
+            <span style="font-size:10px;font-weight:900;padding-bottom:1px;color:#1a6b3a;">${esc(data.academicSession)}</span>
+          </div>
+        </div>
+
+        <div class="cb-row">
+          <span class="cb-label">Programme Track:</span>
+          <div class="cb-item"><input type="checkbox"> Science</div>
+          <div class="cb-item"><input type="checkbox"> Arts</div>
+          <div class="cb-item"><input type="checkbox"> Social Science</div>
+        </div>
+
+        <div style="margin-bottom:5px;">
+          <span style="font-size:8px;font-weight:bold;text-transform:uppercase;color:#222;letter-spacing:0.3px;">A-Level Subject Combination:</span>
         </div>
         <div class="field-row">
-          <div class="field" style="flex:2">
-            <label>Payment Reference</label>
+          <div class="inline-field"><span class="lbl">Subject 1:</span><div class="underline">${esc(sub1)}</div></div>
+        </div>
+        <div class="field-row">
+          <div class="inline-field"><span class="lbl">Subject 2:</span><div class="underline">${esc(sub2)}</div></div>
+        </div>
+        <div class="field-row">
+          <div class="inline-field"><span class="lbl">Subject 3:</span><div class="underline">${esc(sub3)}</div></div>
+        </div>
+      </div><!-- /section C -->
+
+      <!-- SECTION D: Payment Details -->
+      <div class="section">
+        <div class="section-header"><span class="section-letter">D</span> Payment Details</div>
+
+        <div class="field-row">
+          <div class="field" style="flex:3;">
+            <label>Invoice / Reference Number</label>
             <div class="underline">${esc(data.paymentReference) || '&mdash;'}</div>
           </div>
+          <div class="field" style="flex:2;">
+            <label>Amount Paid (&#8358;)</label>
+            <div class="underline">${esc(data.amountPaid) || '&mdash;'}</div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px;">
           <div class="field">
-            <label>Date of Payment</label>
+            <label>Payment Date</label>
             <div class="underline">${esc(data.paymentDate) || '&mdash;'}</div>
           </div>
           <div class="field">
-            <label>Amount Paid</label>
-            <div class="underline">${esc(data.amountPaid) || '&mdash;'}</div>
+            <label>Payment Method</label>
+            <div style="display:flex;align-items:center;gap:10px;padding-top:3px;">
+              <div class="cb-item"><input type="checkbox" ${!isManualPayment ? 'checked' : ''}> Online</div>
+              <div class="cb-item"><input type="checkbox" ${isManualPayment ? 'checked' : ''}> Bank</div>
+              <div class="cb-item"><input type="checkbox"> POS</div>
+            </div>
           </div>
         </div>
       </div><!-- /section D -->
 
-      <!-- DECLARATION -->
-      <div class="declaration">
-        I hereby declare that all information provided on this form is correct and truthful to the best of my knowledge.
-        I understand that any false declaration will result in immediate disqualification and possible prosecution.
-        I agree to abide by all rules and regulations of the Interim Joint Matriculation Board (IJMB).
-      </div>
+      <!-- SECTION E: Declaration & Signatures -->
+      <div class="section">
+        <div class="section-header"><span class="section-letter">E</span> Declaration &amp; Signatures</div>
 
-      <!-- SIGNATURE ROW -->
-      <div class="sig-row">
-        <div class="sig-field">
-          <span class="lbl">Applicant&apos;s Signature:</span>
-          <div class="underline"></div>
+        <div class="declaration">
+          &ldquo;I hereby certify that all information provided in this form is true, correct and complete to the best of my knowledge.&rdquo;
         </div>
-        <div class="date-group">
-          <span class="lbl">Date:</span>
-          <div class="dbox dd"></div>
-          <span class="dsep">/</span>
-          <div class="dbox mm"></div>
-          <span class="dsep">/</span>
-          <div class="dbox yyyy"></div>
-        </div>
-      </div>
 
-      <!-- OFFICIAL USE BOX -->
-      <div class="official-box">
-        <div class="official-title">For Official Use Only</div>
-        <div class="field-row">
-          <div class="field">
-            <label>Verified By</label>
-            <div class="underline" style="height:28px;"></div>
+        <div class="sig-row">
+          <div class="sig-field">
+            <span class="lbl">Candidate Signature:</span>
+            <div class="underline"></div>
           </div>
-          <div class="field">
-            <label>Date Verified</label>
-            <div class="underline" style="height:28px;"></div>
-          </div>
-          <div class="field">
-            <label>Official Stamp</label>
-            <div class="underline" style="height:28px;"></div>
-          </div>
-          <div class="field">
-            <label>Remarks</label>
-            <div class="underline" style="height:28px;"></div>
+          <div class="date-group">
+            <span class="lbl">Date:</span>
+            <div class="dbox dd"></div>
+            <span class="dsep">/</span>
+            <div class="dbox mm"></div>
+            <span class="dsep">/</span>
+            <div class="dbox yyyy"></div>
           </div>
         </div>
-      </div>
+
+        <div class="official-box">
+          <div class="official-title">For Official Use Only</div>
+          <div class="sig-row" style="margin-bottom:0;">
+            <div class="sig-field">
+              <span class="lbl">Signature &amp; Stamp of Centre Coordinator:</span>
+              <div class="underline"></div>
+            </div>
+            <div class="date-group">
+              <span class="lbl">Date:</span>
+              <div class="dbox dd"></div>
+              <span class="dsep">/</span>
+              <div class="dbox mm"></div>
+              <span class="dsep">/</span>
+              <div class="dbox yyyy"></div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /section E -->
 
     </div><!-- /form-body -->
 
