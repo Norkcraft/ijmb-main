@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { sendEmail } from '@/lib/resendClient';
 
 const ALLOWED_TYPES: Record<string, { magic: number[] | null }> = {
   'image/jpeg': { magic: [0xFF, 0xD8, 0xFF] },
@@ -9,9 +10,21 @@ const ALLOWED_TYPES: Record<string, { magic: number[] | null }> = {
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
+const FEE_LABELS: Record<string, string> = {
+  form_fee: 'Registration Form Fee',
+  acceptance_fee: 'Acceptance Fee',
+  tuition_fee: 'Tuition Fee',
+  hostel_fee: 'Hostel Fee',
+};
+
 function checkMagicBytes(buffer: Buffer, magic: number[]): boolean {
   if (buffer.length < magic.length) return false;
   return magic.every((byte, i) => buffer[i] === byte);
+}
+
+function esc(str: string | undefined | null): string {
+  if (!str) return '';
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 export async function POST(request: NextRequest) {
@@ -35,7 +48,7 @@ export async function POST(request: NextRequest) {
       { global: { headers: { Authorization: `Bearer ${token}` } } }
     );
 
-    // Service role client for application status updates (same as webhook)
+    // Service role client for application status updates and profile fetch
     const adminClient = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.SUPABASE_SERVICE_ROLE_KEY!
@@ -124,6 +137,84 @@ export async function POST(request: NextRequest) {
 
       await adminClient.from('applications').update(updates).eq('id', applicationId);
     }
+
+    // Fetch student profile for the notification email (fire-and-forget)
+    adminClient
+      .from('profiles')
+      .select('full_name, phone, email')
+      .eq('id', user.id)
+      .single()
+      .then(({ data: profile }) => {
+        const name = profile?.full_name || 'Unknown';
+        const phone = profile?.phone || 'N/A';
+        const email = profile?.email || user.email || 'N/A';
+        const feeLabel = FEE_LABELS[paymentType!] || paymentType!;
+        const amountFormatted = `₦${parseFloat(amount!).toLocaleString()}`;
+        const receiptUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/student-documents/${storagePath}`;
+        const paidAt = new Date().toLocaleString('en-NG', { timeZone: 'Africa/Lagos', dateStyle: 'full', timeStyle: 'short' });
+
+        const html = `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden">
+            <div style="background:#006400;padding:24px 32px">
+              <img src="https://www.ijmb.info/ijmb-logo.jpeg" alt="IJMB" style="height:56px;border-radius:8px;display:block;margin:0 auto 10px"/>
+              <p style="color:#fff;text-align:center;margin:0;font-size:18px;font-weight:bold">New Payment Receipt Received</p>
+            </div>
+
+            <div style="padding:28px 32px;background:#fff">
+              <p style="color:#475569;margin:0 0 20px">A student has uploaded a bank transfer receipt. Details below:</p>
+
+              <table style="width:100%;border-collapse:collapse;font-size:14px">
+                <tr style="border-bottom:1px solid #f1f5f9">
+                  <td style="padding:10px 8px;color:#64748b;width:40%">Student Name</td>
+                  <td style="padding:10px 8px;font-weight:600;color:#1e293b">${esc(name)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9">
+                  <td style="padding:10px 8px;color:#64748b">Email</td>
+                  <td style="padding:10px 8px;font-weight:600;color:#1e293b">${esc(email)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9">
+                  <td style="padding:10px 8px;color:#64748b">Phone</td>
+                  <td style="padding:10px 8px;font-weight:600;color:#1e293b">${esc(phone)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9">
+                  <td style="padding:10px 8px;color:#64748b">Fee Type</td>
+                  <td style="padding:10px 8px;font-weight:600;color:#1e293b">${esc(feeLabel)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9">
+                  <td style="padding:10px 8px;color:#64748b">Amount</td>
+                  <td style="padding:10px 8px;font-weight:600;color:#006400;font-size:16px">${esc(amountFormatted)}</td>
+                </tr>
+                <tr style="border-bottom:1px solid #f1f5f9">
+                  <td style="padding:10px 8px;color:#64748b">Reference</td>
+                  <td style="padding:10px 8px;font-family:monospace;color:#1e293b">${esc(ref)}</td>
+                </tr>
+                <tr>
+                  <td style="padding:10px 8px;color:#64748b">Submitted At</td>
+                  <td style="padding:10px 8px;color:#1e293b">${esc(paidAt)}</td>
+                </tr>
+              </table>
+
+              <div style="margin-top:24px;text-align:center">
+                <a href="${receiptUrl}" style="display:inline-block;background:#006400;color:#fff;padding:12px 28px;border-radius:6px;text-decoration:none;font-weight:bold;font-size:14px">
+                  View Payment Receipt
+                </a>
+              </div>
+
+              <p style="color:#94a3b8;font-size:12px;margin-top:24px;text-align:center">
+                This payment has been automatically confirmed in the portal.<br/>
+                Log in to the admin dashboard to review.
+              </p>
+            </div>
+          </div>
+        `;
+
+        sendEmail({
+          to: 'support@ijmb.info',
+          subject: `New Payment Receipt — ${feeLabel} (${amountFormatted}) from ${name}`,
+          html,
+        }).catch(err => console.error('[upload-receipt] Email error:', err));
+      })
+      .catch(err => console.error('[upload-receipt] Profile fetch error:', err));
 
     return NextResponse.json({ message: 'Payment confirmed', reference: ref });
   } catch (err: any) {
