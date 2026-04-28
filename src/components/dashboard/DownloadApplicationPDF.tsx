@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Loader2 } from 'lucide-react';
-import { supabase } from '@/lib/supabaseClient';
+import { useAuth } from '@/contexts/AuthContext';
 import { buildApplicationFormHTML } from '@/lib/applicationFormTemplate';
 import { generateQRCodeBase64 } from '@/lib/generateQRCode';
 
@@ -27,6 +27,7 @@ async function toBase64FromUrl(url: string): Promise<string> {
 }
 
 export const DownloadApplicationPDF = ({ applicationId }: Props) => {
+  const { session } = useAuth();
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState('');
 
@@ -38,7 +39,6 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
     let styleEl: HTMLStyleElement | null = null;
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
       const token = session?.access_token;
       if (!token) throw new Error('Not signed in.');
 
@@ -118,14 +118,14 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
         images.map(img => img.complete ? Promise.resolve() : new Promise(r => { img.onload = r; img.onerror = r; }))
       );
       // Allow CSS to settle
-      await new Promise(r => setTimeout(r, 600));
+      await new Promise(r => setTimeout(r, 200));
 
       // 6. Capture with html2canvas — target first child (the form root div)
       const { default: html2canvas } = await import('html2canvas');
       const pageEl = (container.firstElementChild as HTMLElement) || container;
 
       const canvas = await html2canvas(pageEl, {
-        scale: 1.5,
+        scale: 1.2,
         useCORS: true,
         allowTaint: true,
         width: 794,
@@ -140,9 +140,19 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       // 7. Build PDF and trigger download
       const { default: jsPDF } = await import('jspdf');
       const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      const imgData = canvas.toDataURL('image/jpeg', 0.97);
+      const imgData = canvas.toDataURL('image/jpeg', 0.95);
       pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297);
-      pdf.save(`IJMB-Application-${data.applicationId}.pdf`);
+
+      // Force file download via anchor click — avoids browser PDF-viewer popup
+      const blob = pdf.output('blob');
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `IJMB-Application-${data.applicationId}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
 
     } catch (err: any) {
       console.error('PDF download error:', err);
