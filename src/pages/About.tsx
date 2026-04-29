@@ -59,9 +59,9 @@ const About = () => (
   <>
     <SEOHead
       title="About Dynamic School of Advanced Studies – IJMB Study Centre"
-      description="Dynamic School of Advanced Studies is a leading accredited IJMB study centre helping Nigerian students gain direct 200-Level university admission without UTME. Learn about our mission, story, and team."
+      description="Dynamic School of Advanced Studies is a leading IJMB study centre helping Nigerian students gain direct 200-Level university admission without UTME. Learn about our mission, story, and team."
       canonical="https://www.ijmb.info/about"
-      keywords="Dynamic School of Advanced Studies, IJMB study centre, IJMB school Nigeria, about IJMB portal, accredited IJMB centre"
+      keywords="Dynamic School of Advanced Studies, IJMB study centre, IJMB school Nigeria, about IJMB portal, IJMB study centre Nigeria"
     />
     <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "About Us" }]} />
 
@@ -72,7 +72,7 @@ const About = () => (
     >
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <span className="inline-block mb-4 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide uppercase bg-white/15 border border-white/25">
-          Accredited IJMB Study Centre
+          IJMB Study Centre
         </span>
         <h1 className="text-3xl sm:text-4xl lg:text-6xl font-heading font-bold mb-6 leading-tight">
           Dynamic School of<br className="hidden sm:block" /> Advanced Studies
@@ -224,7 +224,7 @@ const About = () => (
               </p>
             </div>
             <div className="p-5 rounded-2xl border" style={{ background: "hsl(40, 92%, 50% / 0.08)" }}>
-              <p className="text-lg font-heading font-bold mb-1">Registered &amp; Accredited</p>
+              <p className="text-lg font-heading font-bold mb-1">Trusted Across Nigeria</p>
               <p className="text-sm text-muted-foreground">
                 We operate fully within the official IJMB framework set by Ahmadu Bello University, Zaria.
               </p>

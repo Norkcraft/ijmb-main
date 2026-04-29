@@ -4,12 +4,12 @@ import About from '@/pages/About';
 export const metadata: Metadata = {
   title: 'About Dynamic School of Advanced Studies – IJMB Study Centre',
   description:
-    'Dynamic School of Advanced Studies is a leading accredited IJMB study centre in Nigeria. We help students gain direct 200-Level university admission without UTME. Learn about our mission, story, and values.',
+    'Dynamic School of Advanced Studies is a leading IJMB study centre in Nigeria. We help students gain direct 200-Level university admission without UTME. Learn about our mission, story, and values.',
   keywords: [
     'Dynamic School of Advanced Studies',
     'about IJMB study centre',
     'IJMB school Nigeria',
-    'accredited IJMB centre',
+    'IJMB study centre Nigeria',
     'IJMB portal about',
     'IJMB direct entry school',
   ],
@@ -44,7 +44,7 @@ const jsonLd = {
   name: 'Dynamic School of Advanced Studies',
   url: 'https://www.ijmb.info/about',
   description:
-    'Accredited IJMB study centre offering A-Level tuition for direct 200-Level university admission in Nigeria.',
+    'IJMB study centre offering A-Level tuition for direct 200-Level university admission in Nigeria.',
   knowsAbout: 'IJMB (Interim Joint Matriculation Board) A-Level Programme',
   breadcrumb: {
     '@type': 'BreadcrumbList',
