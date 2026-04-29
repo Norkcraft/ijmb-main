@@ -19,6 +19,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 const publicNavLinks = [
   { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
   { label: "How It Works", href: "/ijmb-registration" },
   { label: "Centres", href: "/ijmb-centres-in-nigeria" },
   { label: "Fees", href: "/ijmb-fees" },

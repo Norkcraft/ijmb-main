@@ -5,7 +5,9 @@ import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
-import { Mail, Phone, MapPin, Clock, MessageSquare } from "lucide-react";
+import { MessageSquare } from "lucide-react";
+
+const WHATSAPP_LINK = "https://wa.link/udcjk0";
 
 const yr = new Date().getFullYear();
 const YEAR = `${yr}/${yr + 1}`;
@@ -14,118 +16,59 @@ const Contact = () => (
   <>
     <SEOHead
       title={`Contact IJMB Official Support – ${YEAR} Admission Enquiries`}
-      description={`Need help with IJMB registration? Contact our official admission support team. Call, email or visit our head office for ${YEAR} admission guidance.`}
-      canonical="https://www.ijmb.info/contact-us"
-      keywords="Contact IJMB, IJMB support, IJMB admission office, IJMB helpline, IJMB office address"
+      description={`Need help with IJMB registration? Chat with our official admission support team on WhatsApp for instant answers on ${YEAR} admission, fees, and study centres.`}
+      canonical="https://www.ijmb.info/contact"
+      keywords="Contact IJMB, IJMB WhatsApp, IJMB support, IJMB admission office, IJMB helpline"
     />
     <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Contact Us" }]} />
 
     <section className="section-padding">
-      <div className="max-w-6xl mx-auto">
-        <div className="grid lg:grid-cols-2 gap-12 items-start">
-          <div>
-            <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-6">Contact Our Admission Support Team</h1>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
-              Do you have questions about the IJMB programme, registration process, or study centres?
-              Our dedicated admission officers are available to guide you through every step of your journey into 200 Level.
-            </p>
+      <div className="max-w-2xl mx-auto text-center">
 
-            <div className="space-y-6 mb-10">
-              <div className="flex gap-4 items-start p-4 bg-secondary/30 rounded-xl border hover:border-primary transition-colors">
-                <div className="bg-primary/10 p-3 rounded-full text-primary">
-                  <Phone size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">Call Us</h3>
-                  <p className="text-muted-foreground mb-1">Speak directly with an admission officer.</p>
-                  <a href="tel:08000000000" className="text-lg font-bold text-primary hover:underline">080-0000-0000</a>
-                  <p className="text-xs text-muted-foreground">Mon-Fri, 8am - 6pm</p>
-                </div>
-              </div>
+        <h1 className="text-3xl lg:text-5xl font-heading font-bold mb-5">
+          Talk to Us on WhatsApp
+        </h1>
+        <p className="text-lg text-muted-foreground leading-relaxed mb-10">
+          Have a question about IJMB registration, fees, or study centres?
+          Send us a message on WhatsApp — our admission officers are available and reply fast.
+        </p>
 
-              <div className="flex gap-4 items-start p-4 bg-secondary/30 rounded-xl border hover:border-primary transition-colors">
-                <div className="bg-primary/10 p-3 rounded-full text-primary">
-                   <Mail size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">Email Support</h3>
-                  <p className="text-muted-foreground mb-1">Send us your enquiries anytime.</p>
-                  <a href="mailto:help@ijmb.info" className="text-lg font-bold text-primary hover:underline">help@ijmb.info</a>
-                  <p className="text-xs text-muted-foreground">We reply within 24 hours</p>
-                </div>
-              </div>
+        {/* WhatsApp CTA */}
+        <a
+          href={WHATSAPP_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-3 px-10 py-4 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-xl hover:brightness-105 transition-all"
+          style={{ backgroundColor: "#25D366" }}
+        >
+          {/* WhatsApp SVG icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-6 h-6 fill-current shrink-0">
+            <path d="M16.004 0h-.008C7.174 0 0 7.176 0 16.004c0 3.5 1.129 6.744 3.047 9.379L1.054 31.27l6.1-1.957a15.9 15.9 0 008.85 2.691C24.826 32 32 24.826 32 16.004S24.826 0 16.004 0zm9.35 22.617c-.393 1.107-1.943 2.025-3.188 2.293-.852.182-1.963.326-5.705-1.227-4.787-1.986-7.867-6.834-8.107-7.152-.229-.318-1.928-2.568-1.928-4.895s1.221-3.473 1.654-3.947c.434-.475.947-.594 1.262-.594.316 0 .631.002.908.016.291.016.682-.111 1.068.814.393.947 1.34 3.264 1.457 3.502.119.238.197.514.039.83-.158.318-.236.514-.475.791-.236.277-.498.619-.711.83-.238.238-.486.496-.209.971.277.475 1.234 2.035 2.65 3.299 1.82 1.623 3.354 2.127 3.83 2.365.475.238.752.197 1.029-.119.277-.316 1.182-1.379 1.498-1.854.316-.475.633-.395 1.068-.238.434.158 2.752 1.299 3.225 1.535.475.238.791.355.908.553.119.197.119 1.145-.275 2.252z"/>
+          </svg>
+          Chat with Us on WhatsApp
+        </a>
 
-              <div className="flex gap-4 items-start p-4 bg-secondary/30 rounded-xl border hover:border-primary transition-colors">
-                <div className="bg-primary/10 p-3 rounded-full text-primary">
-                   <MapPin size={24} />
-                </div>
-                <div>
-                  <h3 className="font-bold text-lg">Head Office</h3>
-                  <p className="text-muted-foreground">
-                    Plot 12, Educational Zone, <br />
-                    Gwagwalada, Abuja, FCT.
-                  </p>
-                </div>
-              </div>
-            </div>
+        <p className="text-sm text-muted-foreground mt-5">
+          Available Mon – Sat · Typically replies within minutes
+        </p>
 
-            <div className="bg-blue-50 border border-blue-100 p-6 rounded-xl">
-               <h3 className="font-bold text-blue-900 flex items-center gap-2 mb-2">
-                 <MessageSquare size={20} /> Quick Tip
-               </h3>
-               <p className="text-blue-800 text-sm">
-                 Most questions are answered in our <Link href="/ijmb-faq" className="underline font-bold">Frequently Asked Questions</Link> section.
-                 Check it out for instant answers about fees, centres, and requirements.
-               </p>
-            </div>
-          </div>
-
-          <div className="bg-card border rounded-2xl shadow-sm p-6 lg:p-8">
-            <h2 className="text-2xl font-bold mb-6">Send a Message</h2>
-            <form className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">First Name</label>
-                  <input type="text" className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="John" />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Last Name</label>
-                  <input type="text" className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="Doe" />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Email Address</label>
-                <input type="email" className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="john@example.com" />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Phone Number</label>
-                <input type="tel" className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="080..." />
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Subject</label>
-                <select className="w-full px-3 py-2 border rounded-md bg-white focus:ring-2 focus:ring-primary/20 outline-none">
-                  <option>General Enquiry</option>
-                  <option>Payment Issue</option>
-                  <option>Centre Location</option>
-                  <option>Admission Status</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Message</label>
-                <textarea rows={4} className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-primary/20 outline-none" placeholder="How can we help you today?"></textarea>
-              </div>
-
-              <button className="w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg hover:opacity-90 transition-opacity">
-                Send Message
-              </button>
-            </form>
-          </div>
+        {/* Quick Tip */}
+        <div className="mt-12 bg-blue-50 border border-blue-100 p-6 rounded-xl text-left">
+          <h3 className="font-bold text-blue-900 flex items-center gap-2 mb-2">
+            <MessageSquare size={20} /> Quick Tip
+          </h3>
+          <p className="text-blue-800 text-sm">
+            Most questions are answered in our{" "}
+            <Link href="/faq" className="underline font-bold">
+              Frequently Asked Questions
+            </Link>{" "}
+            section. Check it out for instant answers about fees, centres, and requirements.
+          </p>
         </div>
 
+      </div>
+
+      <div className="max-w-6xl mx-auto mt-16">
         <InternalLinks />
       </div>
     </section>

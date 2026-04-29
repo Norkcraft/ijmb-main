@@ -31,6 +31,7 @@ const Footer = () => (
         <div>
           <h3 className="font-heading font-bold mb-4">Resources</h3>
           <ul className="space-y-2 text-sm opacity-80">
+            <li><Link href="/about" className="hover:opacity-100 transition-opacity">About Us</Link></li>
             <li><Link href="/blog" className="hover:opacity-100 transition-opacity">Blog & Updates</Link></li>
             <li><Link href="/ijmb-vs-jamb" className="hover:opacity-100 transition-opacity">IJMB vs JAMB</Link></li>
             <li><Link href="/faq" className="hover:opacity-100 transition-opacity">FAQ</Link></li>
