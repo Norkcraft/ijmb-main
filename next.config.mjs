@@ -26,6 +26,14 @@ const nextConfig = {
   async headers() {
     return [
       {
+        // Ensure Googlebot can read the sitemap with correct content-type
+        source: '/sitemap.xml',
+        headers: [
+          { key: 'Content-Type', value: 'application/xml; charset=utf-8' },
+          { key: 'Cache-Control', value: 'public, max-age=3600, must-revalidate' },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           // Force HTTPS for 1 year

@@ -59,6 +59,11 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    /*
+     * Run middleware ONLY on these routes.
+     * Explicitly exclude sitemap.xml, robots.txt and static files
+     * so Googlebot can always fetch them without interference.
+     */
     '/dashboard/:path*',
     '/portal-admin/:path*',
     '/login',
