@@ -1,4 +1,4 @@
-import { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next';
 import { blogPosts } from '@/data/blogPosts';
 
 const BASE_URL = 'https://www.ijmb.info';
