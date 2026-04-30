@@ -2,11 +2,11 @@ import type { Metadata } from 'next';
 import About from '@/pages/About';
 
 export const metadata: Metadata = {
-  title: 'About Dynamic School of Advanced Studies – IJMB Study Centre',
+  title: 'About Dynamic College of Advanced Studies – IJMB Study Centre',
   description:
-    'Dynamic School of Advanced Studies is a leading IJMB study centre in Nigeria. We help students gain direct 200-Level university admission without UTME. Learn about our mission, story, and values.',
+    'Dynamic College of Advanced Studies is a leading IJMB study centre in Nigeria. We help students gain direct 200-Level university admission without UTME. Learn about our mission, story, and values.',
   keywords: [
-    'Dynamic School of Advanced Studies',
+    'Dynamic College of Advanced Studies',
     'about IJMB study centre',
     'IJMB school Nigeria',
     'IJMB study centre Nigeria',
@@ -16,22 +16,22 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.ijmb.info/about' },
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'About Dynamic School of Advanced Studies – IJMB Study Centre',
+    title: 'About Dynamic College of Advanced Studies – IJMB Study Centre',
     description:
-      "Learn about Dynamic School of Advanced Studies — Nigeria's trusted IJMB study centre helping students bypass UTME and gain 200-Level university admission.",
+      "Learn about Dynamic College of Advanced Studies — Nigeria's trusted IJMB study centre helping students bypass UTME and gain 200-Level university admission.",
     url: 'https://www.ijmb.info/about',
     images: [
       {
         url: 'https://www.ijmb.info/ijmb-logo.jpeg',
         width: 400,
         height: 400,
-        alt: 'Dynamic School of Advanced Studies – IJMB Study Centre',
+        alt: 'Dynamic College of Advanced Studies – IJMB Study Centre',
       },
     ],
   },
   twitter: {
     card: 'summary',
-    title: 'About Dynamic School of Advanced Studies',
+    title: 'About Dynamic College of Advanced Studies',
     description:
       "Nigeria's trusted IJMB study centre. Direct 200-Level admission without UTME.",
     images: ['https://www.ijmb.info/ijmb-logo.jpeg'],
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'EducationalOrganization',
-  name: 'Dynamic School of Advanced Studies',
+  name: 'Dynamic College of Advanced Studies',
   url: 'https://www.ijmb.info/about',
   description:
     'IJMB study centre offering A-Level tuition for direct 200-Level university admission in Nigeria.',

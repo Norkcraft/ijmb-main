@@ -58,10 +58,10 @@ const values = [
 const About = () => (
   <>
     <SEOHead
-      title="About Dynamic School of Advanced Studies – IJMB Study Centre"
-      description="Dynamic School of Advanced Studies is a leading IJMB study centre helping Nigerian students gain direct 200-Level university admission without UTME. Learn about our mission, story, and team."
+      title="About Dynamic College of Advanced Studies – IJMB Study Centre"
+      description="Dynamic College of Advanced Studies is a leading IJMB study centre helping Nigerian students gain direct 200-Level university admission without UTME. Learn about our mission, story, and team."
       canonical="https://www.ijmb.info/about"
-      keywords="Dynamic School of Advanced Studies, IJMB study centre, IJMB school Nigeria, about IJMB portal, IJMB study centre Nigeria"
+      keywords="Dynamic College of Advanced Studies, IJMB study centre, IJMB school Nigeria, about IJMB portal, IJMB study centre Nigeria"
     />
     <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "About Us" }]} />
 
@@ -170,7 +170,7 @@ const About = () => (
         </h2>
         <div className="text-muted-foreground leading-relaxed space-y-4 text-left md:text-center">
           <p>
-            Dynamic School of Advanced Studies was founded with a single conviction — that every
+            Dynamic College of Advanced Studies was founded with a single conviction — that every
             serious Nigerian student deserves a clear, reliable route into higher education.
             The IJMB programme offered exactly that: a nationally recognised A-Level qualification
             that opens the doors to 200-Level admission across more than 200 universities, without
@@ -240,7 +240,7 @@ const About = () => (
         <div className="text-center mb-12">
           <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">Why Students Choose Us</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
-            Thousands of students have trusted Dynamic School of Advanced Studies with their future. Here's why.
+            Thousands of students have trusted Dynamic College of Advanced Studies with their future. Here's why.
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
