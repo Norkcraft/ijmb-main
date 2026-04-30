@@ -11,30 +11,87 @@ const cities = [
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticPages = [
-    { url: BASE_URL, priority: 1.0, changeFrequency: 'weekly' as const },
-    { url: `${BASE_URL}/ijmb-registration`, priority: 0.95, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/ijmb-admission-requirements`, priority: 0.9, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/ijmb-fees`, priority: 0.9, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/ijmb-centres-in-nigeria`, priority: 0.9, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/universities-accepting-ijmb`, priority: 0.9, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/ijmb-vs-jamb`, priority: 0.85, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/faq`, priority: 0.8, changeFrequency: 'monthly' as const },
-    { url: `${BASE_URL}/blog`, priority: 0.85, changeFrequency: 'weekly' as const },
-    { url: `${BASE_URL}/contact`, priority: 0.6, changeFrequency: 'yearly' as const },
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: BASE_URL,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 1.0,
+    },
+    {
+      url: `${BASE_URL}/about`,
+      lastModified: new Date('2026-04-30'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/ijmb-registration`,
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.95,
+    },
+    {
+      url: `${BASE_URL}/ijmb-admission-requirements`,
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/ijmb-fees`,
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/ijmb-centres-in-nigeria`,
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/universities-accepting-ijmb`,
+      lastModified: new Date('2026-04-01'),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/ijmb-vs-jamb`,
+      lastModified: new Date('2026-03-01'),
+      changeFrequency: 'monthly',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/faq`,
+      lastModified: new Date('2026-03-01'),
+      changeFrequency: 'monthly',
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date('2026-04-29'),
+      changeFrequency: 'yearly',
+      priority: 0.6,
+    },
   ];
 
-  const cityPages = cities.map((city) => ({
+  const cityPages: MetadataRoute.Sitemap = cities.map((city) => ({
     url: `${BASE_URL}/ijmb-city/${city}`,
+    lastModified: new Date('2026-03-01'),
+    changeFrequency: 'monthly',
     priority: 0.75,
-    changeFrequency: 'monthly' as const,
   }));
 
-  const blogPages = blogPosts.map((post) => ({
+  const blogPages: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${BASE_URL}/blog/${post.slug}`,
-    priority: 0.7,
-    changeFrequency: 'monthly' as const,
     lastModified: new Date(post.date),
+    changeFrequency: 'monthly',
+    priority: 0.7,
   }));
 
   return [...staticPages, ...cityPages, ...blogPages];
