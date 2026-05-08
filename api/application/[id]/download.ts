@@ -1,40 +1,38 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { supabaseServer } from '../../../src/lib/supabaseServer';
 
+const BLANK_FORM_BUCKET = 'protected-forms';
+const BLANK_FORM_PATH   = 'application-form.pdf';
+const SIGNED_URL_EXPIRY = 60; // seconds
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // 1. Verify Request Method
   if (req.method !== 'GET') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  // 2. Extract Application ID
   const { id } = req.query;
   if (!id || typeof id !== 'string') {
     return res.status(400).json({ message: 'Missing application ID' });
   }
 
-  // 3. Verify Authentication
-  // We need to extract the JWT token from the Authorization header
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized: Missing or invalid token' });
+    return res.status(401).json({ message: 'Unauthorized' });
   }
 
   const token = authHeader.split(' ')[1];
 
   try {
-    // 4. Verify User Token with Supabase
+    // 1. Verify user
     const { data: { user }, error: authError } = await supabaseServer.auth.getUser(token);
-
     if (authError || !user) {
-      console.error('Auth error:', authError);
       return res.status(401).json({ message: 'Unauthorized: Invalid token' });
     }
 
-    // 5. Fetch Application and Verify Ownership
+    // 2. Fetch application — verify ownership and payment status
     const { data: application, error: appError } = await supabaseServer
       .from('applications')
-      .select('id, user_id, application_form_url, application_number')
+      .select('id, user_id, form_fee_paid, application_number')
       .eq('id', id)
       .single();
 
@@ -43,35 +41,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     if (application.user_id !== user.id) {
-      return res.status(403).json({ message: 'Forbidden: You do not own this application' });
+      return res.status(403).json({ message: 'Forbidden' });
     }
 
-    // 6. Check if PDF URL exists
-    if (!application.application_form_url) {
-      return res.status(404).json({ message: 'Application form not yet generated' });
+    // 3. Block access if form fee not paid
+    if (!application.form_fee_paid) {
+      return res.status(403).json({ message: 'Form fee not paid. Please complete payment to download the form.' });
     }
 
-    // 7. Fetch the PDF file
-    // Since it's a public URL in Supabase, we can just fetch it
-    const response = await fetch(application.application_form_url);
-    
-    if (!response.ok) {
-      console.error('Failed to fetch PDF from storage:', response.statusText);
-      return res.status(500).json({ message: 'Failed to retrieve PDF file' });
+    // 4. Generate a short-lived signed URL for the blank form in private storage
+    const { data: signedData, error: signedError } = await supabaseServer
+      .storage
+      .from(BLANK_FORM_BUCKET)
+      .createSignedUrl(BLANK_FORM_PATH, SIGNED_URL_EXPIRY);
+
+    if (signedError || !signedData?.signedUrl) {
+      console.error('Signed URL error:', signedError);
+      return res.status(500).json({ message: 'Could not generate download link. Please try again.' });
     }
 
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // 8. Stream the file back to the client
-    const displayId = application.application_number || id.substring(0, 8);
-    const filename = `IJMB-Application-${displayId}.pdf`;
-
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.setHeader('Content-Length', buffer.length.toString());
-    
-    return res.status(200).send(buffer);
+    return res.status(200).json({ url: signedData.signedUrl });
 
   } catch (error) {
     console.error('Download handler error:', error);
