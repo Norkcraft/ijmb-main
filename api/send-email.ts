@@ -79,6 +79,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       to: recipientEmail,
       subject: email.subject,
       html: email.html,
+      replyTo: type === 'admin_direct_message' ? 'support@ijmb.info' : undefined,
     });
 
     if (!result.success) {

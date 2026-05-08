@@ -23,9 +23,13 @@ export default function SendEmailModal({ student, onClose }: SendEmailModalProps
     if (!student || !subject.trim() || !message.trim()) return;
     setSending(true);
     try {
+      const secret = process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '';
       const res = await fetch('/api/send-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-internal-secret': secret,
+        },
         body: JSON.stringify({
           type: 'admin_direct_message',
           data: {
@@ -37,7 +41,8 @@ export default function SendEmailModal({ student, onClose }: SendEmailModalProps
         }),
       });
 
-      if (!res.ok) throw new Error('Failed to send');
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error((json as any).message || 'Failed to send');
 
       toast({ title: 'Email Sent', description: `Message delivered to ${student.full_name}.` });
       setSubject('');
