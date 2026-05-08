@@ -44,7 +44,7 @@ async function sendEmail(type: string, data: Record<string, string>, toast?: (op
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '',
       },
       body: JSON.stringify({ type, data }),
     });

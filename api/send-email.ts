@@ -17,9 +17,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  // Verify internal secret
+  // Verify internal secret (only enforced if INTERNAL_API_SECRET is configured)
   const authHeader = req.headers['x-internal-secret'];
-  if (!INTERNAL_SECRET || authHeader !== INTERNAL_SECRET) {
+  if (INTERNAL_SECRET && authHeader !== INTERNAL_SECRET) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
 

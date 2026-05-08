@@ -95,10 +95,15 @@ const Register = () => {
         email,
       });
 
+      const emailHeaders = {
+        'Content-Type': 'application/json',
+        'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '',
+      };
+
       // Send welcome email (fire-and-forget)
       fetch('/api/send-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: emailHeaders,
         body: JSON.stringify({
           type: 'welcome',
           data: { fullName, email },
@@ -108,7 +113,7 @@ const Register = () => {
       // Notify admin of new registration (fire-and-forget)
       fetch('/api/send-email', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: emailHeaders,
         body: JSON.stringify({
           type: 'admin_new_registration',
           data: { fullName, email, phone: fullPhone },
