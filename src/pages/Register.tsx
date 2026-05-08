@@ -104,6 +104,16 @@ const Register = () => {
           data: { fullName, email },
         }),
       }).catch(() => {});
+
+      // Notify admin of new registration (fire-and-forget)
+      fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'admin_new_registration',
+          data: { fullName, email, phone: fullPhone },
+        }),
+      }).catch(() => {});
     }
 
     setSent(true);

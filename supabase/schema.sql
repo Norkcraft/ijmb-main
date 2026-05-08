@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   phone        TEXT,
   role         TEXT        NOT NULL DEFAULT 'student'
                            CHECK (role IN ('student', 'coordinator', 'super_admin')),
+  email_verified BOOLEAN   NOT NULL DEFAULT FALSE,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

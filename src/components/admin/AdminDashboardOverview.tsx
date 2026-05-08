@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
-import { FileText, CheckCircle, CreditCard, Clock, ArrowUpRight, Users, AlertTriangle, TrendingUp } from 'lucide-react';
+import { FileText, CheckCircle, CreditCard, Clock, ArrowUpRight, Users, AlertTriangle, TrendingUp, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 
 const STATUS_BADGE: Record<string, string> = {
@@ -35,6 +35,8 @@ export default function AdminDashboardOverview() {
   const [stats, setStats] = useState({
     total: 0, pending: 0, admitted: 0, revenue: 0,
     activeStudents: 0,
+    registeredToday: 0,
+    needsAttentionCount: 0,
     recentApplications: [] as any[],
     pipeline: {} as Record<string, number>,
   });
@@ -43,19 +45,37 @@ export default function AdminDashboardOverview() {
   useEffect(() => {
     const fetchStats = async () => {
       setLoading(true);
-      const [appRes, payRes] = await Promise.all([
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const [appRes, payRes, profilesRes] = await Promise.all([
         supabase
           .from('applications')
           .select('id, status, created_at, first_name, surname, intended_course, profiles(full_name)')
           .order('created_at', { ascending: false }),
         supabase.from('payments').select('amount, created_at').eq('status', 'success'),
+        supabase.from('profiles').select('id, email_verified, created_at').eq('role', 'student'),
       ]);
 
       const apps = appRes.data || [];
       const payments = payRes.data || [];
+      const profiles = profilesRes.data || [];
 
       const pipeline: Record<string, number> = {};
       apps.forEach(a => { pipeline[a.status] = (pipeline[a.status] || 0) + 1; });
+
+      const appUserIds = new Set(apps.map((a: any) => a.user_id));
+      const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+      const abandonedIds = new Set(
+        apps.filter(a => a.status === 'draft' && new Date(a.created_at).getTime() < sevenDaysAgo).map((a: any) => a.user_id)
+      );
+
+      const needsAttentionCount = profiles.filter(p => {
+        if (!p.email_verified) return true;
+        if (!appUserIds.has(p.id)) return true;
+        if (abandonedIds.has(p.id)) return true;
+        return false;
+      }).length;
 
       setStats({
         total: apps.length,
@@ -63,6 +83,8 @@ export default function AdminDashboardOverview() {
         admitted: apps.filter(a => ['admitted', 'fees_pending', 'active'].includes(a.status)).length,
         activeStudents: apps.filter(a => a.status === 'active').length,
         revenue: payments.reduce((s, p) => s + (Number(p.amount) || 0), 0),
+        registeredToday: profiles.filter(p => new Date(p.created_at) >= todayStart).length,
+        needsAttentionCount,
         recentApplications: apps.slice(0, 8),
         pipeline,
       });
@@ -114,6 +136,14 @@ export default function AdminDashboardOverview() {
       sub: 'Confirmed payments',
       href: '/portal-admin?tab=payments',
     },
+    {
+      label: 'Registered Today',
+      value: stats.registeredToday,
+      icon: <UserPlus size={18} />,
+      iconBg: stats.registeredToday > 0 ? 'bg-green-100 text-green-600' : 'bg-muted text-muted-foreground',
+      sub: stats.registeredToday > 0 ? 'New today' : 'None yet today',
+      href: '/portal-admin?tab=students',
+    },
   ];
 
   // Pipeline stages to display
@@ -129,7 +159,7 @@ export default function AdminDashboardOverview() {
   return (
     <div className="p-5 sm:p-6 space-y-6">
 
-      {/* Attention alert */}
+      {/* Applications pending alert */}
       {stats.pending > 0 && (
         <div className="flex items-center gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl">
           <AlertTriangle size={18} className="text-amber-600 shrink-0" />
@@ -144,8 +174,23 @@ export default function AdminDashboardOverview() {
         </div>
       )}
 
+      {/* Students needing attention alert */}
+      {stats.needsAttentionCount > 0 && (
+        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-xl">
+          <AlertTriangle size={18} className="text-red-600 shrink-0" />
+          <p className="text-sm text-red-800 flex-1">
+            <span className="font-semibold">{stats.needsAttentionCount} student{stats.needsAttentionCount > 1 ? 's' : ''}</span> stuck — unverified email, no application, or abandoned draft.
+          </p>
+          <Link href="/portal-admin?tab=students">
+            <span className="text-xs font-semibold text-red-700 hover:text-red-900 flex items-center gap-1 whitespace-nowrap">
+              View now <ArrowUpRight size={13} />
+            </span>
+          </Link>
+        </div>
+      )}
+
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         {statCards.map((card) => (
           <Link href={card.href} key={card.label}>
             <div className={`bg-white rounded-2xl border p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer group ${card.urgent ? 'border-amber-300' : ''}`}>

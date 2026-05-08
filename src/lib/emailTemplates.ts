@@ -287,6 +287,53 @@ export function passwordResetEmail(resetLink: string) {
   return { html: wrapper(body), subject: 'Reset Your IJMB Portal Password' };
 }
 
+// ─── 7. ADMIN: NEW REGISTRATION NOTIFICATION ──────────────────────────────
+export function adminNewRegistrationEmail(fullName: string, email: string, phone: string) {
+  const body = `
+    ${header('New Student Registration')}
+    <div style="padding:36px 32px">
+      <h1 style="color:#006400;margin:0 0 12px;font-size:22px">New Student Registered</h1>
+      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
+        A new student has just created an account on the IJMB portal.
+      </p>
+      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
+        <tbody>
+          ${infoRow('Full Name', esc(fullName))}
+          ${infoRow('Email', esc(email))}
+          ${infoRow('Phone', esc(phone) || 'Not provided')}
+          ${infoRow('Registered', new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' } as any))}
+        </tbody>
+      </table>
+      ${ctaButton('View in Admin Dashboard', `${SITE}/portal-admin?tab=students`)}
+    </div>
+    ${footer()}
+  `;
+  return { html: wrapper(body), subject: `New Registration: ${esc(fullName)}` };
+}
+
+// ─── 8. ADMIN: DIRECT MESSAGE TO STUDENT ──────────────────────────────────
+export function adminDirectMessageEmail(studentName: string, subject: string, message: string) {
+  const body = `
+    ${header('Message from IJMB')}
+    <div style="padding:36px 32px">
+      <h1 style="color:#006400;margin:0 0 12px;font-size:22px">Message from IJMB Admin</h1>
+      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
+        Dear <strong>${esc(studentName)}</strong>,
+      </p>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px 24px;margin-bottom:24px">
+        <p style="margin:0;font-size:15px;color:#1e293b;line-height:1.8;white-space:pre-wrap">${esc(message)}</p>
+      </div>
+      <p style="color:#475569;font-size:14px;line-height:1.7">
+        If you have questions, reply to this email or contact us at
+        <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>.
+      </p>
+      ${ctaButton('Go to My Dashboard', `${SITE}/dashboard`)}
+    </div>
+    ${footer()}
+  `;
+  return { html: wrapper(body), subject: esc(subject) };
+}
+
 // ─── 6. ACCOUNT UPDATE NOTIFICATION ───────────────────────────────────────
 export function accountUpdateEmail(fullName: string, changeDescription: string) {
   const body = `

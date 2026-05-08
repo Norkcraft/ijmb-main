@@ -24,10 +24,11 @@ const AdminDashboard = () => {
   const currentTab = searchParams?.get('tab') || 'overview';
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [newNotifications, setNewNotifications] = useState(false);
+  const [newStudentNotification, setNewStudentNotification] = useState(false);
 
   useEffect(() => {
     // Listen for new payments in real-time
-    const channel = supabase
+    const paymentsChannel = supabase
       .channel('admin-dashboard-payments')
       .on(
         'postgres_changes',
@@ -44,16 +45,35 @@ const AdminDashboard = () => {
       )
       .subscribe();
 
+    // Listen for new student registrations in real-time
+    const studentsChannel = supabase
+      .channel('admin-dashboard-students')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'profiles' },
+        (payload) => {
+          const profile = payload.new;
+          if (profile.role === 'student') {
+            toast({
+              title: "New Student Registered!",
+              description: `${profile.full_name || 'A new student'} just signed up.`,
+              duration: 10000,
+            });
+            setNewStudentNotification(true);
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(paymentsChannel);
+      supabase.removeChannel(studentsChannel);
     };
   }, [toast]);
 
-  // Reset notification when viewing payments
+  // Reset notifications when viewing the relevant tab
   useEffect(() => {
-    if (currentTab === 'payments') {
-        setNewNotifications(false);
-    }
+    if (currentTab === 'payments') setNewNotifications(false);
   }, [currentTab]);
 
   return (
@@ -66,6 +86,7 @@ const AdminDashboard = () => {
             user={user}
             signOut={signOut}
             newNotifications={newNotifications}
+            newStudentNotification={newStudentNotification}
         />
 
         {/* Mobile Header & Content */}
@@ -75,6 +96,7 @@ const AdminDashboard = () => {
              setIsMobileMenuOpen={setIsMobileMenuOpen}
              signOut={signOut}
              newNotifications={newNotifications}
+             newStudentNotification={newStudentNotification}
           />
 
           {/* Main Content Area */}
@@ -99,7 +121,7 @@ const AdminDashboard = () => {
                 {currentTab === 'subjects' && <AdminSubjects />}
                 {currentTab === 'sessions' && <AdminSessions />}
                 {currentTab === 'fees' && <AdminFees />}
-                {currentTab === 'students' && <AdminStudents />}
+                {currentTab === 'students' && <AdminStudents onMount={() => setNewStudentNotification(false)} />}
               </div>
             </div>
           </main>

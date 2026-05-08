@@ -21,13 +21,15 @@ interface AdminMobileHeaderProps {
   setIsMobileMenuOpen: (open: boolean) => void;
   signOut: () => void;
   newNotifications?: boolean;
+  newStudentNotification?: boolean;
 }
 
 export const AdminMobileHeader = ({
   isMobileMenuOpen,
   setIsMobileMenuOpen,
   signOut,
-  newNotifications
+  newNotifications,
+  newStudentNotification,
 }: AdminMobileHeaderProps) => {
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get('tab') || 'overview';
@@ -73,6 +75,9 @@ export const AdminMobileHeader = ({
                     <span className="flex-1">{item.label}</span>
                     {item.id === 'payments' && newNotifications && (
                       <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+                    )}
+                    {item.id === 'students' && newStudentNotification && (
+                      <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                     )}
                     {isActive && <ChevronRight size={13} className="text-white/40" />}
                   </div>

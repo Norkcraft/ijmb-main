@@ -15,6 +15,7 @@ export default function AuthCallback() {
 
     const handleSession = async (userId: string) => {
       // Check if this user already has a profile
+      const { data: { user } } = await supabase.auth.getUser();
       const { data: profile } = await supabase
         .from('profiles')
         .select('id, role')
@@ -24,12 +25,33 @@ export default function AuthCallback() {
       clearTimeout(fallback);
 
       if (!profile) {
-        // New user — needs to complete their profile
-        router.replace('/complete-profile');
-      } else if (profile.role === 'super_admin' || profile.role === 'coordinator') {
-        router.replace('/portal-admin');
+        // Check if registration metadata is available (email/password signup flow)
+        const meta = user?.user_metadata;
+        const fullName = meta?.full_name;
+        const phone = meta?.phone;
+
+        if (fullName && phone) {
+          // Auto-create profile from registration data — no need to visit complete-profile
+          await supabase.from('profiles').upsert({
+            id: userId,
+            full_name: fullName,
+            phone: phone,
+            email: user?.email,
+            email_verified: true,
+          });
+          router.replace('/dashboard');
+        } else {
+          // OAuth or missing data — needs to complete their profile
+          router.replace('/complete-profile');
+        }
       } else {
-        router.replace('/dashboard');
+        // Profile exists — mark email as verified
+        await supabase.from('profiles').update({ email_verified: true }).eq('id', userId);
+        if (profile.role === 'super_admin' || profile.role === 'coordinator') {
+          router.replace('/portal-admin');
+        } else {
+          router.replace('/dashboard');
+        }
       }
     };
 

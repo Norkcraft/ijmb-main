@@ -25,9 +25,10 @@ interface AdminSidebarProps {
   user: any;
   signOut: () => void;
   newNotifications?: boolean;
+  newStudentNotification?: boolean;
 }
 
-export function AdminSidebar({ className, user, signOut, newNotifications }: AdminSidebarProps) {
+export function AdminSidebar({ className, user, signOut, newNotifications, newStudentNotification }: AdminSidebarProps) {
   const searchParams = useSearchParams();
   const currentTab = searchParams?.get('tab') || 'overview';
   const [signingOut, setSigningOut] = useState(false);
@@ -73,6 +74,9 @@ export function AdminSidebar({ className, user, signOut, newNotifications }: Adm
                 <span className="flex-1">{item.label}</span>
                 {item.id === 'payments' && newNotifications && (
                   <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
+                )}
+                {item.id === 'students' && newStudentNotification && (
+                  <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
                 )}
                 {isActive && <ChevronRight size={14} className="text-white/40" />}
               </div>
