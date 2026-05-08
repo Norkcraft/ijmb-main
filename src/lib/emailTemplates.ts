@@ -14,79 +14,112 @@ const LOGO = 'https://www.ijmb.info/ijmb-logo.jpeg';
 const SITE = 'https://www.ijmb.info';
 const SUPPORT_EMAIL = 'support@ijmb.info';
 const YEAR = new Date().getFullYear() + '/' + (new Date().getFullYear() + 1);
+const PRIMARY = '#006400';
+const GOLD = '#f5a623';
 
-const header = (title: string) => `
-  <div style="background:#006400;padding:28px 32px;text-align:center">
-    <img src="${LOGO}" alt="IJMB" style="height:64px;border-radius:10px;display:block;margin:0 auto 12px"/>
-    <p style="color:#f0f4ff;margin:0;font-size:13px;letter-spacing:0.5px;text-transform:uppercase">IJMB Student Portal — ${YEAR}</p>
+const header = (title: string, subtitle?: string) => `
+  <div style="background:linear-gradient(135deg,#006400 0%,#004d00 100%);padding:40px 40px 32px;text-align:center">
+    <img src="${LOGO}" alt="IJMB" style="height:60px;width:60px;border-radius:12px;display:block;margin:0 auto 16px;object-fit:cover;border:3px solid rgba(255,255,255,0.2)"/>
+    <h1 style="color:#ffffff;margin:0 0 6px;font-size:22px;font-weight:700;letter-spacing:-0.3px;font-family:Georgia,serif">${title}</h1>
+    ${subtitle ? `<p style="color:rgba(255,255,255,0.75);margin:0;font-size:13px;letter-spacing:0.3px">${subtitle}</p>` : `<p style="color:rgba(255,255,255,0.6);margin:0;font-size:12px;letter-spacing:0.5px;text-transform:uppercase">IJMB Student Portal &mdash; ${YEAR}</p>`}
   </div>
 `;
 
 const footer = () => `
-  <div style="background:#f1f5f9;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center">
-    <p style="color:#1e293b;font-size:13px;font-weight:600;margin:0 0 2px">Thanks for choosing IJMB.</p>
-    <p style="color:#64748b;font-size:12px;margin:0 0 12px">IJMB Support Group</p>
-    <p style="color:#64748b;font-size:12px;margin:0 0 6px">
-      Need help? Email us at <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>
-    </p>
-    <p style="color:#94a3b8;font-size:11px;margin:0">
-      © ${new Date().getFullYear()} IJMB Info ·
-      <a href="${SITE}" style="color:#94a3b8;text-decoration:none">ijmb.info</a> ·
-      <a href="${SITE}/contact" style="color:#94a3b8;text-decoration:none">Contact Us</a>
-    </p>
+  <div style="background:#0a0a0a;padding:32px 40px;text-align:center">
+    <img src="${LOGO}" alt="IJMB" style="height:36px;width:36px;border-radius:8px;display:block;margin:0 auto 14px;opacity:0.85"/>
+    <p style="color:#ffffff;font-size:15px;font-weight:700;margin:0 0 2px;letter-spacing:-0.2px">Thanks for choosing IJMB.</p>
+    <p style="color:#f5a623;font-size:12px;font-weight:600;margin:0 0 16px;letter-spacing:0.5px;text-transform:uppercase">IJMB Support Group</p>
+    <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:16px;margin-top:4px">
+      <p style="color:#888;font-size:12px;margin:0 0 6px">
+        Need help? <a href="mailto:${SUPPORT_EMAIL}" style="color:#f5a623;text-decoration:none;font-weight:600">${SUPPORT_EMAIL}</a>
+      </p>
+      <p style="color:#555;font-size:11px;margin:0">
+        &copy; ${new Date().getFullYear()} IJMB Info &nbsp;&middot;&nbsp;
+        <a href="${SITE}" style="color:#555;text-decoration:none">ijmb.info</a>
+        &nbsp;&middot;&nbsp;
+        <a href="${SITE}/contact" style="color:#555;text-decoration:none">Contact Us</a>
+      </p>
+    </div>
   </div>
 `;
 
 const wrapper = (content: string) => `
 <!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/></head>
-<body style="margin:0;padding:0;background:#f8fafc;font-family:Arial,Helvetica,sans-serif">
-  <div style="max-width:600px;margin:32px auto;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 2px 8px rgba(0,0,0,0.06)">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="color-scheme" content="light"/>
+</head>
+<body style="margin:0;padding:0;background:#f0f4f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased">
+  <div style="max-width:600px;margin:40px auto 40px;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.10)">
     ${content}
   </div>
+  <p style="text-align:center;color:#aab;font-size:11px;margin:12px 0 32px">This email was sent by IJMB Portal. Please do not reply directly to this address.</p>
 </body>
 </html>`;
 
-const ctaButton = (text: string, href: string) => `
-  <div style="text-align:center;margin:28px 0">
-    <a href="${href}"
-      style="display:inline-block;background:#ffd700;color:#1a1a1a;padding:14px 36px;border-radius:7px;text-decoration:none;font-weight:bold;font-size:16px;letter-spacing:0.3px">
-      ${text}
+const ctaButton = (text: string, href: string, color = PRIMARY) => `
+  <div style="text-align:center;margin:32px 0 8px">
+    <a href="${href}" style="display:inline-block;background:${color};color:#ffffff;padding:15px 40px;border-radius:50px;text-decoration:none;font-weight:700;font-size:15px;letter-spacing:0.2px;box-shadow:0 4px 12px rgba(0,100,0,0.25)">
+      ${text} &rarr;
     </a>
   </div>
 `;
 
+const infoTable = (rows: string) => `
+  <table style="width:100%;border-collapse:collapse;margin-bottom:24px">
+    <tbody>${rows}</tbody>
+  </table>
+`;
+
 const infoRow = (label: string, value: string) => `
   <tr>
-    <td style="padding:8px 0;color:#64748b;font-size:14px;width:160px">${label}</td>
-    <td style="padding:8px 0;color:#1e293b;font-size:14px;font-weight:600">${value}</td>
+    <td style="padding:11px 16px;background:#f8fafc;border-bottom:1px solid #e8edf2;color:#64748b;font-size:13px;font-weight:500;width:44%;border-radius:0">${label}</td>
+    <td style="padding:11px 16px;background:#ffffff;border-bottom:1px solid #e8edf2;color:#0f172a;font-size:13px;font-weight:600">${value}</td>
   </tr>
 `;
+
+const divider = () => `<div style="height:1px;background:#f1f5f9;margin:24px 0"></div>`;
+
+const badge = (text: string, color: string, bg: string) => `<span style="display:inline-block;background:${bg};color:${color};font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0.3px">${text}</span>`;
 
 // ─── 1. WELCOME / REGISTRATION ─────────────────────────────────────────────
 export function welcomeEmail(fullName: string, email: string) {
   const body = `
-    ${header('Welcome to IJMB Portal')}
-    <div style="padding:36px 32px">
-      <h1 style="color:#006400;margin:0 0 8px;font-size:22px">Welcome, ${esc(fullName)}! 🎓</h1>
-      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
-        Your IJMB Student Portal account has been created successfully. You're one step closer to gaining <strong>direct entry into 200 Level</strong> at any Nigerian university — without UTME.
+    ${header('Welcome to IJMB Portal', 'Your journey to Direct Entry starts here')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 8px">Hi ${esc(fullName)}, welcome aboard!</p>
+      <p style="color:#475569;font-size:15px;margin:0 0 24px;line-height:1.7">
+        Your IJMB Student Portal account has been created. You're now one step closer to gaining <strong style="color:#006400">Direct Entry into 200 Level</strong> at any Nigerian university &mdash; no UTME required.
       </p>
-      <div style="background:#f0fff0;border-left:4px solid #006400;padding:16px 20px;border-radius:0 8px 8px 0;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#1e293b"><strong>Your account email:</strong> ${esc(email)}</p>
+
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-bottom:28px">
+        <p style="margin:0;font-size:13px;color:#166534"><span style="font-weight:700">Account Email:</span> ${esc(email)}</p>
       </div>
-      <h3 style="color:#006400;font-size:15px;margin:0 0 12px">What to do next:</h3>
-      <ol style="color:#475569;font-size:14px;line-height:2;margin:0 0 24px;padding-left:20px">
-        <li>Log in to your dashboard</li>
-        <li>Fill in your application form (takes ~10 minutes)</li>
-        <li>Pay the ₦10,000 registration form fee</li>
-        <li>Upload your O-Level result or awaiting slip</li>
-        <li>Receive your admission letter and report to your assigned centre</li>
-      </ol>
+
+      <p style="color:#0f172a;font-size:14px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.5px">What to do next</p>
+      <table style="width:100%;border-collapse:collapse">
+        ${[
+          ['1', 'Log in to your dashboard'],
+          ['2', 'Fill in your application form (takes ~10 minutes)'],
+          ['3', 'Pay the ₦10,000 registration form fee'],
+          ['4', 'Upload your O-Level result or awaiting slip'],
+          ['5', 'Receive your admission letter and report to your centre'],
+        ].map(([num, step]) => `
+          <tr>
+            <td style="padding:8px 0;vertical-align:top;width:32px">
+              <div style="width:24px;height:24px;background:#006400;border-radius:50%;color:#fff;font-size:12px;font-weight:700;text-align:center;line-height:24px">${num}</div>
+            </td>
+            <td style="padding:8px 0;color:#475569;font-size:14px;line-height:1.5">${step}</td>
+          </tr>
+        `).join('')}
+      </table>
+
       ${ctaButton('Go to My Dashboard', `${SITE}/dashboard`)}
-      <p style="color:#94a3b8;font-size:13px;text-align:center;margin-top:8px">
-        Registration closes when slots are filled. Register now to secure your place.
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        Slots are limited &mdash; complete your application early to secure your place.
       </p>
     </div>
     ${footer()}
@@ -101,45 +134,43 @@ export function paymentConfirmationEmail(
   reference: string,
   paymentType: 'form_fee' | 'tuition' | 'hostel' | string
 ) {
-  const typeLabel = paymentType === 'form_fee'
-    ? 'IJMB Registration Form Fee'
-    : paymentType === 'tuition'
-    ? 'IJMB Tuition Fee'
-    : paymentType === 'hostel'
-    ? 'IJMB Hostel Fee'
+  const typeLabel = paymentType === 'form_fee' ? 'IJMB Registration Form Fee'
+    : paymentType === 'tuition' ? 'IJMB Tuition Fee'
+    : paymentType === 'hostel'  ? 'IJMB Hostel Fee'
     : 'Payment';
 
   const nextStep = paymentType === 'form_fee'
-    ? 'Your application has been submitted. Complete your application form on your dashboard and upload your documents.'
-    : 'Your payment has been recorded. You can view your payment history on your dashboard.';
+    ? 'Complete your application form and upload your documents on your dashboard.'
+    : 'Your payment has been recorded. View your payment history on your dashboard.';
 
   const body = `
-    ${header('Payment Confirmed')}
-    <div style="padding:36px 32px">
-      <div style="text-align:center;margin-bottom:28px">
-        <div style="display:inline-flex;align-items:center;justify-content:center;background:#dcfce7;border-radius:50%;width:64px;height:64px;margin-bottom:12px">
-          <span style="font-size:32px">✓</span>
-        </div>
-        <h1 style="color:#16a34a;margin:0;font-size:22px">Payment Successful!</h1>
+    ${header('Payment Confirmed', 'Your payment has been received')}
+    <div style="padding:40px 40px 32px">
+
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="display:inline-block;background:#dcfce7;border-radius:50%;width:72px;height:72px;line-height:72px;font-size:36px;margin-bottom:12px">✓</div>
+        <p style="color:#16a34a;font-size:20px;font-weight:700;margin:0">Payment Successful!</p>
+        <p style="color:#64748b;font-size:14px;margin:6px 0 0">Hi <strong>${esc(fullName)}</strong>, here are your payment details</p>
       </div>
-      <p style="color:#475569;margin:0 0 24px;line-height:1.7">
-        Hi <strong>${esc(fullName)}</strong>, we have received your payment. Here are your payment details:
-      </p>
-      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
-        <tbody>
-          ${infoRow('Payment For', typeLabel)}
-          ${infoRow('Amount Paid', `₦${amount.toLocaleString()}`)}
-          ${infoRow('Reference', reference)}
-          ${infoRow('Date', new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }))}
-          ${infoRow('Status', '<span style="color:#16a34a">✓ Confirmed</span>')}
-        </tbody>
-      </table>
-      <div style="background:#fffbeb;border-left:4px solid #ffd700;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#7a5c00">${nextStep}</p>
+
+      <div style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:24px">
+        ${infoTable([
+          infoRow('Payment For', typeLabel),
+          infoRow('Amount Paid', `<span style="color:#16a34a;font-size:15px">₦${amount.toLocaleString()}</span>`),
+          infoRow('Reference', `<code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${esc(reference)}</code>`),
+          infoRow('Date', new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })),
+          infoRow('Status', badge('✓ CONFIRMED', '#14532d', '#dcfce7')),
+        ].join(''))}
       </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:600">Next step</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#92400e">${nextStep}</p>
+      </div>
+
       ${ctaButton('View My Dashboard', `${SITE}/dashboard`)}
-      <p style="color:#94a3b8;font-size:12px;text-align:center">
-        Keep this email as your payment receipt. Reference: <strong>${reference}</strong>
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        Save this email as your receipt &mdash; Ref: <strong>${esc(reference)}</strong>
       </p>
     </div>
     ${footer()}
@@ -155,28 +186,43 @@ export function applicationSubmittedEmail(
   subjects: string
 ) {
   const body = `
-    ${header('Application Submitted')}
-    <div style="padding:36px 32px">
-      <h1 style="color:#006400;margin:0 0 12px;font-size:22px">Application Received!</h1>
-      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
-        Hi <strong>${esc(fullName)}</strong>, your IJMB ${YEAR} application has been submitted successfully and is now under review by our admissions team.
+    ${header('Application Submitted', `IJMB ${YEAR} Session`)}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 8px">Application Received!</p>
+      <p style="color:#475569;font-size:15px;margin:0 0 24px;line-height:1.7">
+        Hi <strong>${esc(fullName)}</strong>, your IJMB ${YEAR} application has been submitted and is now under review by our admissions team.
       </p>
-      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
-        <tbody>
-          ${infoRow('Application ID', esc(applicationId))}
-          ${infoRow('Assigned Centre', esc(centre) || 'To be assigned')}
-          ${infoRow('Subjects', esc(subjects) || 'As selected')}
-          ${infoRow('Session', YEAR)}
-          ${infoRow('Status', '<span style="color:#b8860b">⏳ Under Review</span>')}
-        </tbody>
+
+      <div style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:24px">
+        ${infoTable([
+          infoRow('Application ID', `<code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${esc(applicationId)}</code>`),
+          infoRow('Study Centre', esc(centre) || 'To be assigned'),
+          infoRow('Subjects', esc(subjects) || 'As selected'),
+          infoRow('Session', YEAR),
+          infoRow('Status', badge('⏳ Under Review', '#7a5c00', '#fef9c3')),
+        ].join(''))}
+      </div>
+
+      <p style="color:#0f172a;font-size:14px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.5px">What happens next</p>
+      <table style="width:100%;border-collapse:collapse">
+        ${[
+          ['Our team reviews your documents', '2–5 working days'],
+          ['You receive an admission offer email', 'Once approved'],
+          ['Print your admission letter', 'From your dashboard'],
+          ['Report to your assigned centre', 'On resumption date'],
+        ].map(([step, timing]) => `
+          <tr>
+            <td style="padding:8px 0 8px 0;vertical-align:top;width:16px">
+              <div style="width:8px;height:8px;background:#006400;border-radius:50%;margin-top:6px"></div>
+            </td>
+            <td style="padding:8px 0 8px 12px">
+              <p style="margin:0;color:#0f172a;font-size:14px;font-weight:600">${step}</p>
+              <p style="margin:2px 0 0;color:#94a3b8;font-size:12px">${timing}</p>
+            </td>
+          </tr>
+        `).join('')}
       </table>
-      <h3 style="color:#006400;font-size:15px;margin:0 0 12px">What happens next?</h3>
-      <ol style="color:#475569;font-size:14px;line-height:2;margin:0 0 24px;padding-left:20px">
-        <li>Our team will review your documents (2–5 working days)</li>
-        <li>You'll receive an admission offer email once approved</li>
-        <li>Print your admission letter from your dashboard</li>
-        <li>Report to your assigned centre on the stated resumption date</li>
-      </ol>
+
       ${ctaButton('Track My Application', `${SITE}/dashboard`)}
     </div>
     ${footer()}
@@ -196,64 +242,75 @@ export function admissionOfferEmail(
   subjects: string
 ) {
   const body = `
-    ${header('Congratulations — Admission Offer')}
-    <div style="padding:36px 32px">
-      <div style="text-align:center;margin-bottom:28px">
-        <div style="font-size:48px;margin-bottom:8px">🎉</div>
-        <h1 style="color:#006400;margin:0;font-size:24px">Congratulations, ${esc(fullName)}!</h1>
-        <p style="color:#475569;margin:8px 0 0">You have been offered admission into the IJMB Programme</p>
+    ${header('Congratulations — You\'ve Been Admitted!', `IJMB ${YEAR} Session`)}
+    <div style="padding:40px 40px 32px">
+
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:56px;margin-bottom:8px">🎉</div>
+        <p style="color:#006400;font-size:22px;font-weight:700;margin:0 0 6px">Congratulations, ${esc(fullName)}!</p>
+        <p style="color:#64748b;font-size:14px;margin:0">You have been offered admission into the IJMB Programme</p>
       </div>
-      <div style="background:#f0fff0;border:2px solid #006400;border-radius:10px;padding:20px 24px;margin-bottom:24px;text-align:center">
-        <p style="color:#006400;font-weight:bold;font-size:18px;margin:0 0 4px">IJMB ${YEAR} Session</p>
-        <p style="color:#475569;font-size:13px;margin:0">Interim Joint Matriculation Board — Direct Entry Programme</p>
+
+      <div style="background:linear-gradient(135deg,#006400,#004d00);border-radius:12px;padding:20px 24px;margin-bottom:24px;text-align:center">
+        <p style="color:#ffd700;font-weight:700;font-size:18px;margin:0 0 4px;letter-spacing:-0.2px">IJMB ${YEAR} Session</p>
+        <p style="color:rgba(255,255,255,0.75);font-size:13px;margin:0">Interim Joint Matriculation Board &mdash; Direct Entry Programme</p>
       </div>
-      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
-        <tbody>
-          ${infoRow('Full Name', esc(fullName))}
-          ${infoRow('Application ID', esc(applicationId))}
-          ${infoRow('Study Centre', esc(centre))}
-          ${infoRow('Subject Combination', esc(subjects))}
-          ${infoRow('Resumption Date', esc(resumptionDate))}
-          ${infoRow('Status', '<span style="color:#16a34a;font-weight:bold">✓ ADMITTED</span>')}
-        </tbody>
-      </table>
-      <div style="background:#fffbeb;border-left:4px solid #ffd700;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:bold">Important: Report to your centre on or before the resumption date.</p>
-        <p style="margin:6px 0 0;font-size:13px;color:#7a5c00">Bring: printed admission letter, O-Level result, passport photos, and payment receipts.</p>
+
+      <div style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:24px">
+        ${infoTable([
+          infoRow('Full Name', esc(fullName)),
+          infoRow('Application ID', `<code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${esc(applicationId)}</code>`),
+          infoRow('Study Centre', esc(centre)),
+          infoRow('Subject Combination', esc(subjects)),
+          infoRow('Resumption Date', `<strong style="color:#006400">${esc(resumptionDate)}</strong>`),
+          infoRow('Status', badge('✓ ADMITTED', '#14532d', '#dcfce7')),
+        ].join(''))}
       </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:700">Important — What to bring on resumption day:</p>
+        <p style="margin:8px 0 0;font-size:13px;color:#92400e;line-height:1.7">
+          ✓ Printed admission letter &nbsp;&nbsp; ✓ O-Level result &nbsp;&nbsp; ✓ Passport photographs &nbsp;&nbsp; ✓ Payment receipts
+        </p>
+      </div>
+
       ${ctaButton('Download Admission Letter', `${SITE}/dashboard`)}
-      <p style="color:#475569;font-size:13px;line-height:1.7;text-align:center">
-        Upon successful completion of the IJMB programme, you will be eligible for <strong>Direct Entry admission into 200 Level</strong> at over 200 Nigerian universities — without sitting UTME.
+      <p style="color:#64748b;font-size:13px;text-align:center;margin-top:16px;line-height:1.7">
+        Upon completing IJMB, you qualify for <strong>Direct Entry into 200 Level</strong> at over 200 Nigerian universities &mdash; without UTME.
       </p>
     </div>
     ${footer()}
   `;
   return {
     html: wrapper(body),
-    subject: `Admission Offer — IJMB ${YEAR} | ${esc(fullName)}`
+    subject: `🎉 Admission Offer — IJMB ${YEAR} | ${esc(fullName)}`
   };
 }
 
 // ─── 5. ADMISSION LETTER AVAILABLE ────────────────────────────────────────
 export function admissionLetterEmail(fullName: string, applicationId: string) {
   const body = `
-    ${header('Your Admission Letter is Ready')}
-    <div style="padding:36px 32px">
-      <div style="text-align:center;margin-bottom:28px">
-        <div style="font-size:48px;margin-bottom:8px">📄</div>
-        <h1 style="color:#006400;margin:0;font-size:24px">Your Admission Letter is Ready</h1>
-        <p style="color:#475569;margin:8px 0 0">Hi <strong>${esc(fullName)}</strong>, your admission letter has been uploaded and is now available for download.</p>
+    ${header('Your Admission Letter is Ready', 'Download it from your dashboard')}
+    <div style="padding:40px 40px 32px">
+
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:56px;margin-bottom:8px">📄</div>
+        <p style="color:#0f172a;font-size:20px;font-weight:700;margin:0 0 6px">Admission Letter Ready</p>
+        <p style="color:#64748b;font-size:14px;margin:0">Hi <strong>${esc(fullName)}</strong>, your letter has been uploaded and is available for download.</p>
       </div>
-      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
-        <tbody>
-          ${infoRow('Application ID', esc(applicationId))}
-          ${infoRow('Status', '<span style="color:#16a34a;font-weight:bold">✓ Letter Available</span>')}
-        </tbody>
-      </table>
-      <div style="background:#fffbeb;border-left:4px solid #ffd700;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:bold">Next step: Log in to your dashboard and download your admission letter.</p>
-        <p style="margin:6px 0 0;font-size:13px;color:#7a5c00">Bring a printed copy when you report to your assigned centre on resumption day.</p>
+
+      <div style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:24px">
+        ${infoTable([
+          infoRow('Application ID', `<code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${esc(applicationId)}</code>`),
+          infoRow('Status', badge('✓ Letter Available', '#14532d', '#dcfce7')),
+        ].join(''))}
       </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:700">Next step</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#92400e">Log in to your dashboard, download and print your admission letter. Bring it on resumption day.</p>
+      </div>
+
       ${ctaButton('Download My Admission Letter', `${SITE}/dashboard`)}
     </div>
     ${footer()}
@@ -264,23 +321,27 @@ export function admissionLetterEmail(fullName: string, applicationId: string) {
   };
 }
 
-// ─── 6. PASSWORD RESET (CUSTOM) ────────────────────────────────────────────
+// ─── 6. PASSWORD RESET ────────────────────────────────────────────────────
 export function passwordResetEmail(resetLink: string) {
   const body = `
-    ${header('Reset Your Password')}
-    <div style="padding:36px 32px">
-      <h1 style="color:#006400;margin:0 0 12px;font-size:22px">Reset Your Password</h1>
-      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
+    ${header('Reset Your Password', 'This link expires in 1 hour')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 8px">Forgot your password?</p>
+      <p style="color:#475569;font-size:15px;margin:0 0 28px;line-height:1.7">
         We received a request to reset the password for your IJMB Student Portal account. Click the button below to set a new password.
       </p>
+
       ${ctaButton('Reset My Password', resetLink)}
-      <div style="background:#fef2f2;border-left:4px solid #ef4444;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px">
-        <p style="margin:0;font-size:13px;color:#7f1d1d">
-          This link expires in <strong>1 hour</strong>. If you did not request a password reset, please ignore this email — your account is safe.
+
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:16px 20px;margin:24px 0">
+        <p style="margin:0;font-size:13px;color:#7f1d1d;font-weight:600">Security notice</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#991b1b">
+          This link expires in <strong>1 hour</strong>. If you did not request a password reset, you can safely ignore this email.
         </p>
       </div>
-      <p style="color:#94a3b8;font-size:12px;text-align:center">
-        If the button doesn't work, copy and paste this link into your browser:<br/>
+
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin:0">
+        Button not working? Copy and paste this link:<br/>
         <a href="${resetLink}" style="color:#006400;font-size:11px;word-break:break-all">${resetLink}</a>
       </p>
     </div>
@@ -289,23 +350,54 @@ export function passwordResetEmail(resetLink: string) {
   return { html: wrapper(body), subject: 'Reset Your IJMB Portal Password' };
 }
 
-// ─── 7. ADMIN: NEW REGISTRATION NOTIFICATION ──────────────────────────────
+// ─── 7. ACCOUNT UPDATE ───────────────────────────────────────────────────
+export function accountUpdateEmail(fullName: string, changeDescription: string) {
+  const body = `
+    ${header('Account Updated', 'A change was made to your account')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 8px">Account Change Notification</p>
+      <p style="color:#475569;font-size:15px;margin:0 0 24px;line-height:1.7">
+        Hi <strong>${esc(fullName)}</strong>, this is a notification that your IJMB Student Portal account was recently updated.
+      </p>
+
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;margin-bottom:20px">
+        <p style="margin:0 0 4px;font-size:13px;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px">Change made</p>
+        <p style="margin:0;font-size:15px;color:#0f172a;font-weight:600">${esc(changeDescription)}</p>
+        <p style="margin:6px 0 0;font-size:12px;color:#94a3b8">${new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+      </div>
+
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;font-size:13px;color:#7f1d1d">
+          <strong>Wasn't you?</strong> Contact us immediately at <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400;font-weight:600">${SUPPORT_EMAIL}</a>
+        </p>
+      </div>
+
+      ${ctaButton('Review My Account', `${SITE}/dashboard`)}
+    </div>
+    ${footer()}
+  `;
+  return { html: wrapper(body), subject: 'Your IJMB Portal Account Was Updated' };
+}
+
+// ─── 8. ADMIN: NEW REGISTRATION NOTIFICATION ──────────────────────────────
 export function adminNewRegistrationEmail(fullName: string, email: string, phone: string) {
   const body = `
-    ${header('New Student Registration')}
-    <div style="padding:36px 32px">
-      <h1 style="color:#006400;margin:0 0 12px;font-size:22px">New Student Registered</h1>
-      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
+    ${header('New Student Registration', 'A new account was just created')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 8px">New Student Registered</p>
+      <p style="color:#475569;font-size:15px;margin:0 0 24px;line-height:1.7">
         A new student has just created an account on the IJMB portal.
       </p>
-      <table style="width:100%;border-collapse:collapse;background:#f8fafc;border-radius:8px;padding:4px;margin-bottom:24px">
-        <tbody>
-          ${infoRow('Full Name', esc(fullName))}
-          ${infoRow('Email', esc(email))}
-          ${infoRow('Phone', esc(phone) || 'Not provided')}
-          ${infoRow('Registered', new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' } as any))}
-        </tbody>
-      </table>
+
+      <div style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:24px">
+        ${infoTable([
+          infoRow('Full Name', esc(fullName)),
+          infoRow('Email', esc(email)),
+          infoRow('Phone', esc(phone) || 'Not provided'),
+          infoRow('Registered', new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' } as any)),
+        ].join(''))}
+      </div>
+
       ${ctaButton('View in Admin Dashboard', `${SITE}/portal-admin?tab=students`)}
     </div>
     ${footer()}
@@ -313,50 +405,24 @@ export function adminNewRegistrationEmail(fullName: string, email: string, phone
   return { html: wrapper(body), subject: `New Registration: ${esc(fullName)}` };
 }
 
-// ─── 8. ADMIN: DIRECT MESSAGE TO STUDENT ──────────────────────────────────
+// ─── 9. ADMIN: DIRECT MESSAGE TO STUDENT ──────────────────────────────────
 export function adminDirectMessageEmail(studentName: string, subject: string, message: string) {
   const body = `
-    ${header('Message from IJMB')}
-    <div style="padding:36px 32px">
-      <h1 style="color:#006400;margin:0 0 12px;font-size:22px">Message from IJMB Admin</h1>
-      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
-        Dear <strong>${esc(studentName)}</strong>,
-      </p>
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:20px 24px;margin-bottom:24px">
+    ${header('Message from IJMB', 'Official communication from the IJMB team')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 20px">Dear ${esc(studentName)},</p>
+
+      <div style="background:#f8fafc;border-left:4px solid #006400;border-radius:0 12px 12px 0;padding:20px 24px;margin-bottom:24px">
         <p style="margin:0;font-size:15px;color:#1e293b;line-height:1.8;white-space:pre-wrap">${esc(message)}</p>
       </div>
-      <p style="color:#475569;font-size:14px;line-height:1.7">
-        If you have questions, reply to this email or contact us at
-        <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>.
+
+      <p style="color:#475569;font-size:14px;line-height:1.7;margin-bottom:24px">
+        You can reply directly to this email and our support team will respond as soon as possible.
       </p>
+
       ${ctaButton('Go to My Dashboard', `${SITE}/dashboard`)}
     </div>
     ${footer()}
   `;
   return { html: wrapper(body), subject: esc(subject) };
-}
-
-// ─── 6. ACCOUNT UPDATE NOTIFICATION ───────────────────────────────────────
-export function accountUpdateEmail(fullName: string, changeDescription: string) {
-  const body = `
-    ${header('Account Updated')}
-    <div style="padding:36px 32px">
-      <h1 style="color:#006400;margin:0 0 12px;font-size:22px">Your Account Was Updated</h1>
-      <p style="color:#475569;margin:0 0 20px;line-height:1.7">
-        Hi <strong>${esc(fullName)}</strong>, this is a notification that your IJMB Student Portal account was recently updated.
-      </p>
-      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px 20px;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#1e293b"><strong>Change made:</strong> ${esc(changeDescription)}</p>
-        <p style="margin:6px 0 0;font-size:12px;color:#94a3b8">Date: ${new Date().toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
-      </div>
-      <div style="background:#fef2f2;border-left:4px solid #ef4444;padding:14px 18px;border-radius:0 8px 8px 0;margin-bottom:24px">
-        <p style="margin:0;font-size:13px;color:#7f1d1d">
-          If you did not make this change, please contact us immediately at <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>.
-        </p>
-      </div>
-      ${ctaButton('Review My Account', `${SITE}/dashboard`)}
-    </div>
-    ${footer()}
-  `;
-  return { html: wrapper(body), subject: 'Your IJMB Portal Account Was Updated' };
 }
