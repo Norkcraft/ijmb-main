@@ -41,8 +41,8 @@ export const generateApplicationPDF = async (applicationId: string, userToken?: 
     }
     const appData = app as any;
 
-    // Fetch related records individually
-    const [profileRes, sessionRes, assignedCentreRes, preferredCentreRes, subjectComboRes] = await Promise.all([
+    // Fetch all related records in parallel (including O-level and payment)
+    const [profileRes, sessionRes, assignedCentreRes, preferredCentreRes, subjectComboRes, olevelRes, paymentRes] = await Promise.all([
       appData.user_id
         ? supabase.from('profiles').select('email, phone').eq('id', appData.user_id).single()
         : Promise.resolve({ data: null }),
@@ -58,6 +58,8 @@ export const generateApplicationPDF = async (applicationId: string, userToken?: 
       appData.subject_combination_id
         ? supabase.from('subject_combinations').select('name, track').eq('id', appData.subject_combination_id).single()
         : Promise.resolve({ data: null }),
+      supabase.from('olevel_results').select('subject, grade, exam_type, exam_year').eq('application_id', applicationId).order('created_at'),
+      supabase.from('payments').select('reference, created_at, amount').eq('application_id', applicationId).eq('type', 'form_fee').eq('status', 'success').order('created_at').limit(1).maybeSingle(),
     ]);
 
     const profile = profileRes.data as any;
@@ -65,47 +67,10 @@ export const generateApplicationPDF = async (applicationId: string, userToken?: 
     const assignedCentre = assignedCentreRes.data as any;
     const preferredCentre = preferredCentreRes.data as any;
     const subjectCombo = subjectComboRes.data as any;
+    const olevelRows = olevelRes.data as any;
+    const feePayment = paymentRes.data as any;
 
-    // Fetch O-Level results
-    const { data: olevelRows } = await supabase
-      .from('olevel_results')
-      .select('subject, grade, exam_type, exam_year')
-      .eq('application_id', applicationId)
-      .order('created_at');
-
-    // Fetch form_fee payment for reference/date
-    const { data: feePayment } = await supabase
-      .from('payments')
-      .select('reference, created_at, amount')
-      .eq('application_id', applicationId)
-      .eq('type', 'form_fee')
-      .eq('status', 'success')
-      .order('created_at')
-      .limit(1)
-      .maybeSingle();
-
-    // 2. Fetch Passport Photo (Convert to Base64)
-    let passportBase64 = '';
-    if (appData.passport_path) {
-      try {
-        const { data: photoData, error: photoError } = await supabase.storage
-          .from('student-documents')
-          .download(appData.passport_path);
-
-        if (photoError) throw photoError;
-
-        if (photoData) {
-          const arrayBuffer = await photoData.arrayBuffer();
-          const buffer = Buffer.from(arrayBuffer);
-          const mimeType = photoData.type || 'image/jpeg';
-          passportBase64 = `data:${mimeType};base64,${buffer.toString('base64')}`;
-        }
-      } catch (err) {
-        console.warn('Failed to load passport photo:', err);
-      }
-    }
-
-    // 3. Load Site Logo
+    // 2. Load logo (sync, fast), fetch passport photo and generate QR in parallel
     let logoBase64 = '';
     try {
       const logoPath = path.resolve(process.cwd(), 'public', 'ijmb-logo.jpeg');
@@ -123,10 +88,21 @@ export const generateApplicationPDF = async (applicationId: string, userToken?: 
       console.warn('Failed to load site logo:', err);
     }
 
-    // 4. Generate QR Code
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.ijmb.info';
     const verifyUrl = `${siteUrl}/verify/${applicationId}`;
-    const qrCodeBase64 = await generateQRCodeBase64(verifyUrl);
+
+    const [passportBase64, qrCodeBase64] = await Promise.all([
+      // 3. Fetch Passport Photo (Convert to Base64)
+      appData.passport_path
+        ? supabase.storage.from('student-documents').download(appData.passport_path).then(async ({ data: photoData, error: photoError }) => {
+            if (photoError || !photoData) { console.warn('Failed to load passport photo:', photoError); return ''; }
+            const buffer = Buffer.from(await photoData.arrayBuffer());
+            return `data:${photoData.type || 'image/jpeg'};base64,${buffer.toString('base64')}`;
+          }).catch((err) => { console.warn('Failed to load passport photo:', err); return ''; })
+        : Promise.resolve(''),
+      // 4. Generate QR Code
+      generateQRCodeBase64(verifyUrl),
+    ]);
 
     // 5. Generate Application ID
     const displayId = appData.application_number || generateApplicationId(1000);
@@ -207,7 +183,7 @@ export const generateApplicationPDF = async (applicationId: string, userToken?: 
     }
 
     const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+    await page.setContent(htmlContent, { waitUntil: 'domcontentloaded' });
 
     // 8. Generate PDF
     const pdfBuffer = await page.pdf({

@@ -45,7 +45,16 @@
       "Bash(grep -iv \"//.*callback\\\\|import\\\\|className\\\\|verifyUrl\\\\|qr\\\\|application\")",
       "Bash(find . -path ./node_modules -prune -o -path ./.next -prune -o -name paystack* -print)",
       "WebFetch(domain:www.ijmb.info)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(find /c/Users/not found/OneDrive/Desktop/ijmb-main -path */node_modules -prune -o -path */.next -prune -o -type f \\\\\\(-name *.ts -o -name *.tsx -o -name *.js -o -name *.jsx \\\\\\) -print)",
+      "Bash(find /c/Users/not found/OneDrive/Desktop/ijmb-main/src/pages -type f \\\\\\(-name *.tsx -o -name *.ts \\\\\\))",
+      "Bash(grep -r signInWith /c/Users/not found/OneDrive/Desktop/ijmb-main/src --include=*.ts --include=*.tsx)",
+      "Bash(find /c/Users/not found/OneDrive/Desktop/ijmb-main/app/api -type f -name *.ts -o -name *.tsx)",
+      "Bash(find /c/Users/not found/OneDrive/Desktop/ijmb-main/src -path */node_modules -prune -o -type f -name *hook* -o -name *utils* -name *auth*)",
+      "Bash(node -e \"const p = require\\(''./package.json''\\); console.log\\(''@tanstack/react-query:'', p.dependencies[''@tanstack/react-query'']\\); console.log\\(''next:'', p.dependencies[''next'']\\); console.log\\(''@supabase/supabase-js:'', p.dependencies[''@supabase/supabase-js'']\\);\")",
+      "Bash(find /c/Users/not found/OneDrive/Desktop/ijmb-main -name tailwind.config.* -o -name next.config.*)",
+      "WebFetch(domain:fabra.dev)",
+      "WebFetch(domain:mikebifulco.com)"
     ]
   }
 }
