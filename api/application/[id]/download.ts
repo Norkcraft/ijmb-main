@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const { data: signedData, error: signedError } = await supabaseServer
       .storage
       .from(BLANK_FORM_BUCKET)
-      .createSignedUrl(BLANK_FORM_PATH, SIGNED_URL_EXPIRY);
+      .createSignedUrl(BLANK_FORM_PATH, SIGNED_URL_EXPIRY, { download: 'IJMB-Application-Form.pdf' });
 
     if (signedError || !signedData?.signedUrl) {
       console.error('Signed URL error:', signedError);
