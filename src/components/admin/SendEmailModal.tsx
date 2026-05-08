@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 import { Send, Loader2, Mail } from 'lucide-react';
 
 interface SendEmailModalProps {
@@ -18,17 +19,20 @@ export default function SendEmailModal({ student, onClose }: SendEmailModalProps
   const [message, setMessage] = useState('');
   const [sending, setSending] = useState(false);
   const { toast } = useToast();
+  const { session } = useAuth();
 
   const handleSend = async () => {
     if (!student || !subject.trim() || !message.trim()) return;
     setSending(true);
     try {
-      const secret = process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '';
+      const token = session?.access_token;
+      if (!token) throw new Error('Not signed in.');
+
       const res = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-internal-secret': secret,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           type: 'admin_direct_message',

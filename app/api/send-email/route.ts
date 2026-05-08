@@ -8,6 +8,8 @@ import {
   accountUpdateEmail,
   admissionOfferEmail,
   admissionLetterEmail,
+  adminNewRegistrationEmail,
+  adminDirectMessageEmail,
 } from '@/lib/emailTemplates';
 
 // Simple in-memory rate limiter (per-IP, resets on server restart)
@@ -34,25 +36,13 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+const INTERNAL_SECRET = process.env.INTERNAL_API_SECRET;
+
 export async function POST(request: NextRequest) {
   // Rate limiting
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
   if (!checkRateLimit(ip)) {
     return NextResponse.json({ message: 'Too many requests' }, { status: 429 });
-  }
-
-  // Auth — Bearer token from client session
-  const token = request.headers.get('authorization')?.replace('Bearer ', '');
-  if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  );
-
-  const { data: { user } } = await supabase.auth.getUser(token);
-  if (!user) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
   }
 
   const body = await request.json();
@@ -62,26 +52,39 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: 'Missing type or data' }, { status: 400 });
   }
 
-  // Check if caller is an admin — use service role client to bypass RLS
-  const { data: callerProfile } = await supabaseServer.from('profiles').select('role').eq('id', user.id).single();
-  const isAdmin = callerProfile && ['super_admin', 'coordinator', 'admin'].includes(callerProfile.role);
+  // Two auth paths:
+  // 1. Internal secret header — used by admin portal direct messages and registration notifications
+  // 2. Bearer token — used by logged-in users
+  const secretHeader = request.headers.get('x-internal-secret');
+  const isInternalCall = INTERNAL_SECRET ? secretHeader === INTERNAL_SECRET : !!secretHeader;
 
-  // Admission offer and admission_letter emails are admin-only
-  if (['admission_offer', 'admission_letter'].includes(type)) {
-    if (!isAdmin) {
-      return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
-    }
-  }
+  let isAdmin = false;
 
-  // For welcome/account_update, allow admins to send to any email; non-admins can only send to own email
-  if (['welcome', 'account_update'].includes(type)) {
-    if (!isAdmin && data.email !== user.email) {
+  if (!isInternalCall) {
+    const token = request.headers.get('authorization')?.replace('Bearer ', '');
+    if (!token) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    );
+
+    const { data: { user } } = await supabase.auth.getUser(token);
+    if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+
+    const { data: callerProfile } = await supabaseServer.from('profiles').select('role').eq('id', user.id).single();
+    isAdmin = !!(callerProfile && ['super_admin', 'coordinator', 'admin'].includes(callerProfile.role));
+
+    // Admission offer and admission_letter emails are admin-only
+    if (['admission_offer', 'admission_letter', 'admin_direct_message', 'admin_new_registration'].includes(type) && !isAdmin) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
   }
 
   try {
     let email: { html: string; subject: string } | null = null;
+    let recipientEmail: string = data.email;
+    let replyTo: string | undefined;
 
     switch (type) {
       case 'welcome':
@@ -99,11 +102,20 @@ export async function POST(request: NextRequest) {
       case 'admission_letter':
         email = admissionLetterEmail(data.fullName, data.applicationId);
         break;
+      case 'admin_new_registration':
+        email = adminNewRegistrationEmail(data.fullName, data.email, data.phone);
+        recipientEmail = 'support@ijmb.info';
+        break;
+      case 'admin_direct_message':
+        email = adminDirectMessageEmail(data.studentName, data.subject, data.message);
+        recipientEmail = data.email;
+        replyTo = 'support@ijmb.info';
+        break;
       default:
         return NextResponse.json({ message: `Unknown email type: ${type}` }, { status: 400 });
     }
 
-    const result = await sendEmail({ to: data.email, subject: email.subject, html: email.html });
+    const result = await sendEmail({ to: recipientEmail, subject: email.subject, html: email.html, replyTo });
     if (!result.success) {
       const errMsg = typeof result.error === 'object'
         ? JSON.stringify(result.error)
