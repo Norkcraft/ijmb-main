@@ -23,7 +23,9 @@ const header = (title: string) => `
 `;
 
 const footer = () => `
-  <div style="background:#f1f5f9;padding:20px 32px;border-top:1px solid #e2e8f0;text-align:center">
+  <div style="background:#f1f5f9;padding:24px 32px;border-top:1px solid #e2e8f0;text-align:center">
+    <p style="color:#1e293b;font-size:13px;font-weight:600;margin:0 0 2px">Thanks for choosing IJMB.</p>
+    <p style="color:#64748b;font-size:12px;margin:0 0 12px">IJMB Support Group</p>
     <p style="color:#64748b;font-size:12px;margin:0 0 6px">
       Need help? Email us at <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>
     </p>
