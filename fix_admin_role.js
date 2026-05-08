@@ -7,7 +7,7 @@ const serviceRoleKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmF
 const supabase = createClient(supabaseUrl, serviceRoleKey);
 
 async function fixAdminRole() {
-  const email = 'admin@ijmb.info';
+  const email = 'support@ijmb.info';
   
   console.log(`Checking user: ${email}...`);
 
@@ -33,7 +33,7 @@ async function fixAdminRole() {
   if (profile) {
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ role: 'admin' })
+        .update({ role: 'super_admin' })
         .eq('id', userId);
         
       if (updateError) console.error('Error updating role:', updateError);
@@ -44,7 +44,7 @@ async function fixAdminRole() {
         .from('profiles')
         .insert({ 
             id: userId, 
-            role: 'admin',
+            role: 'super_admin',
             full_name: 'System Admin',
             phone: '+2348000000000'
         });
