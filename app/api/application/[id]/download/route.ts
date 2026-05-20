@@ -48,16 +48,18 @@ export async function GET(
       );
     }
 
-    // 4. Return the PDF URL saved by the webhook
-    const formUrl = (application as any).application_form_url;
-    if (!formUrl) {
-      return NextResponse.json(
-        { message: 'Your application form is not ready yet. Please contact support.' },
-        { status: 404 }
-      );
+    // 4. Generate a short-lived signed URL for the shared application form
+    const { data: signedData, error: signedError } = await supabaseServer
+      .storage
+      .from('student-documents')
+      .createSignedUrl('application-form.pdf', 120, { download: 'IJMB-Application-Form.pdf' });
+
+    if (signedError || !signedData?.signedUrl) {
+      console.error('Signed URL error:', signedError);
+      return NextResponse.json({ message: 'Could not generate download link. Please try again.' }, { status: 500 });
     }
 
-    return NextResponse.json({ url: formUrl });
+    return NextResponse.json({ url: signedData.signedUrl });
 
   } catch (error) {
     console.error('Download handler error:', error);
