@@ -51,7 +51,7 @@ export async function GET(
     // 4. Generate a short-lived signed URL for the shared application form
     const { data: signedData, error: signedError } = await supabaseServer
       .storage
-      .from('student-documents')
+      .from('protected-forms')
       .createSignedUrl('application-form.pdf', 120, { download: 'IJMB-Application-Form.pdf' });
 
     if (signedError || !signedData?.signedUrl) {
