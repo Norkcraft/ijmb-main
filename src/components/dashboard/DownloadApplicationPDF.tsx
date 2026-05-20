@@ -3,35 +3,29 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FileText, Loader2 } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Props {
   applicationId: string;
 }
 
 export const DownloadApplicationPDF = ({ applicationId }: Props) => {
-  const { session } = useAuth();
   const [loading, setLoading] = useState(false);
 
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const token = session?.access_token;
-      if (!token) throw new Error('Not signed in.');
+      const { data, error } = await supabase
+        .storage
+        .from('protected-forms')
+        .createSignedUrl('application-form.pdf', 120, { download: 'IJMB-Application-Form.pdf' });
 
-      const res = await fetch(`/api/download-form?id=${applicationId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      const json = await res.json();
-
-      if (!res.ok) {
-        throw new Error(json.message || 'Failed to get download link.');
+      if (error || !data?.signedUrl) {
+        throw new Error('Could not generate download link. Please try again.');
       }
 
-      // Open the signed URL — browser triggers the download
       const a = document.createElement('a');
-      a.href = json.url;
+      a.href = data.signedUrl;
       a.download = 'IJMB-Application-Form.pdf';
       document.body.appendChild(a);
       a.click();
