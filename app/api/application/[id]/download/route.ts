@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseServer } from '@/lib/supabaseServer';
-
+import { createClient } from '@supabase/supabase-js';
 
 export async function GET(
   req: NextRequest,
@@ -18,17 +17,22 @@ export async function GET(
 
   const token = authHeader.split(' ')[1];
 
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
   try {
     // 1. Verify user
-    const { data: { user }, error: authError } = await supabaseServer.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     if (authError || !user) {
       return NextResponse.json({ message: 'Unauthorized: Invalid token' }, { status: 401 });
     }
 
-    // 2. Fetch application — verify ownership and payment status
-    const { data: application, error: appError } = await supabaseServer
+    // 2. Fetch application — verify ownership and payment
+    const { data: application, error: appError } = await supabase
       .from('applications')
-      .select('id, user_id, form_fee_paid, application_number, application_form_url')
+      .select('id, user_id, form_fee_paid')
       .eq('id', id)
       .single();
 
@@ -36,20 +40,19 @@ export async function GET(
       return NextResponse.json({ message: 'Application not found' }, { status: 404 });
     }
 
-    if ((application as any).user_id !== user.id) {
+    if (application.user_id !== user.id) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
-    // 3. Block access if form fee not paid
-    if (!(application as any).form_fee_paid) {
+    if (!application.form_fee_paid) {
       return NextResponse.json(
         { message: 'Form fee not paid. Please complete payment to download the form.' },
         { status: 403 }
       );
     }
 
-    // 4. Generate a short-lived signed URL for the shared application form
-    const { data: signedData, error: signedError } = await supabaseServer
+    // 3. Generate a short-lived signed URL for the shared application form
+    const { data: signedData, error: signedError } = await supabase
       .storage
       .from('protected-forms')
       .createSignedUrl('application-form.pdf', 120, { download: 'IJMB-Application-Form.pdf' });
