@@ -19,7 +19,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       const token = session?.access_token;
       if (!token) throw new Error('Not signed in.');
 
-      const res = await fetch(`/api/application/${applicationId}/download`, {
+      const res = await fetch(`/api/download-form?id=${applicationId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
