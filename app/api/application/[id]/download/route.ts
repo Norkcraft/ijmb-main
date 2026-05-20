@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
-const SIGNED_URL_EXPIRY = 120; // seconds
 
 export async function GET(
   req: NextRequest,
@@ -49,22 +48,16 @@ export async function GET(
       );
     }
 
-    // 4. Generate a signed URL for the student's generated PDF in student-documents bucket
-    const filePath = `${id}/application-form.pdf`;
-    const { data: signedData, error: signedError } = await supabaseServer
-      .storage
-      .from('student-documents')
-      .createSignedUrl(filePath, SIGNED_URL_EXPIRY, { download: 'IJMB-Application-Form.pdf' });
-
-    if (signedError || !signedData?.signedUrl) {
-      console.error('Signed URL error:', signedError);
+    // 4. Return the PDF URL saved by the webhook
+    const formUrl = (application as any).application_form_url;
+    if (!formUrl) {
       return NextResponse.json(
-        { message: 'Your application form is not ready yet. Please contact support if this persists.' },
+        { message: 'Your application form is not ready yet. Please contact support.' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ url: signedData.signedUrl });
+    return NextResponse.json({ url: formUrl });
 
   } catch (error) {
     console.error('Download handler error:', error);
