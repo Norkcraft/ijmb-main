@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabaseServer';
 
-const BLANK_FORM_BUCKET = 'protected-forms';
-const BLANK_FORM_PATH   = 'application-form.pdf';
-const SIGNED_URL_EXPIRY = 60; // seconds
+const SIGNED_URL_EXPIRY = 120; // seconds
 
 export async function GET(
   req: NextRequest,
@@ -31,7 +29,7 @@ export async function GET(
     // 2. Fetch application — verify ownership and payment status
     const { data: application, error: appError } = await supabaseServer
       .from('applications')
-      .select('id, user_id, form_fee_paid, application_number')
+      .select('id, user_id, form_fee_paid, application_number, application_form_url')
       .eq('id', id)
       .single();
 
@@ -39,27 +37,31 @@ export async function GET(
       return NextResponse.json({ message: 'Application not found' }, { status: 404 });
     }
 
-    if (application.user_id !== user.id) {
+    if ((application as any).user_id !== user.id) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     // 3. Block access if form fee not paid
-    if (!application.form_fee_paid) {
+    if (!(application as any).form_fee_paid) {
       return NextResponse.json(
         { message: 'Form fee not paid. Please complete payment to download the form.' },
         { status: 403 }
       );
     }
 
-    // 4. Generate a short-lived signed URL for the blank form in private storage
+    // 4. Generate a signed URL for the student's generated PDF in student-documents bucket
+    const filePath = `${id}/application-form.pdf`;
     const { data: signedData, error: signedError } = await supabaseServer
       .storage
-      .from(BLANK_FORM_BUCKET)
-      .createSignedUrl(BLANK_FORM_PATH, SIGNED_URL_EXPIRY, { download: 'IJMB-Application-Form.pdf' });
+      .from('student-documents')
+      .createSignedUrl(filePath, SIGNED_URL_EXPIRY, { download: 'IJMB-Application-Form.pdf' });
 
     if (signedError || !signedData?.signedUrl) {
       console.error('Signed URL error:', signedError);
-      return NextResponse.json({ message: 'Could not generate download link. Please try again.' }, { status: 500 });
+      return NextResponse.json(
+        { message: 'Your application form is not ready yet. Please contact support if this persists.' },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ url: signedData.signedUrl });
