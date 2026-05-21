@@ -130,14 +130,19 @@ export default function AdminStudents({ onMount }: AdminStudentsProps) {
   const handleResendVerification = async (student: Student) => {
     setResendingId(student.id);
     try {
-      const { error } = await supabase.auth.resend({
-        type: 'signup',
-        email: student.email,
+      const res = await fetch('/api/admin/resend-confirmation', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_INTERNAL_API_SECRET}`,
+        },
+        body: JSON.stringify({ email: student.email, fullName: student.full_name }),
       });
-      if (error) throw error;
-      toast({ title: 'Verification Email Sent', description: `Resent to ${student.email}` });
-    } catch {
-      toast({ title: 'Failed', description: 'Could not resend the verification email.', variant: 'destructive' });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message);
+      toast({ title: 'Confirmation Email Sent', description: `Fresh link sent to ${student.email}` });
+    } catch (err: any) {
+      toast({ title: 'Failed', description: err?.message || 'Could not resend the confirmation email.', variant: 'destructive' });
     } finally {
       setResendingId(null);
     }
