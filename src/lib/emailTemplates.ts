@@ -405,7 +405,75 @@ export function adminNewRegistrationEmail(fullName: string, email: string, phone
   return { html: wrapper(body), subject: `New Registration: ${esc(fullName)}` };
 }
 
-// ─── 9. ADMIN: DIRECT MESSAGE TO STUDENT ──────────────────────────────────
+// ─── 9. INCOMPLETE APPLICATION REMINDER ───────────────────────────────────
+export function incompleteApplicationReminderEmail(
+  fullName: string,
+  type: 'no_application' | 'draft'
+) {
+  const isNoApp = type === 'no_application';
+  const statusLine = isNoApp
+    ? "You created your IJMB account but haven't started your application yet."
+    : "You started your IJMB application but haven't submitted it yet.";
+  const ctaLabel = isNoApp ? 'Start My Application' : 'Complete My Application';
+
+  const body = `
+    ${header('Your IJMB Application is Waiting', `Don't miss your spot for ${YEAR}`)}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 8px">Hi ${esc(fullName)},</p>
+      <p style="color:#475569;font-size:15px;margin:0 0 24px;line-height:1.7">
+        ${statusLine} Thousands of students are applying for the IJMB ${YEAR} session &mdash; <strong style="color:#006400">don't lose your place.</strong>
+      </p>
+
+      <div style="background:linear-gradient(135deg,#006400,#004d00);border-radius:12px;padding:20px 24px;margin-bottom:28px;text-align:center">
+        <p style="color:#ffd700;font-weight:700;font-size:17px;margin:0 0 4px">IJMB ${YEAR} Session</p>
+        <p style="color:rgba(255,255,255,0.75);font-size:13px;margin:0">Complete your application to secure your admission</p>
+      </div>
+
+      <p style="color:#0f172a;font-size:14px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:0.5px">Why complete your application?</p>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:28px">
+        ${[
+          ['Gain Direct Entry into 200 Level', 'Skip 100 Level and go straight into your second year at university'],
+          ['No UTME required', 'IJMB is fully recognised by JAMB as a Direct Entry qualification'],
+          ['200+ universities accept IJMB', 'Including University of Ibadan, OAU, UNILAG, ABU and many more'],
+          ['Flexible study centres nationwide', 'Study near you — centres in every major state'],
+        ].map(([title, detail]) => `
+          <tr>
+            <td style="padding:8px 0;vertical-align:top;width:16px">
+              <div style="width:8px;height:8px;background:#006400;border-radius:50%;margin-top:6px"></div>
+            </td>
+            <td style="padding:8px 0 8px 12px">
+              <p style="margin:0;color:#0f172a;font-size:14px;font-weight:600">${title}</p>
+              <p style="margin:2px 0 0;color:#94a3b8;font-size:12px">${detail}</p>
+            </td>
+          </tr>
+        `).join('')}
+      </table>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:28px">
+        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:700">⚠ Limited Slots Available</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#92400e;line-height:1.6">
+          The ${YEAR} session is open now. Each study centre has a limited number of places. Complete your application before the session closes.
+        </p>
+      </div>
+
+      ${ctaButton(ctaLabel, `${SITE}/dashboard`)}
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        The application takes about 10 minutes to complete. The registration fee is ₦10,000.
+      </p>
+      ${divider()}
+      <p style="color:#cbd5e1;font-size:11px;text-align:center;margin:0">
+        You're receiving this because you registered on the IJMB portal. If you no longer wish to apply, simply ignore this email.
+      </p>
+    </div>
+    ${footer()}
+  `;
+  return {
+    html: wrapper(body),
+    subject: `Complete Your IJMB ${YEAR} Application — Slots Are Filling Up`
+  };
+}
+
+// ─── 10. ADMIN: DIRECT MESSAGE TO STUDENT ─────────────────────────────────
 export function adminDirectMessageEmail(studentName: string, subject: string, message: string) {
   const body = `
     ${header('Message from IJMB', 'Official communication from the IJMB team')}
