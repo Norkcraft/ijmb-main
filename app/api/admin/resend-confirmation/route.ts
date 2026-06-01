@@ -20,9 +20,11 @@ export async function POST(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Generate a fresh confirmation link using the admin API
+    // Generate a fresh confirmation link using the admin API.
+    // We use 'magiclink' because the user already exists — this generates a
+    // one-click login link that also confirms their email address.
     const { data, error } = await supabase.auth.admin.generateLink({
-      type: 'signup',
+      type: 'magiclink',
       email,
     });
 
