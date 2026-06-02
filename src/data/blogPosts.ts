@@ -1247,5 +1247,410 @@ export const blogPosts: BlogPost[] = [
     date: '2026-04-13',
     image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&q=80&w=800',
     tags: ['Medicine', 'MBBS', 'Direct Entry', 'IJMB']
+  },
+  {
+    id: '18',
+    slug: 'ijmb-registration-portal-2026-complete-guide',
+    title: 'IJMB Registration Portal 2026: How to Register Online (Step-by-Step)',
+    excerpt: 'The official IJMB registration portal is open for the 2026/2027 session. This complete guide shows you exactly how to create an account, fill your form, make payment, and get your admission letter — all online.',
+    content: `
+      <h2>What is the IJMB Registration Portal?</h2>
+      <p>The <strong>IJMB registration portal</strong> is the official online platform at <a href="https://www.ijmb.info" class="text-primary font-medium underline">www.ijmb.info</a> where students apply for the Interim Joint Matriculation Board (IJMB) A-Level programme. Through the portal, you can create an account, complete your application form, upload your documents, pay all fees, and download your admission letter — without visiting any office in person.</p>
+      <p>The portal is open <strong>24 hours a day, 7 days a week</strong>. You can start and save your application at any time and return to complete it later.</p>
+
+      <h2>What You Need Before You Start</h2>
+      <ul>
+        <li>A working email address (you will receive important notifications here)</li>
+        <li>Your phone number</li>
+        <li>A passport photograph (JPEG or PNG, under 2MB)</li>
+        <li>Your O-Level result or awaiting slip (if available — not compulsory at registration)</li>
+        <li>A valid debit card or access to bank transfer for payment</li>
+      </ul>
+
+      <h2>Step 1: Create Your Account on the Portal</h2>
+      <ol>
+        <li>Go to <a href="https://www.ijmb.info/register" class="text-primary font-medium underline">www.ijmb.info/register</a></li>
+        <li>Enter your full name, email address, and phone number</li>
+        <li>Create a strong password</li>
+        <li>Click "Create Account"</li>
+        <li>Check your email inbox for a verification link and click it to confirm your account</li>
+      </ol>
+      <p>If you don't see the verification email within 5 minutes, check your spam or junk folder.</p>
+
+      <h2>Step 2: Log In and Open Your Application Form</h2>
+      <ol>
+        <li>Go to <a href="https://www.ijmb.info/login" class="text-primary font-medium underline">www.ijmb.info/login</a></li>
+        <li>Enter your email and password</li>
+        <li>You will land on your student dashboard</li>
+        <li>Click "Start Application" or "My Application" to open the form</li>
+      </ol>
+
+      <h2>Step 3: Fill In Your Application Form</h2>
+      <p>The application form has four sections. All sections must be completed before payment.</p>
+      <ul>
+        <li><strong>Section 1 — Personal Details:</strong> Full name, date of birth, gender, state of origin, residential address, guardian information</li>
+        <li><strong>Section 2 — Academic Details:</strong> O-Level exam type (WAEC/NECO/NABTEB), exam year, exam number, and individual subject grades</li>
+        <li><strong>Section 3 — Programme Selection:</strong> Preferred study centre, subject combination, intended university course, academic session</li>
+        <li><strong>Section 4 — Documents:</strong> Upload passport photograph and O-Level result (if available)</li>
+      </ul>
+      <p>Your form is automatically saved as you go — you will not lose progress if you close the browser.</p>
+
+      <h2>Step 4: Pay the Registration Form Fee</h2>
+      <p>After completing the form, you will be prompted to pay the <strong>₦10,000 registration form fee</strong>. Payment options include:</p>
+      <ul>
+        <li>Debit card (Visa, Mastercard, Verve) — processed instantly via Paystack</li>
+        <li>Bank transfer — upload your receipt after transferring</li>
+        <li>USSD — available through your mobile banking app</li>
+      </ul>
+      <p>Once payment is confirmed, your application status changes from <em>Draft</em> to <em>Submitted</em> and your admission process begins.</p>
+
+      <h2>Step 5: Receive Your Admission Letter</h2>
+      <p>After your application is reviewed and approved by the admissions team (typically within 2–5 working days), you will receive:</p>
+      <ul>
+        <li>An email notification that your admission letter is ready</li>
+        <li>Your admission letter available for download directly from your dashboard</li>
+        <li>Your study centre assignment and resumption date</li>
+      </ul>
+      <p>Print your admission letter and bring it with you on resumption day.</p>
+
+      <h2>Frequently Asked Questions About the IJMB Portal</h2>
+
+      <h3>Can I register on a phone?</h3>
+      <p>Yes. The IJMB portal is fully mobile-responsive. You can complete the entire registration process on a smartphone or tablet.</p>
+
+      <h3>What if I forget my password?</h3>
+      <p>Click "Forgot Password" on the login page, enter your email, and you will receive a password reset link within minutes.</p>
+
+      <h3>Can I change my subject combination after registration?</h3>
+      <p>Subject combinations can be changed before payment. Once payment is made and your form is submitted, changes require contacting the admissions office directly.</p>
+
+      <h3>Is my payment secure?</h3>
+      <p>Yes. All payments are processed via <strong>Paystack</strong>, one of Africa's most trusted payment gateways. Your card details are never stored on the IJMB portal.</p>
+
+      <h3>How do I know my application was received?</h3>
+      <p>You will receive a confirmation email immediately after successful payment. Your dashboard will also show your application status as "Submitted".</p>
+    `,
+    author: 'Admissions Office',
+    date: '2026-05-01',
+    image: 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&q=80&w=800',
+    tags: ['Registration Portal', 'Online Registration', 'How-to', 'IJMB']
+  },
+  {
+    id: '19',
+    slug: 'ijmb-portal-login-dashboard-guide',
+    title: 'IJMB Portal Login Guide: How to Access Your Student Dashboard',
+    excerpt: 'Already registered on the IJMB portal? Learn how to log in, navigate your student dashboard, track your application status, download documents, and make payments — all from www.ijmb.info.',
+    content: `
+      <h2>How to Log In to the IJMB Student Portal</h2>
+      <p>Once you have created your account on the IJMB registration portal, logging in is straightforward:</p>
+      <ol>
+        <li>Go to <a href="https://www.ijmb.info/login" class="text-primary font-medium underline">www.ijmb.info/login</a></li>
+        <li>Enter the email address you used when registering</li>
+        <li>Enter your password</li>
+        <li>Click "Login"</li>
+      </ol>
+      <p>You will be taken directly to your personal student dashboard.</p>
+
+      <h2>What You Can Do on the IJMB Student Dashboard</h2>
+      <p>Your dashboard is the control centre for your entire IJMB application. Here is what each section shows:</p>
+
+      <h3>Application Status</h3>
+      <p>The dashboard shows your current application status in real time:</p>
+      <ul>
+        <li><strong>Draft</strong> — You have started but not yet paid the form fee</li>
+        <li><strong>Submitted</strong> — Form fee paid, application under review</li>
+        <li><strong>Under Review</strong> — Admissions team is processing your documents</li>
+        <li><strong>Admitted</strong> — Your application has been approved</li>
+        <li><strong>Active</strong> — Tuition paid and enrolment complete</li>
+      </ul>
+
+      <h3>Application Form</h3>
+      <p>Access and complete your application form. Once submitted (after payment), the form is locked and becomes a read-only record of your registration details.</p>
+
+      <h3>Documents</h3>
+      <p>Upload and view your documents — passport photograph, O-Level result, and admission letter. Documents can be uploaded directly from your phone or computer.</p>
+
+      <h3>Payments</h3>
+      <p>View all payments made, including the form fee and any tuition or hostel payments. Each payment shows the amount, date, reference number, and status.</p>
+
+      <h3>Admission Letter</h3>
+      <p>Once you are admitted, your admission letter appears here for download as a PDF. Print it and bring it to your study centre on resumption day.</p>
+
+      <h2>I Can't Log In — What Should I Do?</h2>
+
+      <h3>Forgot Password</h3>
+      <p>Click "Forgot Password" on the login page. Enter your registered email and you will receive a reset link. Check your spam folder if it doesn't arrive within 5 minutes.</p>
+
+      <h3>Email Not Recognised</h3>
+      <p>Make sure you are using the same email address you used when registering. If you are not sure which email you used, contact support at <a href="mailto:support@ijmb.info" class="text-primary font-medium">support@ijmb.info</a>.</p>
+
+      <h3>Account Not Verified</h3>
+      <p>You must verify your email before you can log in. Check your inbox (and spam folder) for the verification email sent when you registered. If you need the verification link resent, contact support.</p>
+
+      <h3>Portal is Loading Slowly</h3>
+      <p>This is usually a network issue. Try refreshing the page, switching from mobile data to WiFi (or vice versa), or clearing your browser cache. The portal works best on Chrome or Firefox.</p>
+
+      <h2>How to Check Your Application Status Without Logging In</h2>
+      <p>If you cannot access your account, you can check your application status by emailing <a href="mailto:support@ijmb.info" class="text-primary font-medium">support@ijmb.info</a> with your full name and the email address you used to register.</p>
+
+      <h2>Keeping Your Account Secure</h2>
+      <ul>
+        <li>Never share your password with anyone — including people claiming to be IJMB staff</li>
+        <li>Always log out after using the portal on a shared device</li>
+        <li>Use a unique password that you do not use for other websites</li>
+        <li>If you suspect your account has been accessed by someone else, change your password immediately and contact support</li>
+      </ul>
+    `,
+    author: 'Admissions Office',
+    date: '2026-05-05',
+    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800',
+    tags: ['Portal Login', 'Dashboard', 'Student Portal', 'IJMB']
+  },
+  {
+    id: '20',
+    slug: 'ijmb-form-2026-where-to-buy-and-fill',
+    title: 'IJMB Form 2026: Where to Buy, How to Fill It, and What to Submit',
+    excerpt: 'Where do you get the IJMB form for 2026? The answer is simple: online at www.ijmb.info. This guide walks you through buying the form, filling every section correctly, and submitting your application without mistakes.',
+    content: `
+      <h2>Where to Buy the IJMB Form 2026</h2>
+      <p>The IJMB registration form for the <strong>2026/2027 academic session</strong> is purchased and completed entirely online through the official IJMB portal at <a href="https://www.ijmb.info" class="text-primary font-medium underline">www.ijmb.info</a>.</p>
+      <p>There is no physical form to buy from a bookshop or bank. There is no need to visit any IJMB office. Everything is done online — from account creation to downloading your admission letter.</p>
+
+      <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 my-6">
+        <p class="font-bold text-yellow-800">⚠ Scam Warning</p>
+        <p class="text-yellow-700 text-sm mt-1">Beware of individuals or websites selling "IJMB forms" outside of www.ijmb.info. The only legitimate place to purchase and fill the IJMB 2026 registration form is through the official portal. Do not pay into any personal bank account.</p>
+      </div>
+
+      <h2>How Much Does the IJMB Form Cost in 2026?</h2>
+      <p>The official IJMB registration form fee for 2026/2027 is <strong>₦10,000</strong>. This fee is paid online through the portal after you have filled in your application details. Payment is processed securely via Paystack.</p>
+
+      <h2>How to Fill the IJMB Form Correctly</h2>
+      <p>The form has four main sections. Here is what each requires and common mistakes to avoid:</p>
+
+      <h3>Section 1: Personal Details</h3>
+      <ul>
+        <li><strong>Surname:</strong> Enter exactly as it appears on your O-Level certificate — spelling must match</li>
+        <li><strong>First Name and Middle Name:</strong> As on your certificate</li>
+        <li><strong>Date of Birth:</strong> Must match your birth certificate or O-Level certificate</li>
+        <li><strong>State of Origin:</strong> Select your actual home state — this affects centre assignment in some cases</li>
+        <li><strong>Guardian Details:</strong> Parent or guardian name, phone number, and occupation</li>
+        <li><strong>Residential Address:</strong> Where you currently live (not necessarily your state of origin)</li>
+      </ul>
+
+      <h3>Section 2: O-Level Details</h3>
+      <ul>
+        <li><strong>Exam Type:</strong> Select WAEC, NECO, NABTEB, or "Awaiting Result" if you haven't received results yet</li>
+        <li><strong>Exam Year:</strong> The year you sat the exam (e.g., 2024 or 2025)</li>
+        <li><strong>Exam Number:</strong> Your WAEC or NECO examination number (found on your result or slip)</li>
+        <li><strong>Subjects and Grades:</strong> Enter each subject and your grade. Use A1, B2, B3, C4, C5, C6, D7, E8, F9 format for WAEC grades</li>
+      </ul>
+      <p>If you are awaiting results, select "Awaiting" and upload your examination slip as proof.</p>
+
+      <h3>Section 3: Programme Selection</h3>
+      <ul>
+        <li><strong>Preferred Centre:</strong> Choose the IJMB study centre closest to where you will be living during the programme. See our <a href="/ijmb-centres-in-nigeria" class="text-primary underline">full list of centres</a></li>
+        <li><strong>Subject Combination:</strong> Choose the three A-Level subjects that match your intended university course. See our <a href="/blog/ijmb-subject-combinations-all-courses" class="text-primary underline">subject combinations guide</a></li>
+        <li><strong>Intended Course:</strong> The university course you plan to study (e.g., Medicine, Engineering, Law)</li>
+        <li><strong>Academic Session:</strong> Select 2026/2027</li>
+      </ul>
+
+      <h3>Section 4: Document Uploads</h3>
+      <ul>
+        <li><strong>Passport Photograph:</strong> Recent photo, white background, clear face, JPEG or PNG format, under 2MB</li>
+        <li><strong>O-Level Result:</strong> Upload a scan or clear photo of your WAEC/NECO certificate or result slip</li>
+      </ul>
+
+      <h2>Reviewing and Submitting Your Form</h2>
+      <p>Before paying, review every detail carefully — especially your name, date of birth, and O-Level grades. Errors in these fields must be corrected <em>before</em> payment. Once you click Submit and pay the form fee:</p>
+      <ul>
+        <li>Your form is locked and cannot be edited</li>
+        <li>Your application moves to "Submitted" status</li>
+        <li>The admissions team begins processing your documents</li>
+        <li>You will receive a confirmation email immediately</li>
+      </ul>
+
+      <h2>What Happens After Submission?</h2>
+      <p>After submitting your form and paying the fee:</p>
+      <ol>
+        <li>Your application is reviewed within 2–5 working days</li>
+        <li>If your documents are in order, you receive an admission offer notification</li>
+        <li>You pay the acceptance fee and tuition to complete enrolment</li>
+        <li>Your admission letter is uploaded to your dashboard for download</li>
+        <li>You report to your assigned study centre on the resumption date</li>
+      </ol>
+    `,
+    author: 'Admissions Office',
+    date: '2026-05-08',
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=800',
+    tags: ['IJMB Form', 'Registration', 'Application', 'How-to', 'IJMB']
+  },
+  {
+    id: '21',
+    slug: 'ijmb-registration-portal-problems-and-solutions',
+    title: 'IJMB Portal Problems: 8 Common Issues and How to Fix Them',
+    excerpt: 'Having trouble with the IJMB registration portal? This guide covers the most common problems students face — login errors, payment failures, document upload issues, email not received — and exactly how to fix each one.',
+    content: `
+      <h2>Common Problems on the IJMB Registration Portal</h2>
+      <p>Thousands of students use the IJMB portal every year. Here are the most common issues reported and the solutions that work.</p>
+
+      <h2>Problem 1: "Email or Password Incorrect" Error on Login</h2>
+      <p><strong>Why it happens:</strong> You may be using the wrong email address, or your password has expired / been forgotten.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>Double-check you are using the exact email address you registered with (check for typos)</li>
+        <li>Try clicking "Forgot Password" to reset your password via email</li>
+        <li>If you registered with a different email and cannot remember it, email <a href="mailto:support@ijmb.info" class="text-primary font-medium">support@ijmb.info</a> with your full name and phone number to recover your account</li>
+      </ul>
+
+      <h2>Problem 2: Verification Email Not Received</h2>
+      <p><strong>Why it happens:</strong> The email may have been filtered into spam, or there was a typo in your email address during registration.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>Check your spam / junk folder — verification emails sometimes land there</li>
+        <li>Search your inbox for "IJMB" or "noreply@ijmb.info"</li>
+        <li>If not found anywhere, contact <a href="mailto:support@ijmb.info" class="text-primary font-medium">support@ijmb.info</a> to have the verification link resent</li>
+      </ul>
+
+      <h2>Problem 3: Payment Deducted But Application Not Updated</h2>
+      <p><strong>Why it happens:</strong> Occasionally, a payment is confirmed by the bank but there is a delay in the portal updating. This is usually resolved automatically within a few minutes but sometimes requires manual confirmation.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>Wait 10–15 minutes and refresh your dashboard</li>
+        <li>If status still shows "Draft", email <a href="mailto:support@ijmb.info" class="text-primary font-medium">support@ijmb.info</a> with your payment reference number and the amount paid. Your bank SMS or app will have this reference</li>
+        <li>Do <strong>not</strong> make a second payment before confirming with support — this could result in a double charge</li>
+      </ul>
+
+      <h2>Problem 4: Payment Failed / Card Declined</h2>
+      <p><strong>Why it happens:</strong> Insufficient funds, international transaction restrictions, or bank security flags.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>Ensure you have at least ₦10,200 in your account (to cover the fee and small transaction charge)</li>
+        <li>Try a different card or use bank transfer as an alternative</li>
+        <li>Some banks block online payments by default — enable online payments in your banking app or call your bank</li>
+        <li>For bank transfer, follow the instructions shown on the payment page and upload your receipt</li>
+      </ul>
+
+      <h2>Problem 5: Document Upload Fails</h2>
+      <p><strong>Why it happens:</strong> File is too large, wrong format, or connection was interrupted.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>Maximum file size is <strong>2MB</strong> per document. Compress large images using a free tool like compressjpeg.com</li>
+        <li>Accepted formats are JPEG, PNG, and PDF only — do not upload Word documents or HEIC files</li>
+        <li>Ensure you have a stable internet connection when uploading</li>
+        <li>Try uploading from a different device if the problem persists</li>
+      </ul>
+
+      <h2>Problem 6: Form Won't Save / Progress Lost</h2>
+      <p><strong>Why it happens:</strong> Browser tab was closed without saving, session timed out, or internet connection dropped.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>The form auto-saves as you progress — but click "Save" manually whenever you pause</li>
+        <li>Log back in and go to "My Application" — your progress should be saved from the last auto-save point</li>
+        <li>Use Chrome or Firefox for the most reliable experience on the portal</li>
+      </ul>
+
+      <h2>Problem 7: Cannot Find My Centre in the Dropdown</h2>
+      <p><strong>Why it happens:</strong> Some centres have limited slots and may be temporarily hidden once full, or the name differs from what you expect.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>Browse through the full dropdown list — centres are listed by state</li>
+        <li>If your preferred state has no available centre, choose the closest neighbouring state</li>
+        <li>Contact support to ask about availability at your preferred location</li>
+      </ul>
+
+      <h2>Problem 8: Admission Letter Not on Dashboard After Approval</h2>
+      <p><strong>Why it happens:</strong> The letter is generated after admin review. If you were just approved, it may take a few hours to appear.</p>
+      <p><strong>Solution:</strong></p>
+      <ul>
+        <li>Wait 24 hours after receiving the admission notification email, then refresh your dashboard</li>
+        <li>Check the "Documents" section of your dashboard — not the main application page</li>
+        <li>If it still doesn't appear after 48 hours, email support with your application number</li>
+      </ul>
+
+      <h2>Still Having Issues?</h2>
+      <p>The IJMB support team is available to help. Reach out via:</p>
+      <ul>
+        <li>Email: <a href="mailto:support@ijmb.info" class="text-primary font-medium">support@ijmb.info</a></li>
+        <li>Portal: Log in and use the contact/message feature in your dashboard</li>
+      </ul>
+      <p>When contacting support, always include your <strong>full name, registered email address, and a description of the problem</strong> to get a faster response.</p>
+    `,
+    author: 'Technical Support',
+    date: '2026-05-12',
+    image: 'https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&q=80&w=800',
+    tags: ['Portal Issues', 'Troubleshooting', 'Login', 'Payment', 'IJMB']
+  },
+  {
+    id: '22',
+    slug: 'ijmb-2026-2027-registration-is-open',
+    title: 'IJMB 2026/2027 Registration is Open — How to Apply Now',
+    excerpt: 'The IJMB 2026/2027 academic session registration portal is now open. Slots are limited. Find out how to register today, what documents you need, fees, and what to expect after you apply.',
+    content: `
+      <h2>IJMB 2026/2027 Registration is Now Open</h2>
+      <p>The <strong>Interim Joint Matriculation Board (IJMB) 2026/2027 academic session</strong> is officially open for registration. Prospective students across Nigeria can now apply online through the official IJMB portal at <a href="https://www.ijmb.info" class="text-primary font-medium underline">www.ijmb.info</a>.</p>
+      <p>Study centres have limited spaces available per session. <strong>Early registration is strongly advised</strong> to secure your preferred centre and subject combination.</p>
+
+      <h2>Who Can Apply for IJMB 2026/2027?</h2>
+      <p>You are eligible to register if you meet any of the following criteria:</p>
+      <ul>
+        <li>You have completed secondary school and hold a minimum of <strong>5 O-Level credits</strong> (WAEC, NECO, NABTEB, or GCE) including English Language and Mathematics</li>
+        <li>You are currently <strong>awaiting your O-Level results</strong> — you can register and upload your result later</li>
+        <li>You have previously written JAMB but were not admitted and want an alternative route to university</li>
+        <li>You want to skip 100 Level and enter university directly at <strong>200 Level</strong></li>
+      </ul>
+
+      <h2>Key Dates for the 2026/2027 Session</h2>
+      <ul>
+        <li><strong>Registration Opens:</strong> Now (portal live at www.ijmb.info)</li>
+        <li><strong>Recommended Registration Deadline:</strong> Register as early as possible — centres fill up</li>
+        <li><strong>Lectures Begin:</strong> October/November 2026 (varies by centre)</li>
+        <li><strong>IJMB A-Level Examinations:</strong> April–June 2027</li>
+        <li><strong>Results Released:</strong> September–November 2027</li>
+        <li><strong>University Direct Entry (JAMB DE):</strong> January–March 2027/2028</li>
+      </ul>
+
+      <h2>Registration Fees for 2026/2027</h2>
+      <ul>
+        <li><strong>Registration Form Fee:</strong> ₦10,000 (paid online at registration)</li>
+        <li><strong>Tuition Fee:</strong> ₦350,000 per session (payable in instalments at most centres)</li>
+        <li><strong>Hostel Accommodation:</strong> ₦150,000 per session (optional)</li>
+        <li><strong>Acceptance Fee:</strong> ₦15,000 (paid after admission offer)</li>
+      </ul>
+
+      <h2>Available Centres for 2026/2027</h2>
+      <p>IJMB study centres are available across all 36 states and the FCT. To see the full list of accredited centres and check availability in your state, visit the <a href="/ijmb-centres-in-nigeria" class="text-primary font-medium underline">Centres Page</a> on this portal.</p>
+      <p>Popular centre locations include: Abuja (FCT), Lagos, Kano, Ibadan, Port Harcourt, Kaduna, Enugu, Benin City, Onitsha, Maiduguri, and many more.</p>
+
+      <h2>Available Subject Combinations for 2026/2027</h2>
+      <p>Choose three subjects from the approved IJMB combination list based on your intended university course:</p>
+      <ul>
+        <li><strong>Sciences (Medicine, Pharmacy, Nursing, Engineering):</strong> Biology, Chemistry, Physics or Maths</li>
+        <li><strong>Social Sciences (Economics, Accounting, Business):</strong> Economics, Mathematics, Government or Commerce</li>
+        <li><strong>Arts & Law (Law, Literature, History, Mass Comm):</strong> Literature, Government, Economics or History</li>
+      </ul>
+      <p>See the full <a href="/blog/ijmb-subject-combinations-all-courses" class="text-primary font-medium underline">subject combinations guide</a> for all courses.</p>
+
+      <h2>How to Apply — 3 Simple Steps</h2>
+      <ol>
+        <li><strong>Create your account</strong> at <a href="https://www.ijmb.info/register" class="text-primary font-medium underline">www.ijmb.info/register</a> using your email address</li>
+        <li><strong>Fill in your application form</strong> — takes about 10 minutes. The form saves automatically so you can return later</li>
+        <li><strong>Pay the ₦10,000 form fee</strong> online using your debit card, bank transfer, or USSD</li>
+      </ol>
+      <p>After payment, your admission letter will be processed and made available on your dashboard within 2–5 working days.</p>
+
+      <h2>Why Register Early?</h2>
+      <ul>
+        <li>Centre slots are limited — popular centres fill up months before the session starts</li>
+        <li>Early registrants get first pick of their preferred centre and subject combination</li>
+        <li>You have more time to gather and upload your documents without rushing</li>
+        <li>You avoid late registration stress and potential price increases</li>
+      </ul>
+
+      <p style="font-weight:bold;color:#006400;font-size:16px">Register now at <a href="https://www.ijmb.info/register" class="text-primary underline">www.ijmb.info/register</a> and secure your spot for 2026/2027.</p>
+    `,
+    author: 'Admissions Office',
+    date: '2026-05-15',
+    image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800',
+    tags: ['2026/2027', 'Registration Open', 'IJMB Portal', 'Apply Now']
   }
 ];
