@@ -5,13 +5,14 @@ import { incompleteApplicationReminderEmail } from '@/lib/emailTemplates';
 
 // Vercel automatically injects CRON_SECRET and sends it as
 // "Authorization: Bearer <secret>" on every cron invocation.
-// This check prevents anyone else from triggering the endpoint.
 function isAuthorized(request: NextRequest): boolean {
   const auth = request.headers.get('authorization');
   const secret = process.env.CRON_SECRET;
   if (!secret) return false;
   return auth === `Bearer ${secret}`;
 }
+
+const THREE_DAYS_AGO = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
 
 export async function GET(request: NextRequest) {
   if (!isAuthorized(request)) {
@@ -22,13 +23,13 @@ export async function GET(request: NextRequest) {
   let errors = 0;
 
   // ── Group 1: Registered students who never started an application ──────────
-  // We target profiles created between 3 and 4 days ago with no application row.
+  // Query everyone older than 3 days who hasn't been reminded yet.
   const { data: noAppProfiles, error: noAppError } = await supabaseServer
     .from('profiles')
-    .select('id, email, full_name, created_at')
+    .select('id, email, full_name')
     .eq('role', 'student')
-    .gte('created_at', new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString())
-    .lt('created_at', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString());
+    .is('reminder_sent_at', null)
+    .lt('created_at', THREE_DAYS_AGO);
 
   if (noAppError) {
     console.error('[cron/remind-incomplete] Error fetching profiles:', noAppError);
@@ -46,13 +47,19 @@ export async function GET(request: NextRequest) {
     const appliedIds = new Set((existingApps ?? []).map((a) => a.user_id));
 
     for (const profile of noAppProfiles) {
-      if (appliedIds.has(profile.id)) continue; // already has an application
+      if (appliedIds.has(profile.id)) continue;
 
       const name = profile.full_name || 'Student';
       const { html, subject } = incompleteApplicationReminderEmail(name, 'no_application');
       const result = await sendEmail({ to: profile.email, subject, html });
+
       if (result.success) {
         sent++;
+        // Mark as reminded so they don't get a second email
+        await supabaseServer
+          .from('profiles')
+          .update({ reminder_sent_at: new Date().toISOString() })
+          .eq('id', profile.id);
       } else {
         errors++;
         console.error(`[cron/remind-incomplete] Failed to email ${profile.email}:`, result.error);
@@ -60,13 +67,14 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  // ── Group 2: Draft applications not touched in 3–4 days ───────────────────
+  // ── Group 2: Draft applications not submitted ─────────────────────────────
+  // Query everyone with a draft older than 3 days who hasn't been reminded yet.
   const { data: draftApps, error: draftError } = await supabaseServer
     .from('applications')
     .select('id, user_id, profiles(email, full_name)')
     .eq('status', 'draft')
-    .gte('updated_at', new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString())
-    .lt('updated_at', new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString());
+    .is('reminder_sent_at', null)
+    .lt('updated_at', THREE_DAYS_AGO);
 
   if (draftError) {
     console.error('[cron/remind-incomplete] Error fetching draft applications:', draftError);
@@ -80,8 +88,14 @@ export async function GET(request: NextRequest) {
     const name = profile.full_name || 'Student';
     const { html, subject } = incompleteApplicationReminderEmail(name, 'draft');
     const result = await sendEmail({ to: profile.email, subject, html });
+
     if (result.success) {
       sent++;
+      // Mark as reminded so they don't get a second email
+      await supabaseServer
+        .from('applications')
+        .update({ reminder_sent_at: new Date().toISOString() })
+        .eq('id', app.id);
     } else {
       errors++;
       console.error(`[cron/remind-incomplete] Failed to email ${profile.email}:`, result.error);
