@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
 
       const name = profile.full_name || 'Student';
       const { html, subject } = incompleteApplicationReminderEmail(name, 'no_application');
-      const result = await sendEmail({ to: profile.email, subject, html });
+      const result = await sendEmail({ to: profile.email, subject, html, replyTo: 'support@ijmb.info' });
 
       if (result.success) {
         sent++;
@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 
     const name = profile.full_name || 'Student';
     const { html, subject } = incompleteApplicationReminderEmail(name, 'draft');
-    const result = await sendEmail({ to: profile.email, subject, html });
+    const result = await sendEmail({ to: profile.email, subject, html, replyTo: 'support@ijmb.info' });
 
     if (result.success) {
       sent++;
