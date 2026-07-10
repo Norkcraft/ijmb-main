@@ -1507,7 +1507,7 @@ export const blogPosts: BlogPost[] = [
       <p><strong>Solution:</strong></p>
       <ul>
         <li>Check your spam / junk folder — verification emails sometimes land there</li>
-        <li>Search your inbox for "IJMB" or "noreply@ijmb.info"</li>
+        <li>Search your inbox for "IJMB" or "support@ijmb.info"</li>
         <li>If not found anywhere, contact <a href="mailto:support@ijmb.info" class="text-primary font-medium">support@ijmb.info</a> to have the verification link resent</li>
       </ul>
 

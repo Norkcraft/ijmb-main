@@ -21,7 +21,6 @@ const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
   const router = useRouter();
@@ -35,7 +34,22 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
 
-    const fullPhone = `${countryCode}${phone.replace(/^0+/, '')}`;
+    const digitsOnly = phone.replace(/\D/g, '').replace(/^0+/, '');
+
+    // Validate phone length per country code
+    const expectedLengths: Record<string, number> = { '+234': 10, '+233': 9, '+44': 10, '+1': 10 };
+    const expected = expectedLengths[countryCode] ?? 10;
+    if (digitsOnly.length !== expected) {
+      toast({
+        title: 'Invalid phone number',
+        description: `Please enter a valid ${expected}-digit phone number for ${countryCode}.`,
+        variant: 'destructive',
+      });
+      setLoading(false);
+      return;
+    }
+
+    const fullPhone = `${countryCode}${digitsOnly}`;
 
     // ── 1. Check phone uniqueness ─────────────────────────────────────────
     const { data: existingPhone } = await supabase
@@ -121,34 +135,9 @@ const Register = () => {
       }).catch(() => {});
     }
 
-    setSent(true);
+    router.replace('/dashboard');
     setLoading(false);
   };
-
-  if (sent) {
-    return (
-      <>
-        <SEOHead title="Check Your Email – IJMB Registration" description="Verify your email to complete IJMB registration." canonical="https://www.ijmb.info/verify-email" />
-        <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Register' }, { label: 'Verify Email' }]} />
-        <section className="section-padding min-h-[60vh] flex items-center justify-center">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                <UserPlus className="text-primary" size={28} />
-              </div>
-              <CardTitle className="font-heading">Check Your Email</CardTitle>
-              <CardDescription>We've sent a verification link to <strong>{email}</strong>. Click the link to verify your account, then log in.</CardDescription>
-            </CardHeader>
-            <CardContent className="text-center">
-              <Link href="/login">
-                <Button variant="outline" className="mt-2">Go to Login</Button>
-              </Link>
-            </CardContent>
-          </Card>
-        </section>
-      </>
-    );
-  }
 
   return (
     <>
