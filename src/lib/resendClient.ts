@@ -6,7 +6,7 @@ if (!process.env.RESEND_API_KEY) {
 
 export const resend = new Resend(process.env.RESEND_API_KEY || '');
 
-export const FROM_EMAIL = process.env.EMAIL_FROM || 'IJMB Portal <noreply@ijmb.info>';
+export const FROM_EMAIL = process.env.EMAIL_FROM || 'IJMB Portal <support@ijmb.info>';
 
 export async function sendEmail({
   to,
