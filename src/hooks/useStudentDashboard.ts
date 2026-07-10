@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/hooks/use-toast';
@@ -85,6 +85,22 @@ export const useStudentDashboard = () => {
   const centres = staticData?.centres || [];
   const combos = staticData?.combos || [];
   const formFee = staticData?.formFee || 10000;
+
+  // Auto-create application in pay-first flow for existing users with no application yet.
+  // The ref prevents a double-insert if the effect re-runs before the query refreshes.
+  const autoCreateRef = useRef(false);
+  useEffect(() => {
+    if (!user || loadingUser || userQueryError) return;
+    if (userData !== undefined && userData.application === null && !autoCreateRef.current) {
+      autoCreateRef.current = true;
+      supabase.from('applications').insert({
+        user_id: user.id,
+        status: 'payment_pending',
+      }).then(() => {
+        queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
+      });
+    }
+  }, [user?.id, loadingUser, userData, userQueryError]);
 
   // Mutation: Save Application
   const saveMutation = useMutation({
