@@ -473,7 +473,86 @@ export function incompleteApplicationReminderEmail(
   };
 }
 
-// ─── 10. ADMIN: DIRECT MESSAGE TO STUDENT ─────────────────────────────────
+// ─── 10. STAGE REMINDERS ───────────────────────────────────────────────────
+
+export function reminderNoApplicationEmail(fullName: string) {
+  const body = `
+    ${header('Your IJMB Journey Awaits', 'You registered but haven\'t started your application yet')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 16px">Hi ${esc(fullName)},</p>
+      <p style="color:#475569;font-size:15px;line-height:1.8;margin-bottom:20px">
+        You created your IJMB account but haven't started your application yet. Slots at our study centres are limited
+        and filling up fast for the <strong>${YEAR}</strong> session.
+      </p>
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px 24px;margin-bottom:24px">
+        <p style="margin:0 0 10px;font-size:14px;font-weight:700;color:#166534">What happens when you apply:</p>
+        <p style="margin:4px 0;font-size:13px;color:#166534">✓ Skip 100 level — enter university at 200 level directly</p>
+        <p style="margin:4px 0;font-size:13px;color:#166534">✓ Recognised by 40+ federal and state universities</p>
+        <p style="margin:4px 0;font-size:13px;color:#166534">✓ Registration form fee is just ₦10,000</p>
+      </div>
+      ${ctaButton('Start My Application Now', `${SITE}/dashboard`)}
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        Takes less than 10 minutes. Need help? Reply to this email or contact <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>
+      </p>
+    </div>
+    ${footer()}
+  `;
+  return { html: wrapper(body), subject: `${esc(fullName)}, your IJMB application is waiting — start today` };
+}
+
+export function reminderAbandonedDraftEmail(fullName: string) {
+  const body = `
+    ${header('Complete Your IJMB Application', 'You\'re almost there — don\'t lose your spot')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 16px">Hi ${esc(fullName)},</p>
+      <p style="color:#475569;font-size:15px;line-height:1.8;margin-bottom:20px">
+        You started your IJMB application but didn't finish it. Your draft is saved — log in now to pick up where you left off
+        and secure your place for the <strong>${YEAR}</strong> session before slots close.
+      </p>
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:700">⚠ Don't lose your spot</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#92400e;line-height:1.6">
+          Study centre slots are limited. Incomplete applications do not reserve a place — submit yours today.
+        </p>
+      </div>
+      ${ctaButton('Continue My Application', `${SITE}/dashboard`)}
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        Questions? Reply to this email or contact <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>
+      </p>
+    </div>
+    ${footer()}
+  `;
+  return { html: wrapper(body), subject: `${esc(fullName)}, complete your IJMB application — slots are filling up` };
+}
+
+export function reminderPaymentPendingEmail(fullName: string) {
+  const body = `
+    ${header('Complete Your IJMB Payment', 'One step away from securing your place')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 16px">Hi ${esc(fullName)},</p>
+      <p style="color:#475569;font-size:15px;line-height:1.8;margin-bottom:20px">
+        Your IJMB application is ready — the only thing left is to complete your payment to confirm your place
+        for the <strong>${YEAR}</strong> session.
+      </p>
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px 24px;margin-bottom:24px">
+        <p style="margin:0 0 8px;font-size:14px;font-weight:700;color:#166534">Registration Form Fee</p>
+        <p style="margin:0;font-size:28px;font-weight:800;color:#006400">₦10,000</p>
+        <p style="margin:4px 0 0;font-size:12px;color:#166534">One-time payment to confirm your application</p>
+      </div>
+      <p style="color:#475569;font-size:14px;line-height:1.7;margin-bottom:24px">
+        Log in to your dashboard to complete payment. If you have any issues paying, reply to this email and we'll help you straight away.
+      </p>
+      ${ctaButton('Pay Now & Confirm My Place', `${SITE}/dashboard`)}
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        Need help? Contact us at <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>
+      </p>
+    </div>
+    ${footer()}
+  `;
+  return { html: wrapper(body), subject: `Action needed: complete your IJMB payment, ${esc(fullName)}` };
+}
+
+// ─── 11. ADMIN: DIRECT MESSAGE TO STUDENT ─────────────────────────────────
 export function adminDirectMessageEmail(studentName: string, subject: string, message: string) {
   const body = `
     ${header('Message from IJMB', 'Official communication from the IJMB team')}

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { useToast } from '@/hooks/use-toast';
-import { Search, ArrowUpRight, Users, GraduationCap, Clock, CheckCircle, XCircle, UserCheck, AlertTriangle, Mail, RefreshCw, Loader2 } from 'lucide-react';
+import { Search, ArrowUpRight, Users, GraduationCap, Clock, CheckCircle, XCircle, UserCheck, AlertTriangle, Mail, Send, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import SendEmailModal from './SendEmailModal';
 
@@ -55,17 +55,23 @@ type Student = {
   } | null;
 };
 
-type AttentionReason = 'unverified' | 'no_application' | 'abandoned_draft';
+type AttentionReason = 'no_application' | 'abandoned_draft' | 'payment_pending';
 
 const ATTENTION_TAG: Record<AttentionReason, { label: string; className: string }> = {
-  unverified:        { label: 'Email Unverified',  className: 'bg-red-100 text-red-700' },
   no_application:    { label: 'No Application',    className: 'bg-amber-100 text-amber-700' },
   abandoned_draft:   { label: 'Abandoned Draft',   className: 'bg-orange-100 text-orange-700' },
+  payment_pending:   { label: 'Payment Pending',   className: 'bg-red-100 text-red-700' },
+};
+
+const REMINDER_TYPE: Record<AttentionReason, string> = {
+  no_application:  'reminder_no_application',
+  abandoned_draft: 'reminder_abandoned_draft',
+  payment_pending: 'reminder_payment_pending',
 };
 
 function getAttentionReason(student: Student): AttentionReason | null {
-  if (!student.email_verified) return 'unverified';
   if (!student.application) return 'no_application';
+  if (student.application.status === 'payment_pending') return 'payment_pending';
   if (
     student.application.status === 'draft' &&
     Date.now() - new Date(student.application.created_at).getTime() > 7 * 24 * 60 * 60 * 1000
@@ -92,7 +98,7 @@ export default function AdminStudents({ onMount }: AdminStudentsProps) {
   const [filter, setFilter] = useState('all');
   const [viewMode, setViewMode] = useState<'all' | 'needs_attention'>('all');
   const [emailTarget, setEmailTarget] = useState<{ id: string; full_name: string; email: string } | null>(null);
-  const [resendingId, setResendingId] = useState<string | null>(null);
+  const [remindingId, setRemindingId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => { onMount?.(); }, []);
@@ -127,24 +133,27 @@ export default function AdminStudents({ onMount }: AdminStudentsProps) {
     fetchStudents();
   }, []);
 
-  const handleResendVerification = async (student: Student) => {
-    setResendingId(student.id);
+  const handleSendReminder = async (student: Student, reason: AttentionReason) => {
+    setRemindingId(student.id);
     try {
-      const res = await fetch('/api/admin/resend-confirmation', {
+      const res = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_INTERNAL_API_SECRET}`,
+          'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '',
         },
-        body: JSON.stringify({ email: student.email, fullName: student.full_name }),
+        body: JSON.stringify({
+          type: REMINDER_TYPE[reason],
+          data: { fullName: student.full_name, email: student.email },
+        }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.message);
-      toast({ title: 'Confirmation Email Sent', description: `Fresh link sent to ${student.email}` });
+      toast({ title: 'Reminder Sent', description: `Email sent to ${student.email}` });
     } catch (err: any) {
-      toast({ title: 'Failed', description: err?.message || 'Could not resend the confirmation email.', variant: 'destructive' });
+      toast({ title: 'Failed to send reminder', description: err?.message || 'Unknown error', variant: 'destructive' });
     } finally {
-      setResendingId(null);
+      setRemindingId(null);
     }
   };
 
@@ -251,9 +260,9 @@ export default function AdminStudents({ onMount }: AdminStudentsProps) {
           <div className="space-y-3">
             {/* Legend */}
             <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400 inline-block" /> Email Unverified</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400 inline-block" /> No Application Started</span>
               <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-400 inline-block" /> Abandoned Draft (7+ days)</span>
+              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-400 inline-block" /> Payment Pending</span>
             </div>
 
             <div className="bg-white rounded-2xl border overflow-hidden">
@@ -289,23 +298,21 @@ export default function AdminStudents({ onMount }: AdminStudentsProps) {
 
                       {/* Actions */}
                       <div className="col-span-3 flex items-center justify-end gap-2">
-                        {reason === 'unverified' && (
-                          <button
-                            onClick={() => handleResendVerification(student)}
-                            disabled={resendingId === student.id}
-                            className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-60"
-                          >
-                            {resendingId === student.id
-                              ? <Loader2 size={12} className="animate-spin" />
-                              : <RefreshCw size={12} />}
-                            Resend Link
-                          </button>
-                        )}
+                        <button
+                          onClick={() => handleSendReminder(student, reason)}
+                          disabled={remindingId === student.id}
+                          className="flex items-center gap-1 text-xs font-semibold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-60"
+                        >
+                          {remindingId === student.id
+                            ? <Loader2 size={12} className="animate-spin" />
+                            : <Send size={12} />}
+                          Send Reminder
+                        </button>
                         <button
                           onClick={() => setEmailTarget({ id: student.id, full_name: student.full_name, email: student.email })}
                           className="flex items-center gap-1 text-xs font-semibold text-primary hover:text-primary/80 bg-primary/10 hover:bg-primary/20 px-2.5 py-1.5 rounded-lg transition-colors"
                         >
-                          <Mail size={12} /> Email
+                          <Mail size={12} /> Custom
                         </button>
                       </div>
                     </div>
