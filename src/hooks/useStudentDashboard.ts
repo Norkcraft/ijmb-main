@@ -92,7 +92,7 @@ export const useStudentDashboard = () => {
   const autoCreateRef = useRef(false);
   useEffect(() => {
     if (!user || loadingUser || userQueryError) return;
-    if (userData === undefined || autoCreateRef.current) return;
+    if (userData === undefined || userData === null || autoCreateRef.current) return;
 
     const app = userData.application;
     if (app === null) {
