@@ -71,7 +71,6 @@ export default function AdminDashboardOverview() {
       );
 
       const needsAttentionCount = profiles.filter(p => {
-        if (!p.email_verified) return true;
         if (!appUserIds.has(p.id)) return true;
         if (abandonedIds.has(p.id)) return true;
         return false;

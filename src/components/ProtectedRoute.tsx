@@ -15,12 +15,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       router.push('/login');
       return;
     }
-    const provider = user.app_metadata?.provider;
-    const emailVerified = !!user.email_confirmed_at || provider === 'google' || provider === 'phone';
-    if (!emailVerified) {
-      router.push('/verify-email');
-      return;
-    }
     // Only redirect to complete-profile if not already there — prevents redirect loop
     if (!profile && pathname !== '/complete-profile') {
       router.push('/complete-profile');
@@ -36,11 +30,6 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (!user) return null;
-
-  const provider = user.app_metadata?.provider;
-  const emailVerified = !!user.email_confirmed_at || provider === 'google' || provider === 'phone';
-
-  if (!emailVerified) return null;
   if (!profile) return null;
 
   return <>{children}</>;
