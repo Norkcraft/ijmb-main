@@ -118,39 +118,24 @@ const Centres = () => (
               </div>
 
               <h2 className="text-2xl font-heading font-bold mt-10 mb-4">IJMB Centre Fees Overview</h2>
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                Fees vary depending on the location and facilities of the centre. Generally, centres in major cities like Lagos, Abuja, and Port Harcourt may have higher fees due to the cost of living and operations.
+              <p className="text-muted-foreground leading-relaxed mb-4">
+                To get started with IJMB, all you need to pay is the registration form fee. Tuition and accommodation fees vary by centre and location.
               </p>
 
-              <div className="overflow-x-auto">
-                <table className="w-full border text-sm">
-                   <thead className="bg-muted">
-                      <tr>
-                         <th className="p-3 text-left">Location Category</th>
-                         <th className="p-3 text-left">Estimated Tuition</th>
-                         <th className="p-3 text-left">Estimated Hostel</th>
-                      </tr>
-                   </thead>
-                   <tbody>
-                      <tr className="border-b">
-                         <td className="p-3 font-medium">All Centres (Standard)</td>
-                         <td className="p-3">₦350,000</td>
-                         <td className="p-3">₦150,000</td>
-                      </tr>
-                      <tr className="border-b">
-                         <td className="p-3 font-medium">Registration Form Fee</td>
-                         <td className="p-3 font-medium text-primary">₦10,000</td>
-                         <td className="p-3">—</td>
-                      </tr>
-                      <tr>
-                         <td className="p-3 font-medium">Total (with Hostel)</td>
-                         <td className="p-3 font-bold">₦510,000</td>
-                         <td className="p-3 text-muted-foreground">incl. above</td>
-                      </tr>
-                   </tbody>
-                </table>
+              <div className="flex justify-center mb-4">
+                <div className="border-2 border-primary rounded-2xl shadow-md p-8 text-center max-w-xs w-full bg-white">
+                  <p className="text-sm uppercase tracking-widest text-muted-foreground mb-3 font-medium">Registration Form Fee</p>
+                  <div className="text-4xl font-extrabold text-primary mb-3">₦10,000</div>
+                  <p className="text-muted-foreground text-sm">One-time payment to start your application</p>
+                </div>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">*Fees are estimates and subject to change. Visit specific city pages for detailed pricing.</p>
+
+              <p className="text-sm text-center text-muted-foreground mt-3">
+                For tuition and accommodation fees,{" "}
+                <a href="mailto:support@ijmb.info" className="text-primary font-semibold underline hover:opacity-80 transition-opacity">
+                  email us at support@ijmb.info
+                </a>
+              </p>
 
               <InternalLinks exclude="/ijmb-centres-in-nigeria" />
            </div>
