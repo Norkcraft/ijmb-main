@@ -109,6 +109,12 @@ const Register = () => {
         email,
       });
 
+      // ── 5. Pre-create application so dashboard goes straight to payment ──
+      await supabase.from('applications').insert({
+        user_id: data.user.id,
+        status: 'payment_pending',
+      });
+
       const emailHeaders = {
         'Content-Type': 'application/json',
         'x-internal-secret': process.env.NEXT_PUBLIC_INTERNAL_API_SECRET || '',

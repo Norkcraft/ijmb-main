@@ -21,8 +21,9 @@ import { useState } from 'react';
 
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS_MAP: Record<string, { label: string; color: string; bg: string; dot: string; icon: React.ReactNode }> = {
-  draft:           { label: 'Draft',           color: 'text-slate-600',  bg: 'bg-slate-100',   dot: 'bg-slate-400',   icon: <FileText size={14} /> },
-  payment_pending: { label: 'Awaiting Payment',color: 'text-amber-700',  bg: 'bg-amber-100',   dot: 'bg-amber-500',   icon: <CreditCard size={14} /> },
+  draft:                { label: 'Draft',            color: 'text-slate-600',  bg: 'bg-slate-100',   dot: 'bg-slate-400',   icon: <FileText size={14} /> },
+  payment_pending:      { label: 'Awaiting Payment', color: 'text-amber-700',  bg: 'bg-amber-100',   dot: 'bg-amber-500',   icon: <CreditCard size={14} /> },
+  paid_details_pending: { label: 'Complete Details', color: 'text-blue-700',   bg: 'bg-blue-100',    dot: 'bg-blue-500',    icon: <FileText size={14} /> },
   submitted:       { label: 'Under Review',    color: 'text-blue-700',   bg: 'bg-blue-100',    dot: 'bg-blue-500',    icon: <Clock size={14} /> },
   review:          { label: 'Under Review',    color: 'text-blue-700',   bg: 'bg-blue-100',    dot: 'bg-blue-500',    icon: <Clock size={14} /> },
   admitted:        { label: 'Admitted!',        color: 'text-green-700',  bg: 'bg-green-100',   dot: 'bg-green-500',   icon: <Star size={14} /> },
@@ -42,8 +43,9 @@ const STEPS = [
 
 function getStepIndex(status?: string) {
   switch (status) {
-    case 'draft':            return 0;
-    case 'payment_pending':  return 1;
+    case 'draft':                return 0;
+    case 'payment_pending':      return 1;
+    case 'paid_details_pending': return 1;
     case 'submitted':
     case 'review':           return 2;
     case 'admitted':         return 3;
@@ -889,6 +891,7 @@ const Dashboard = () => {
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application.status);
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
   const isPaymentPending = application?.status === 'payment_pending';
+  const isFormDetailsPending = application?.status === 'paid_details_pending';
   const isDraft = !application || application.status === 'draft' || !application.status;
 
   const handlePrint = () => {
@@ -973,6 +976,8 @@ const Dashboard = () => {
 
   // Stage 2: Pay Form Fee
   if (isPaymentPending && !formFeePaid) {
+    // Distinguish pay-first flow (no form details yet) from fill-first flow
+    const isPayFirstFlow = !application?.surname;
     return (
       <>
         <SEOHead title="Payment – IJMB" description="Pay your IJMB registration fee." />
@@ -985,8 +990,11 @@ const Dashboard = () => {
                   <CheckCircle size={24} />
                 </div>
                 <div>
-                  <p className="font-black text-xl mb-1">Application Submitted!</p>
-                  <p className="text-white/70 text-sm">One final step — pay the ₦{formFee.toLocaleString()} registration fee to send your application for review.</p>
+                  <p className="font-black text-xl mb-1">{isPayFirstFlow ? 'One Step to Get Started!' : 'Application Submitted!'}</p>
+                  <p className="text-white/70 text-sm">{isPayFirstFlow
+                    ? `Pay the ₦${formFee.toLocaleString()} registration fee now — you'll fill in your application details right after.`
+                    : `One final step — pay the ₦${formFee.toLocaleString()} registration fee to send your application for review.`
+                  }</p>
                 </div>
               </div>
             </div>
@@ -997,6 +1005,42 @@ const Dashboard = () => {
             <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName, amount) => {
               await handlePaymentSuccess(feeName, amount);
             }} />
+          </div>
+        </DashboardShell>
+      </>
+    );
+  }
+
+  // Stage 2.5: Payment confirmed — fill in application details (pay-first flow)
+  if (isFormDetailsPending) {
+    return (
+      <>
+        <SEOHead title="Complete Application – IJMB" description="Complete your IJMB application details." />
+        <DashboardShell currentTab="application" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
+          <div className="space-y-6">
+            <div className="relative overflow-hidden rounded-2xl bg-[hsl(145,63%,18%)] text-white p-6 sm:p-8">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
+              <div className="relative flex items-start gap-4">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 flex items-center justify-center shrink-0">
+                  <CheckCircle size={24} />
+                </div>
+                <div>
+                  <p className="font-black text-xl mb-1">Payment Confirmed!</p>
+                  <p className="text-white/70 text-sm">Your registration fee has been received. Fill in your details below to complete your application.</p>
+                </div>
+              </div>
+            </div>
+            <ApplicationForm
+              application={application}
+              initialOlevels={olevelResults}
+              user={user}
+              sessions={sessions}
+              centres={centres}
+              combos={combos}
+              onSave={saveApplication}
+              onFileUpload={handleFileUpload}
+              uploading={uploading}
+            />
           </div>
         </DashboardShell>
       </>

@@ -343,7 +343,10 @@ export const useStudentDashboard = () => {
 
     if (paymentType === 'form_fee') {
       updates.form_fee_paid = true;
-      updates.status = 'submitted';
+      // If the user paid before filling in their details (impulse-buyer flow),
+      // hold in 'paid_details_pending' so the form is shown next.
+      // If details were already filled (surname present), go straight to submitted.
+      updates.status = application?.surname ? 'submitted' : 'paid_details_pending';
     } else if (paymentType === 'acceptance_fee') {
       updates.status = 'fees_pending';
     } else if (paymentType === 'tuition_fee') {
