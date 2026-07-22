@@ -86,9 +86,9 @@ export const useStudentDashboard = () => {
   const combos = staticData?.combos || [];
   const formFee = staticData?.formFee || 10000;
 
-  // Auto-create or upgrade application to payment_pending for the pay-first flow.
-  // Covers: users with no application yet, and users stuck in draft status.
-  // The ref prevents a double-write if the effect re-runs before the query refreshes.
+  // Auto-create a draft application for new users.
+  // Also resets any payment_pending application that was created without the form
+  // being completed (e.g. from a previous pay-first session) back to draft.
   const autoCreateRef = useRef(false);
   useEffect(() => {
     if (!user || loadingUser || userQueryError) return;
@@ -96,7 +96,7 @@ export const useStudentDashboard = () => {
 
     const app = userData.application;
     if (app === null) {
-      // No application yet — create one in draft so user fills details before paying
+      // No application yet — create a draft
       autoCreateRef.current = true;
       supabase.from('applications').insert({
         user_id: user.id,
@@ -104,6 +104,20 @@ export const useStudentDashboard = () => {
       }).then(() => {
         queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
       });
+    } else if (
+      app.status === 'payment_pending' &&
+      !app.form_fee_paid &&
+      !app.subject_combination_id
+    ) {
+      // Application is payment_pending but the form was never properly completed.
+      // Reset to draft so the student fills the form before being shown payment.
+      autoCreateRef.current = true;
+      supabase.from('applications')
+        .update({ status: 'draft', updated_at: new Date().toISOString() })
+        .eq('id', app.id)
+        .then(() => {
+          queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
+        });
     }
   }, [user?.id, loadingUser, userData, userQueryError]);
 
