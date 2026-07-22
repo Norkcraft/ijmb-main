@@ -1652,5 +1652,170 @@ export const blogPosts: BlogPost[] = [
     date: '2026-05-15',
     image: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=800',
     tags: ['2026/2027', 'Registration Open', 'IJMB Portal', 'Apply Now']
+  },
+  {
+    id: '23',
+    slug: 'ijmb-centre-oko-anambra-2026',
+    title: 'IJMB Centre in Oko, Anambra State 2026 – Study Centre, Fees & Registration',
+    excerpt: 'Register for IJMB 2026/2027 at our accredited study centre in Oko, Anambra State. Learn about fees, subject combinations, nearby universities, and how to apply online.',
+    author: 'Admissions Office',
+    date: '2026-07-22',
+    image: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&q=80&w=800',
+    tags: ['IJMB Oko', 'Anambra', 'Study Centre', '2026'],
+    content: `
+      <h2>IJMB in Oko, Anambra State 2026</h2>
+      <p>Oko is a town in Orumba North Local Government Area of Anambra State, located in the heart of South-East Nigeria. This page is the direct portal for our accredited IJMB study centre in Oko, Anambra State — serving students from across Anambra and neighbouring states who are seeking a reliable pathway into 200 Level through the IJMB A-Level programme. Nearby federal and state universities include <strong>Nnamdi Azikiwe University (NAU) Awka</strong> and <strong>Chukwuemeka Odumegwu Ojukwu University (COOU)</strong>, both of which accept IJMB for direct entry admission.</p>
+
+      <h2>Why Study IJMB in Oko, Anambra?</h2>
+      <ul>
+        <li>Anambra State's top academic environment</li>
+        <li>Close to NAU Awka and COOU</li>
+        <li>Experienced A-Level tutors at the centre</li>
+        <li>Limited slots — apply early</li>
+      </ul>
+
+      <h2>Our IJMB Centre in Oko</h2>
+      <p>Our accredited IJMB study centre is located in Oko, Anambra State. The centre offers structured A-Level tuition in Science, Arts, and Social Science subject combinations with experienced lecturers dedicated to helping you score high in your IJMB examinations.</p>
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse border border-gray-300 mt-4 mb-6">
+          <tbody>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Location</td><td class="border border-gray-300 px-4 py-2">Oko, Anambra State</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Session</td><td class="border border-gray-300 px-4 py-2">2026/2027</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Duration</td><td class="border border-gray-300 px-4 py-2">9 months</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Examination Body</td><td class="border border-gray-300 px-4 py-2">ABU Zaria</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Study Mode</td><td class="border border-gray-300 px-4 py-2">Full-time</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Fees for IJMB 2026/2027 (Oko Centre)</h2>
+      <ul>
+        <li>Registration Form: ₦10,000</li>
+        <li>Tuition Fee: ₦350,000</li>
+        <li>Hostel (optional): ₦150,000</li>
+        <li>Acceptance Fee: ₦15,000</li>
+      </ul>
+
+      <h2>Available Subject Combinations</h2>
+      <p>Our Oko centre offers all major IJMB subject combinations to suit your intended university course:</p>
+      <ul>
+        <li>Sciences (Biology, Chemistry, Physics/Maths)</li>
+        <li>Social Sciences (Economics, Mathematics, Government/Commerce)</li>
+        <li>Arts &amp; Law (Literature, Government, Economics/History)</li>
+      </ul>
+      <p>See the full <a href="/blog/ijmb-subject-combinations-all-courses" class="text-primary underline">IJMB subject combinations guide</a> for every course.</p>
+
+      <h2>Universities Near Oko That Accept IJMB</h2>
+      <ul>
+        <li>Nnamdi Azikiwe University (NAU), Awka</li>
+        <li>Chukwuemeka Odumegwu Ojukwu University (COOU), Anambra</li>
+        <li>University of Nigeria Nsukka (UNN) — also accepts IJMB direct entry</li>
+        <li>Enugu State University of Science and Technology (ESUT)</li>
+      </ul>
+
+      <h2>How to Register for IJMB 2026/2027 (Oko Centre)</h2>
+      <ol>
+        <li>Create your account at <a href="https://www.ijmb.info/register" class="text-primary underline">www.ijmb.info/register</a></li>
+        <li>Fill the application form — takes about 10 minutes</li>
+        <li>Pay the ₦10,000 form fee online using your debit card, bank transfer, or USSD</li>
+      </ol>
+      <p><strong><a href="/register" class="text-primary underline">Register now to secure your slot at our Oko, Anambra centre →</a></strong></p>
+
+      <h2>Frequently Asked Questions — Oko IJMB Centre</h2>
+      <dl>
+        <dt><strong>Is the Oko centre accredited?</strong></dt>
+        <dd>Yes, our Oko centre is fully accredited under the IJMB programme administered by ABU Zaria.</dd>
+        <dt><strong>Can I get hostel accommodation in Oko?</strong></dt>
+        <dd>Yes, hostel accommodation is available at the centre for students who require it.</dd>
+        <dt><strong>What documents do I need?</strong></dt>
+        <dd>O-Level result (WAEC/NECO/GCE), passport photograph, and a valid ID. See the full <a href="/ijmb-admission-requirements" class="text-primary underline">admission requirements page</a>.</dd>
+      </dl>
+
+      <p>Read more: <a href='/ijmb-centres-in-nigeria'>All IJMB Centres in Nigeria</a> | <a href='/blog/ijmb-in-anambra-state'>IJMB in Anambra State</a> | <a href='/ijmb-centre-ilorin-kwara'>Our Ilorin, Kwara Centre</a> | <a href='/ijmb-fees'>IJMB Fees Breakdown</a></p>
+    `
+  },
+  {
+    id: '24',
+    slug: 'ijmb-centre-ilorin-kwara-2026',
+    title: 'IJMB Centre in Ilorin, Kwara State 2026 – Study Centre, Fees & Registration',
+    excerpt: 'Register for IJMB 2026/2027 at our accredited study centre in Ilorin, Kwara State. University of Ilorin (UNILORIN) accepts IJMB for direct entry — find fees, requirements, and how to apply.',
+    author: 'Admissions Office',
+    date: '2026-07-22',
+    image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800',
+    tags: ['IJMB Ilorin', 'Kwara', 'Study Centre', '2026'],
+    content: `
+      <h2>IJMB in Ilorin, Kwara State 2026</h2>
+      <p>Ilorin is the capital of Kwara State and home to the <strong>University of Ilorin (UNILORIN)</strong>, one of Nigeria's most competitive federal universities. Students in Ilorin and across Kwara State can now register for IJMB through our accredited study centre in Ilorin and gain <strong>direct entry into 200 level without UTME</strong>.</p>
+
+      <h2>Why Study IJMB in Ilorin?</h2>
+      <ul>
+        <li>Home to UNILORIN — one of Nigeria's best federal universities</li>
+        <li>North-Central hub — accessible from Kwara, Kogi and Niger States</li>
+        <li>Established academic culture with qualified A-Level tutors</li>
+        <li>Competitive advantage: UNILORIN strongly accepts IJMB direct entry candidates</li>
+      </ul>
+
+      <h2>Our IJMB Centre in Ilorin</h2>
+      <p>Our accredited IJMB study centre is located in Ilorin, Kwara State. The centre offers structured A-Level tuition in Science, Arts, and Social Science subject combinations with experienced lecturers dedicated to helping you score high in your IJMB examinations.</p>
+      <div class="overflow-x-auto">
+        <table class="min-w-full border-collapse border border-gray-300 mt-4 mb-6">
+          <tbody>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Location</td><td class="border border-gray-300 px-4 py-2">Ilorin, Kwara State</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Session</td><td class="border border-gray-300 px-4 py-2">2026/2027</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Duration</td><td class="border border-gray-300 px-4 py-2">9 months</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Examination Body</td><td class="border border-gray-300 px-4 py-2">ABU Zaria</td></tr>
+            <tr><td class="border border-gray-300 px-4 py-2 font-medium">Study Mode</td><td class="border border-gray-300 px-4 py-2">Full-time</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Fees for IJMB 2026/2027 (Ilorin Centre)</h2>
+      <ul>
+        <li>Registration Form: ₦10,000</li>
+        <li>Tuition Fee: ₦350,000</li>
+        <li>Hostel (optional): ₦150,000</li>
+        <li>Acceptance Fee: ₦15,000</li>
+      </ul>
+
+      <h2>Available Subject Combinations</h2>
+      <p>Our Ilorin centre offers all major IJMB subject combinations to suit your intended university course:</p>
+      <ul>
+        <li>Sciences (Biology, Chemistry, Physics/Maths)</li>
+        <li>Social Sciences (Economics, Mathematics, Government/Commerce)</li>
+        <li>Arts &amp; Law (Literature, Government, Economics/History)</li>
+      </ul>
+      <p>See the full <a href="/blog/ijmb-subject-combinations-all-courses" class="text-primary underline">IJMB subject combinations guide</a> for every course.</p>
+
+      <h2>Universities Near Ilorin That Accept IJMB</h2>
+      <ul>
+        <li>University of Ilorin (UNILORIN) — top choice for Ilorin IJMB students</li>
+        <li>Kwara State University (KWASU), Malete</li>
+        <li>Al-Hikmah University, Ilorin</li>
+        <li>University of Abuja (UNIABUJA) — also accepts IJMB direct entry</li>
+      </ul>
+
+      <h2>UNILORIN and IJMB — What You Need to Know</h2>
+      <p>UNILORIN is one of the most active IJMB-accepting universities in Nigeria. Direct entry through IJMB into UNILORIN typically requires a minimum of <strong>6 points</strong> in your IJMB examinations, with competitive courses like Medicine, Law, and Engineering requiring <strong>9 points or above</strong>. Our Ilorin centre prepares students specifically with past question drills and ABU Zaria marking scheme analysis. Read more about <a href="/blog/ijmb-vs-jamb-difference" class="text-primary underline">IJMB vs JAMB</a> to understand why UNILORIN candidates prefer IJMB.</p>
+
+      <h2>How to Register — 3 Steps</h2>
+      <ol>
+        <li>Create your account at <a href="https://www.ijmb.info/register" class="text-primary underline">www.ijmb.info/register</a></li>
+        <li>Fill the application form — takes about 10 minutes</li>
+        <li>Pay the ₦10,000 form fee online using your debit card, bank transfer, or USSD</li>
+      </ol>
+      <p><strong><a href="/register" class="text-primary underline">Register now to secure your slot at our Ilorin, Kwara centre →</a></strong></p>
+
+      <h2>FAQs — Ilorin IJMB Centre</h2>
+      <dl>
+        <dt><strong>Does UNILORIN accept IJMB?</strong></dt>
+        <dd>Yes, UNILORIN accepts IJMB for direct entry across most faculties.</dd>
+        <dt><strong>What score do I need for UNILORIN?</strong></dt>
+        <dd>Minimum 6 points for most courses; 9 points or above for Medicine, Law, and Engineering.</dd>
+        <dt><strong>Is hostel available in Ilorin?</strong></dt>
+        <dd>Yes, hostel accommodation is available at the centre.</dd>
+      </dl>
+
+      <p>Read more: <a href='/ijmb-centres-in-nigeria'>All IJMB Centres</a> | <a href='/ijmb-city/ilorin'>IJMB in Ilorin</a> | <a href='/ijmb-centre-oko-anambra'>Our Oko, Anambra Centre</a> | <a href='/blog/ijmb-in-abuja-centres-registration'>IJMB in Abuja</a></p>
+    `
   }
 ];

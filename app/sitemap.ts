@@ -72,6 +72,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.85,
     },
+    { url: `${BASE_URL}/ijmb-centre-oko-anambra`, lastModified: new Date('2026-07-22'), changeFrequency: 'monthly', priority: 0.9 },
+    { url: `${BASE_URL}/ijmb-centre-ilorin-kwara`, lastModified: new Date('2026-07-22'), changeFrequency: 'monthly', priority: 0.9 },
     {
       url: `${BASE_URL}/contact`,
       lastModified: new Date('2026-04-29'),

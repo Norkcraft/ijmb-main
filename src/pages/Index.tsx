@@ -486,21 +486,30 @@ const Index = () => {
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 IJMB accredited study centres are located in major cities across all 36 states of Nigeria.
-                Whether you are in <strong className="text-foreground">Lagos, Abuja, Kano, Ibadan, Port Harcourt,</strong> or any other city, there is an approved IJMB centre near you.
+                Our accredited IJMB study centres are located in <strong className="text-foreground">Oko, Anambra State</strong> and <strong className="text-foreground">Ilorin, Kwara State</strong> — and we work with approved centres across all 36 states of Nigeria.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
                 Each accredited centre provides structured A-Level tuition, study materials, and examination preparation guided by experienced lecturers — giving you the best chance of scoring high in your IJMB exams and securing your preferred university course.
               </p>
-              <div className="flex flex-wrap gap-2 mb-6">
-                {["Lagos", "Abuja", "Ibadan", "Kano", "Port Harcourt", "Ilorin"].map((city) => (
-                  <Link
-                    key={city}
-                    href={`/ijmb-in-${city.toLowerCase().replace(/ /g, "-")}`}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded-full hover:bg-primary hover:text-primary-foreground transition-colors"
-                  >
-                    <MapPin size={14} /> {city}
-                  </Link>
-                ))}
+              <div className="grid sm:grid-cols-2 gap-3 mb-6">
+                <Link href="/ijmb-centre-oko-anambra" className="flex items-start gap-3 p-3 rounded-xl border border-border hover:border-primary hover:bg-primary/5 transition-colors group">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin size={15} className="text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">Oko, Anambra State</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Accredited centre · Slots available</p>
+                  </div>
+                </Link>
+                <Link href="/ijmb-centre-ilorin-kwara" className="flex items-start gap-3 p-3 rounded-xl border border-border hover:border-primary hover:bg-primary/5 transition-colors group">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                    <MapPin size={15} className="text-primary" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">Ilorin, Kwara State</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Accredited centre · UNILORIN nearby</p>
+                  </div>
+                </Link>
               </div>
               <Link
                 href="/ijmb-centres-in-nigeria"
@@ -508,6 +517,14 @@ const Index = () => {
               >
                 View All Centres <ArrowRight size={16} />
               </Link>
+              <div className="mt-4 pt-4 border-t border-border">
+                <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Learn More</p>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/blog/ijmb-centre-oko-anambra-2026" className="text-xs text-primary hover:underline">→ Oko Centre Guide</Link>
+                  <Link href="/blog/ijmb-centre-ilorin-kwara-2026" className="text-xs text-primary hover:underline">→ Ilorin Centre Guide</Link>
+                  <Link href="/blog/what-is-ijmb-complete-guide" className="text-xs text-primary hover:underline">→ What is IJMB?</Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
