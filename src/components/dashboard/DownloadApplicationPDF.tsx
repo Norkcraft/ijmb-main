@@ -15,21 +15,27 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
   const handleDownload = async () => {
     setLoading(true);
     try {
-      const { data, error } = await supabase
-        .storage
-        .from('protected-forms')
-        .createSignedUrl('application-form.pdf', 120, { download: 'IJMB-Application-Form.pdf' });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated. Please log in and try again.');
 
-      if (error || !data?.signedUrl) {
-        throw new Error('Could not generate download link. Please try again.');
+      const response = await fetch(`/api/application/${applicationId}/download`, {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      if (!response.ok) {
+        const err = await response.json().catch(() => ({}));
+        throw new Error(err.message || 'Failed to generate your form. Please try again.');
       }
 
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
-      a.href = data.signedUrl;
+      a.href = url;
       a.download = 'IJMB-Application-Form.pdf';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      URL.revokeObjectURL(url);
 
     } catch (err: any) {
       alert(err.message || 'Failed to download. Please try again.');
@@ -45,7 +51,7 @@ export const DownloadApplicationPDF = ({ applicationId }: Props) => {
       className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
     >
       {loading ? (
-        <><Loader2 size={16} className="mr-2 animate-spin" /> Getting download link…</>
+        <><Loader2 size={16} className="mr-2 animate-spin" /> Generating your form…</>
       ) : (
         <><FileText size={16} className="mr-2" /> Download Application Form (PDF)</>
       )}

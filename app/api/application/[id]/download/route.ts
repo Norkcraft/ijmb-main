@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { generateApplicationPDF } from '@/lib/generateApplicationPDF';
+
+export const maxDuration = 60;
 
 export async function GET(
   req: NextRequest,
@@ -51,21 +54,21 @@ export async function GET(
       );
     }
 
-    // 3. Generate a short-lived signed URL for the shared application form
-    const { data: signedData, error: signedError } = await supabase
-      .storage
-      .from('protected-forms')
-      .createSignedUrl('application-form.pdf', 120, { download: 'IJMB-Application-Form.pdf' });
+    // 3. Generate the prefilled PDF with the candidate's own data
+    const pdfBuffer = await generateApplicationPDF(id, token);
 
-    if (signedError || !signedData?.signedUrl) {
-      console.error('Signed URL error:', signedError);
-      return NextResponse.json({ message: 'Could not generate download link. Please try again.' }, { status: 500 });
-    }
+    // 4. Stream the PDF back as a download
+    return new NextResponse(pdfBuffer, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="IJMB-Application-Form.pdf"',
+        'Content-Length': pdfBuffer.length.toString(),
+      },
+    });
 
-    return NextResponse.json({ url: signedData.signedUrl });
-
-  } catch (error) {
+  } catch (error: any) {
     console.error('Download handler error:', error);
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    return NextResponse.json({ message: error?.message || 'Internal Server Error' }, { status: 500 });
   }
 }
