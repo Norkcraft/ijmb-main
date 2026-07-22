@@ -97,34 +97,63 @@ export default function AdminCentres() {
   };
 
   const handleDelete = async (centre: any) => {
-    // Check if any applications reference this centre
-    const { count } = await supabase
+    // Fetch affected applications with student email + name
+    const { data: affected } = await supabase
       .from('applications')
-      .select('id', { count: 'exact', head: true })
+      .select('id, user_id, first_name, surname, preferred_centre_id, assigned_centre_id, profiles(email)')
       .or(`preferred_centre_id.eq.${centre.id},assigned_centre_id.eq.${centre.id}`);
 
-    if ((count || 0) > 0) {
-      toast({
-        title: 'Cannot delete',
-        description: `This centre has ${count} application(s) referencing it.`,
-        variant: 'destructive',
-        action: (
-          <ToastAction altText="Deactivate centre" onClick={() => toggleStatus(centre)}>
-            Deactivate
-          </ToastAction>
-        ),
-      });
-      return;
-    }
+    const count = affected?.length || 0;
 
-    if (!confirm(`Delete "${centre.name}"? This cannot be undone.`)) return;
+    const confirmMsg = count > 0
+      ? `Delete "${centre.name}"?\n\n${count} student(s) selected this centre. Their centre choice will be cleared and each will receive an email asking them to choose a new centre.\n\nThis cannot be undone.`
+      : `Delete "${centre.name}"? This cannot be undone.`;
+
+    if (!confirm(confirmMsg)) return;
 
     setDeletingId(centre.id);
+
+    // Clear centre references on affected applications
+    if (count > 0) {
+      const updates: any = {};
+      // Only null out fields that point to this centre
+      const ids = affected!.map((a: any) => a.id);
+      await supabase
+        .from('applications')
+        .update({ preferred_centre_id: null })
+        .in('id', ids)
+        .eq('preferred_centre_id', centre.id);
+      await supabase
+        .from('applications')
+        .update({ assigned_centre_id: null })
+        .in('id', ids)
+        .eq('assigned_centre_id', centre.id);
+
+      // Fire-and-forget emails to affected students
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (token) {
+        for (const app of affected!) {
+          const email = (app as any).profiles?.email;
+          const fullName = `${app.first_name || ''} ${app.surname || ''}`.trim() || 'Student';
+          if (!email) continue;
+          fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ type: 'centre_removed', data: { email, fullName } }),
+          });
+        }
+      }
+    }
+
     const { error } = await supabase.from('centres').delete().eq('id', centre.id);
     if (error) {
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      toast({ title: 'Centre deleted' });
+      toast({
+        title: 'Centre deleted',
+        description: count > 0 ? `${count} student(s) have been emailed to select a new centre.` : undefined,
+      });
       fetchCentres();
     }
     setDeletingId(null);

@@ -1085,11 +1085,13 @@ const Dashboard = () => {
   }, [application?.passport_path]);
 
   // Centre reselect: show blocking modal if user's preferred centre is not in the active list
-  const needsCentreReselect = !loading && centres.length > 0 && application !== undefined &&
-    application !== null &&
-    application.preferred_centre_id !== null &&
-    application.preferred_centre_id !== undefined &&
-    !centres.some((c: any) => c.id === application.preferred_centre_id);
+  const STATUSES_REQUIRING_CENTRE = ['submitted', 'admitted', 'fees_pending', 'active', 'rejected'];
+  const needsCentreReselect = !loading && centres.length > 0 && !!application && (
+    // Centre was set but is now inactive/deleted
+    (application.preferred_centre_id != null && !centres.some((c: any) => c.id === application.preferred_centre_id)) ||
+    // Centre was cleared (e.g. centre deleted) and application is past draft
+    (application.preferred_centre_id == null && STATUSES_REQUIRING_CENTRE.includes(application.status))
+  );
 
   const handleCentreReselect = async (centreId: string) => {
     if (!application?.id) return;

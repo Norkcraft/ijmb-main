@@ -13,6 +13,7 @@ import {
   paymentConfirmationEmail,
   rejectionEmail,
   documentRequestEmail,
+  centreRemovedEmail,
 } from '@/lib/emailTemplates';
 
 // Simple in-memory rate limiter (per-IP, resets on server restart)
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     isAdmin = !!(callerProfile && ['super_admin', 'coordinator', 'admin'].includes(callerProfile.role));
 
     // Admission offer, rejection, and admin emails are admin-only
-    if (['admission_offer', 'admission_letter', 'admin_direct_message', 'admin_new_registration', 'rejection', 'document_request'].includes(type) && !isAdmin) {
+    if (['admission_offer', 'admission_letter', 'admin_direct_message', 'admin_new_registration', 'rejection', 'document_request', 'centre_removed'].includes(type) && !isAdmin) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
   }
@@ -122,6 +123,10 @@ export async function POST(request: NextRequest) {
         break;
       case 'document_request':
         email = documentRequestEmail(data.studentName, data.message, `${process.env.NEXT_PUBLIC_SUPABASE_URL ? 'https://www.ijmb.info' : 'https://www.ijmb.info'}/dashboard?tab=documents`);
+        recipientEmail = data.email;
+        break;
+      case 'centre_removed':
+        email = centreRemovedEmail(data.fullName, 'https://www.ijmb.info/dashboard');
         recipientEmail = data.email;
         break;
       default:

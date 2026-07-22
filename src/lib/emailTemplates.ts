@@ -654,3 +654,33 @@ export function adminDirectMessageEmail(studentName: string, subject: string, me
   `;
   return { html: wrapper(body), subject: esc(subject) };
 }
+
+export function centreRemovedEmail(fullName: string, dashboardUrl: string) {
+  const body = `
+    ${header('Action Required: Select a New Study Centre', 'Your previously selected centre is no longer available')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 20px">Dear ${esc(fullName)},</p>
+
+      <p style="color:#475569;font-size:15px;line-height:1.7;margin-bottom:20px">
+        We're writing to let you know that the study centre you previously selected for your IJMB programme
+        is no longer available.
+      </p>
+
+      <div style="background:#fef9c3;border-left:4px solid #ca8a04;border-radius:0 12px 12px 0;padding:20px 24px;margin-bottom:28px">
+        <p style="margin:0;font-size:14px;color:#92400e;font-weight:600">
+          Please log in to your dashboard and select a new centre from the available options as soon as possible.
+          Your application cannot proceed without a valid centre selection.
+        </p>
+      </div>
+
+      ${ctaButton('Select a New Centre', dashboardUrl)}
+
+      <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin-top:28px">
+        If you have any questions, contact us on WhatsApp:
+        <a href="https://wa.me/2348100000000" style="color:#006400">+234 810 000 0000</a>
+      </p>
+    </div>
+    ${footer()}
+  `;
+  return { html: wrapper(body), subject: 'Action Required — Please Select a New Study Centre' };
+}
