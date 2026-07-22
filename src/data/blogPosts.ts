@@ -1656,8 +1656,8 @@ export const blogPosts: BlogPost[] = [
   {
     id: '23',
     slug: 'ijmb-centre-oko-anambra-2026',
-    title: 'IJMB Centre in Oko, Anambra State 2026 – Study Centre, Fees & Registration',
-    excerpt: 'Register for IJMB 2026/2027 at our accredited study centre in Oko, Anambra State. Learn about fees, subject combinations, nearby universities, and how to apply online.',
+    title: 'IJMB Centre in Oko, Anambra State 2026 – Study Centre, Requirements & Registration',
+    excerpt: 'Register for IJMB 2026/2027 at our accredited study centre in Oko, Anambra State. Learn about subject combinations, nearby universities, and how to apply online.',
     author: 'Admissions Office',
     date: '2026-07-22',
     image: 'https://images.unsplash.com/photo-1541829070764-84a7d30dd3f3?auto=format&fit=crop&q=80&w=800',
@@ -1688,14 +1688,6 @@ export const blogPosts: BlogPost[] = [
         </table>
       </div>
 
-      <h2>Fees for IJMB 2026/2027 (Oko Centre)</h2>
-      <ul>
-        <li>Registration Form: ₦10,000</li>
-        <li>Tuition Fee: ₦350,000</li>
-        <li>Hostel (optional): ₦150,000</li>
-        <li>Acceptance Fee: ₦15,000</li>
-      </ul>
-
       <h2>Available Subject Combinations</h2>
       <p>Our Oko centre offers all major IJMB subject combinations to suit your intended university course:</p>
       <ul>
@@ -1717,7 +1709,7 @@ export const blogPosts: BlogPost[] = [
       <ol>
         <li>Create your account at <a href="https://www.ijmb.info/register" class="text-primary underline">www.ijmb.info/register</a></li>
         <li>Fill the application form — takes about 10 minutes</li>
-        <li>Pay the ₦10,000 form fee online using your debit card, bank transfer, or USSD</li>
+        <li>Pay the registration form fee securely online</li>
       </ol>
       <p><strong><a href="/register" class="text-primary underline">Register now to secure your slot at our Oko, Anambra centre →</a></strong></p>
 
@@ -1731,14 +1723,14 @@ export const blogPosts: BlogPost[] = [
         <dd>O-Level result (WAEC/NECO/GCE), passport photograph, and a valid ID. See the full <a href="/ijmb-admission-requirements" class="text-primary underline">admission requirements page</a>.</dd>
       </dl>
 
-      <p>Read more: <a href='/ijmb-centres-in-nigeria'>All IJMB Centres in Nigeria</a> | <a href='/blog/ijmb-in-anambra-state'>IJMB in Anambra State</a> | <a href='/ijmb-centre-ilorin-kwara'>Our Ilorin, Kwara Centre</a> | <a href='/ijmb-fees'>IJMB Fees Breakdown</a></p>
+      <p>Read more: <a href='/ijmb-centres-in-nigeria'>All IJMB Centres in Nigeria</a> | <a href='/blog/ijmb-in-anambra-state'>IJMB in Anambra State</a> | <a href='/ijmb-centre-ilorin-kwara'>Our Ilorin, Kwara Centre</a> | <a href='/ijmb-admission-requirements'>IJMB Requirements</a></p>
     `
   },
   {
     id: '24',
     slug: 'ijmb-centre-ilorin-kwara-2026',
-    title: 'IJMB Centre in Ilorin, Kwara State 2026 – Study Centre, Fees & Registration',
-    excerpt: 'Register for IJMB 2026/2027 at our accredited study centre in Ilorin, Kwara State. University of Ilorin (UNILORIN) accepts IJMB for direct entry — find fees, requirements, and how to apply.',
+    title: 'IJMB Centre in Ilorin, Kwara State 2026 – Study Centre, Requirements & Registration',
+    excerpt: 'Register for IJMB 2026/2027 at our accredited study centre in Ilorin, Kwara State. University of Ilorin (UNILORIN) accepts IJMB for direct entry — find requirements and how to apply.',
     author: 'Admissions Office',
     date: '2026-07-22',
     image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&q=80&w=800',
@@ -1769,14 +1761,6 @@ export const blogPosts: BlogPost[] = [
         </table>
       </div>
 
-      <h2>Fees for IJMB 2026/2027 (Ilorin Centre)</h2>
-      <ul>
-        <li>Registration Form: ₦10,000</li>
-        <li>Tuition Fee: ₦350,000</li>
-        <li>Hostel (optional): ₦150,000</li>
-        <li>Acceptance Fee: ₦15,000</li>
-      </ul>
-
       <h2>Available Subject Combinations</h2>
       <p>Our Ilorin centre offers all major IJMB subject combinations to suit your intended university course:</p>
       <ul>
@@ -1801,7 +1785,7 @@ export const blogPosts: BlogPost[] = [
       <ol>
         <li>Create your account at <a href="https://www.ijmb.info/register" class="text-primary underline">www.ijmb.info/register</a></li>
         <li>Fill the application form — takes about 10 minutes</li>
-        <li>Pay the ₦10,000 form fee online using your debit card, bank transfer, or USSD</li>
+        <li>Pay the registration form fee securely online</li>
       </ol>
       <p><strong><a href="/register" class="text-primary underline">Register now to secure your slot at our Ilorin, Kwara centre →</a></strong></p>
 

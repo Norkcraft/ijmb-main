@@ -143,38 +143,6 @@ export default function OkoCentrePage() {
         </div>
       </section>
 
-      {/* Fees Table */}
-      <section className="py-16 px-4 bg-muted/30">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-heading font-bold mb-8 text-center">
-            Fees for IJMB 2026/2027 — Oko Centre
-          </h2>
-          <div className="overflow-x-auto rounded-xl border border-border">
-            <table className="min-w-full bg-card">
-              <thead>
-                <tr className="border-b border-border bg-muted/50">
-                  <th className="px-5 py-3 text-left text-sm font-semibold text-foreground">Fee</th>
-                  <th className="px-5 py-3 text-left text-sm font-semibold text-foreground">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  { fee: 'Registration Form', amount: '₦10,000' },
-                  { fee: 'Tuition Fee', amount: '₦350,000' },
-                  { fee: 'Hostel (optional)', amount: '₦150,000' },
-                  { fee: 'Acceptance Fee', amount: '₦15,000' },
-                ].map((row, i) => (
-                  <tr key={row.fee} className={i % 2 === 0 ? '' : 'bg-muted/20'}>
-                    <td className="px-5 py-3 text-sm text-foreground">{row.fee}</td>
-                    <td className="px-5 py-3 text-sm font-medium text-primary">{row.amount}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
       {/* Subject Combinations */}
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
@@ -265,7 +233,6 @@ export default function OkoCentrePage() {
               { href: '/blog/ijmb-in-anambra-state', label: 'IJMB in Anambra State' },
               { href: '/ijmb-centre-ilorin-kwara', label: 'Ilorin, Kwara Centre' },
               { href: '/ijmb-centres-in-nigeria', label: 'All IJMB Centres' },
-              { href: '/ijmb-fees', label: 'IJMB Fees Breakdown' },
               { href: '/ijmb-admission-requirements', label: 'Admission Requirements' },
             ].map((link) => (
               <Link
