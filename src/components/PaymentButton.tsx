@@ -22,7 +22,10 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const publicKey = process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '';
+  const isTestMode = process.env.NEXT_PUBLIC_PAYMENT_MODE === 'test';
+  const publicKey = isTestMode
+    ? (process.env.NEXT_PUBLIC_PAYSTACK_TEST_PUBLIC_KEY || '')
+    : (process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '');
 
   const config = {
     email,
@@ -103,6 +106,14 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
     );
   }
 
+  if (isTestMode && !process.env.NEXT_PUBLIC_PAYSTACK_TEST_PUBLIC_KEY) {
+    return (
+      <div className="text-amber-700 text-sm p-3 border border-amber-300 rounded-lg bg-amber-50">
+        Test mode is on but no test key is set. Add <code>NEXT_PUBLIC_PAYSTACK_TEST_PUBLIC_KEY</code> to your environment.
+      </div>
+    );
+  }
+
   const isOutline = variant === 'outline';
 
   return (
@@ -124,7 +135,8 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
         <CreditCard size={18} />
       )}
       <span>{loading ? 'Processing...' : (label ?? `Pay ₦${amount.toLocaleString()} Now`)}</span>
-      {!loading && !isOutline && <Lock size={14} className="ml-auto opacity-70" />}
+      {!loading && isTestMode && <span className="ml-auto text-xs font-bold bg-yellow-400 text-yellow-900 px-1.5 py-0.5 rounded">TEST</span>}
+      {!loading && !isOutline && !isTestMode && <Lock size={14} className="ml-auto opacity-70" />}
     </button>
   );
 };
