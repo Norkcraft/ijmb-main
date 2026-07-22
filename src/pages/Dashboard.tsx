@@ -311,9 +311,16 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
   const combo = combos?.find((c: any) => c.id === application?.subject_combination_id);
 
   const downloadLetter = async () => {
-    if (!application?.admission_letter_path) return;
-    const { data } = await supabase.storage.from('student-documents').createSignedUrl(application.admission_letter_path, 300);
-    if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+    if (!application?.id) return;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    if (!token) return;
+    const res = await fetch(`/api/application/${application.id}/admission-letter`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return;
+    const { url } = await res.json();
+    if (url) window.open(url, '_blank');
   };
 
   const stats = [
@@ -675,11 +682,16 @@ function DocumentsTab({ application, sessions, centres, combos, user }: {
   };
 
   const downloadLetter = async () => {
-    if (!application?.admission_letter_path) return;
-    const { data } = await supabase.storage
-      .from('student-documents')
-      .createSignedUrl(application.admission_letter_path, 300);
-    if (data?.signedUrl) window.open(data.signedUrl, '_blank');
+    if (!application?.id) return;
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData?.session?.access_token;
+    if (!token) return;
+    const res = await fetch(`/api/application/${application.id}/admission-letter`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (!res.ok) return;
+    const { url } = await res.json();
+    if (url) window.open(url, '_blank');
   };
 
   const hasAdmissionLetter = !!application?.admission_letter_path;
