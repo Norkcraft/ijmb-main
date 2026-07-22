@@ -989,7 +989,10 @@ const Dashboard = () => {
               sessions={sessions}
               centres={centres}
               combos={combos}
-              onSave={saveApplication}
+              onSave={async (data, submit, silent) => {
+                await saveApplication(data, submit, silent);
+                if (submit) navigate('payments');
+              }}
               onFileUpload={handleFileUpload}
               uploading={uploading}
             />
