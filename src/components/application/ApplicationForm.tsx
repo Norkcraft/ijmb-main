@@ -77,8 +77,18 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
   const [saving, setSaving] = useState(false);
   const [nextLoading, setNextLoading] = useState(false);
   
-  // Extended State
-  const [olevels, setOlevels] = useState<OLevelResult[]>(initialOlevels || []);
+  // Extended State — seed from DB, fall back to localStorage if DB has none yet
+  const olevelsKey = application?.id ? `ijmb-olevels-${application.id}` : null;
+  const [olevels, setOlevels] = useState<OLevelResult[]>(() => {
+    if (initialOlevels && initialOlevels.length > 0) return initialOlevels;
+    if (typeof window !== 'undefined' && olevelsKey) {
+      try {
+        const saved = localStorage.getItem(olevelsKey);
+        if (saved) return JSON.parse(saved);
+      } catch { /* ignore */ }
+    }
+    return [];
+  });
   const [intendedCourse, setIntendedCourse] = useState(application?.intended_course || '');
   
   // Temporary state for adding a new subject
@@ -152,6 +162,13 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
     if (stepKey) localStorage.setItem(stepKey, step.toString());
   }, [step, stepKey]);
 
+  // Persist olevels to localStorage whenever they change
+  useEffect(() => {
+    if (olevelsKey) {
+      try { localStorage.setItem(olevelsKey, JSON.stringify(olevels)); } catch { /* ignore */ }
+    }
+  }, [olevels, olevelsKey]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setSaving(true);
     try {
@@ -169,8 +186,9 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
         form.reset(values);
         toast({ title: "Progress Saved", description: "Your application has been saved as a draft." });
       } else {
-        // Clear saved step so next visit starts fresh
+        // Clear saved step and olevels so next visit starts fresh
         if (stepKey) localStorage.removeItem(stepKey);
+        if (olevelsKey) localStorage.removeItem(olevelsKey);
       }
     } catch (error: any) {
       // Don't show a generic error if the mutation already showed a specific one
