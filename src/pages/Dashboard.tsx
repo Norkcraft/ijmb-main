@@ -892,11 +892,12 @@ const Dashboard = () => {
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
   const isPaymentPending = application?.status === 'payment_pending';
   const isFormDetailsPending = application?.status === 'paid_details_pending';
-  // Show the form for anyone who hasn't paid yet — lets them go back and edit at any time
+  // Show the form only if they haven't filled their details yet.
+  // Once they've submitted (surname exists), fall through to the payment stage.
   const isDraft = !application ||
     application.status === 'draft' ||
     !application.status ||
-    (application.status === 'payment_pending' && !application.form_fee_paid);
+    (application.status === 'payment_pending' && !application.form_fee_paid && !application.surname);
 
   const handlePrint = () => {
     // Only wait for images that have a real src and haven't loaded yet
