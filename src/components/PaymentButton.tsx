@@ -56,6 +56,40 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
             return;
           }
 
+          // Guard 1: check this reference hasn't already been recorded
+          const { data: existing } = await supabase
+            .from('payments')
+            .select('id')
+            .eq('reference', reference.reference)
+            .maybeSingle();
+
+          if (existing) {
+            // Already saved — just trigger the success callback so the UI updates
+            toast({ title: 'Payment already recorded', description: `Reference: ${reference.reference}` });
+            await onSuccess({ reference: reference.reference, paymentType, amount });
+            return;
+          }
+
+          // Guard 2: check the fee isn't already marked as paid on the application
+          if (applicationId) {
+            const { data: app } = await supabase
+              .from('applications')
+              .select('form_fee_paid, tuition_payment_status, hostel_fee_paid')
+              .eq('id', applicationId)
+              .maybeSingle();
+
+            const alreadyPaid =
+              (paymentType === 'form_fee' && app?.form_fee_paid) ||
+              (paymentType === 'tuition_fee' && app?.tuition_payment_status === 'fully_paid') ||
+              (paymentType === 'hostel_fee' && app?.hostel_fee_paid);
+
+            if (alreadyPaid) {
+              toast({ title: 'Already paid', description: 'This fee has already been recorded on your account.' });
+              await onSuccess({ reference: reference.reference, paymentType, amount });
+              return;
+            }
+          }
+
           const { error } = await supabase.from('payments').insert({
             user_id: userId,
             application_id: applicationId,
