@@ -223,29 +223,13 @@ export const useStudentDashboard = () => {
         }
       }
 
-      return { submit, silent, wasPayFirst: application?.status === 'paid_details_pending' && submit };
+      return { submit, silent };
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['dashboard-user', user?.id] });
       if (data?.submit) {
         toast({ title: 'Application submitted for review!' });
         window.scrollTo(0, 0);
-
-        // Pay-first students: webhook skipped the submission email — send it now
-        if (data?.wasPayFirst && user?.email) {
-          supabase.auth.getSession().then(({ data: { session } }) => {
-            if (!session?.access_token) return;
-            const studentName = profile?.full_name || 'Student';
-            fetch('/api/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
-              body: JSON.stringify({
-                type: 'application_submitted',
-                data: { email: user.email, fullName: studentName, applicationId: application?.id, centre: 'To be assigned', subjects: 'As selected' },
-              }),
-            });
-          });
-        }
       } else if (!data?.silent) {
         toast({ title: 'Application saved successfully.' });
       }
