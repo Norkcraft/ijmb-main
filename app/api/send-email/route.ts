@@ -10,6 +10,9 @@ import {
   admissionLetterEmail,
   adminNewRegistrationEmail,
   adminDirectMessageEmail,
+  paymentConfirmationEmail,
+  rejectionEmail,
+  documentRequestEmail,
 } from '@/lib/emailTemplates';
 
 // Simple in-memory rate limiter (per-IP, resets on server restart)
@@ -75,8 +78,8 @@ export async function POST(request: NextRequest) {
     const { data: callerProfile } = await supabaseServer.from('profiles').select('role').eq('id', user.id).single();
     isAdmin = !!(callerProfile && ['super_admin', 'coordinator', 'admin'].includes(callerProfile.role));
 
-    // Admission offer and admission_letter emails are admin-only
-    if (['admission_offer', 'admission_letter', 'admin_direct_message', 'admin_new_registration'].includes(type) && !isAdmin) {
+    // Admission offer, rejection, and admin emails are admin-only
+    if (['admission_offer', 'admission_letter', 'admin_direct_message', 'admin_new_registration', 'rejection', 'document_request'].includes(type) && !isAdmin) {
       return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
     }
   }
@@ -110,6 +113,16 @@ export async function POST(request: NextRequest) {
         email = adminDirectMessageEmail(data.studentName, data.subject, data.message);
         recipientEmail = data.email;
         replyTo = 'support@ijmb.info';
+        break;
+      case 'payment_confirmation':
+        email = paymentConfirmationEmail(data.fullName, Number(data.amount), data.reference, data.paymentType);
+        break;
+      case 'rejection':
+        email = rejectionEmail(data.fullName, data.applicationId);
+        break;
+      case 'document_request':
+        email = documentRequestEmail(data.studentName, data.message, `${process.env.NEXT_PUBLIC_SUPABASE_URL ? 'https://www.ijmb.info' : 'https://www.ijmb.info'}/dashboard?tab=documents`);
+        recipientEmail = data.email;
         break;
       default:
         return NextResponse.json({ message: `Unknown email type: ${type}` }, { status: 400 });

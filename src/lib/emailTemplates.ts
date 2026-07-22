@@ -552,7 +552,88 @@ export function reminderPaymentPendingEmail(fullName: string) {
   return { html: wrapper(body), subject: `Action needed: complete your IJMB payment, ${esc(fullName)}` };
 }
 
-// ─── 11. ADMIN: DIRECT MESSAGE TO STUDENT ─────────────────────────────────
+// ─── 11. REJECTION NOTIFICATION ───────────────────────────────────────────
+export function rejectionEmail(fullName: string, applicationId: string) {
+  const body = `
+    ${header('Application Update', `IJMB ${YEAR} Session`)}
+    <div style="padding:40px 40px 32px">
+
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:48px;margin-bottom:12px">📋</div>
+        <p style="color:#0f172a;font-size:20px;font-weight:700;margin:0 0 6px">Dear ${esc(fullName)},</p>
+        <p style="color:#64748b;font-size:14px;margin:0">We have an update regarding your IJMB application.</p>
+      </div>
+
+      <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:20px 24px;margin-bottom:24px">
+        <p style="margin:0;font-size:15px;color:#7f1d1d;line-height:1.8">
+          We regret to inform you that your application was not successful at this time. We appreciate the interest you showed in the IJMB programme.
+        </p>
+      </div>
+
+      <div style="background:#f8fafc;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;margin-bottom:24px">
+        ${infoTable([
+          infoRow('Application ID', `<code style="font-size:12px;background:#f1f5f9;padding:2px 6px;border-radius:4px">${esc(applicationId)}</code>`),
+          infoRow('Status', badge('Application Closed', '#7f1d1d', '#fef2f2')),
+        ].join(''))}
+      </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:28px">
+        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:700">Need help or want to appeal?</p>
+        <p style="margin:6px 0 0;font-size:13px;color:#92400e;line-height:1.7">
+          Please contact us on WhatsApp for next steps. Our team will be happy to assist you and explain any further options available to you.
+        </p>
+      </div>
+
+      ${ctaButton('Chat with Us on WhatsApp', 'https://wa.link/udcjk0', '#25D366')}
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        You can also reach us at <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>
+      </p>
+    </div>
+    ${footer()}
+  `;
+  return {
+    html: wrapper(body),
+    subject: `IJMB Application Update — ${esc(applicationId)}`
+  };
+}
+
+// ─── 12. DOCUMENT REQUEST ─────────────────────────────────────────────────
+export function documentRequestEmail(studentName: string, message: string, dashboardUrl: string) {
+  const body = `
+    ${header('Document Upload Required', 'Action needed on your IJMB application')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 20px">Dear ${esc(studentName)},</p>
+
+      <p style="color:#475569;font-size:15px;margin:0 0 24px;line-height:1.7">
+        Our admissions team has reviewed your application and requires additional document(s) from you before we can proceed.
+      </p>
+
+      <div style="background:#f8fafc;border-left:4px solid #006400;border-radius:0 12px 12px 0;padding:20px 24px;margin-bottom:24px">
+        <p style="margin:0 0 6px;font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.4px">Message from Admissions</p>
+        <p style="margin:0;font-size:15px;color:#1e293b;line-height:1.8;white-space:pre-wrap">${esc(message)}</p>
+      </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:28px">
+        <p style="margin:0;font-size:14px;color:#7a5c00;font-weight:700">What to do next</p>
+        <p style="margin:4px 0 0;font-size:13px;color:#92400e;line-height:1.7">
+          Log in to your dashboard and go to the <strong>Documents</strong> section to upload the requested file. Once uploaded, our team will be notified automatically.
+        </p>
+      </div>
+
+      ${ctaButton('Upload Document Now', dashboardUrl)}
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
+        Questions? Reply to this email or contact <a href="mailto:${SUPPORT_EMAIL}" style="color:#006400">${SUPPORT_EMAIL}</a>
+      </p>
+    </div>
+    ${footer()}
+  `;
+  return {
+    html: wrapper(body),
+    subject: `Action Required: Upload Document for Your IJMB Application`
+  };
+}
+
+// ─── 13. ADMIN: DIRECT MESSAGE TO STUDENT ─────────────────────────────────
 export function adminDirectMessageEmail(studentName: string, subject: string, message: string) {
   const body = `
     ${header('Message from IJMB', 'Official communication from the IJMB team')}

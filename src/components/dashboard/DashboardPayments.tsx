@@ -17,7 +17,7 @@ const isManualMode = process.env.NEXT_PUBLIC_PAYMENT_MODE === 'manual';
 interface DashboardPaymentsProps {
   user: any;
   application: any;
-  onFeePaymentSuccess: (feeName: string, amount?: number) => Promise<void>;
+  onFeePaymentSuccess: (feeName: string, amount?: number, reference?: string) => Promise<void>;
 }
 
 export const DashboardPayments = ({
@@ -258,9 +258,9 @@ export const DashboardPayments = ({
                                       paymentType={name}
                                       label={isPartPaid ? `Pay Balance (₦${balance.toLocaleString()})` : `Pay ₦${amount.toLocaleString()} Now`}
                                       disabled={blocked || notConfigured}
-                                      onSuccess={async ({ paymentType, amount }) => {
+                                      onSuccess={async ({ reference, paymentType, amount }) => {
                                         setOptimisticPaid(prev => new Set([...prev, paymentType]));
-                                        await onFeePaymentSuccess(paymentType, amount);
+                                        await onFeePaymentSuccess(paymentType, amount, reference);
                                         await fetchData();
                                       }}
                                     />
@@ -275,8 +275,8 @@ export const DashboardPayments = ({
                                         label={`Pay Installment (₦${(amount / 2).toLocaleString()})`}
                                         disabled={blocked || notConfigured}
                                         variant="outline"
-                                        onSuccess={async ({ paymentType }) => {
-                                          await onFeePaymentSuccess(paymentType);
+                                        onSuccess={async ({ reference, paymentType }) => {
+                                          await onFeePaymentSuccess(paymentType, amount / 2, reference);
                                           await fetchData();
                                         }}
                                       />

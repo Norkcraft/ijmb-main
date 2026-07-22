@@ -357,7 +357,7 @@ export const useStudentDashboard = () => {
     }
   };
 
-  const handlePaymentSuccess = async (paymentType: string = 'form_fee', amountPaid?: number) => {
+  const handlePaymentSuccess = async (paymentType: string = 'form_fee', amountPaid?: number, reference?: string) => {
     if (!application?.id) return;
 
     const updates: Record<string, any> = { updated_at: new Date().toISOString() };
@@ -388,6 +388,34 @@ export const useStudentDashboard = () => {
       hostel_fee: 'Hostel fee confirmed.',
     };
     toast({ title: 'Payment Successful!', description: messages[paymentType] || 'Payment recorded successfully.' });
+
+    // Fire-and-forget: send payment confirmation email
+    if (user?.email && reference) {
+      const studentName = application?.first_name
+        ? `${application.first_name} ${application.surname || ''}`.trim()
+        : profile?.full_name || 'Student';
+      const paidAmount = amountPaid || (paymentType === 'form_fee' ? formFee : 0);
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (!session?.access_token) return;
+        fetch('/api/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            type: 'payment_confirmation',
+            data: {
+              email: user.email,
+              fullName: studentName,
+              amount: paidAmount,
+              reference,
+              paymentType,
+            },
+          }),
+        }).catch(() => {/* fire-and-forget — ignore errors */});
+      });
+    }
   };
 
   const fetchData = async () => {

@@ -17,7 +17,7 @@ import { DownloadApplicationPDF } from '@/components/dashboard/DownloadApplicati
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 // ── Status config ─────────────────────────────────────────────────────────────
 const STATUS_MAP: Record<string, { label: string; color: string; bg: string; dot: string; icon: React.ReactNode }> = {
@@ -604,15 +604,64 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
 }
 
 // ── Documents tab ─────────────────────────────────────────────────────────────
-function DocumentsTab({ application, sessions, centres, combos }: {
+function DocumentsTab({ application, sessions, centres, combos, user }: {
   application: any;
   sessions: any[];
   centres: any[];
   combos: any[];
+  user: any;
 }) {
+  const { toast } = useToast();
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application?.status);
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application?.status);
   const formFeePaid = application?.form_fee_paid;
+
+  // Document requests
+  const [docRequests, setDocRequests] = useState<any[]>([]);
+  const [uploadingReqId, setUploadingReqId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!application?.id) return;
+    supabase.from('document_requests')
+      .select('*')
+      .eq('application_id', application.id)
+      .order('created_at', { ascending: false })
+      .then(({ data }) => setDocRequests(data || []));
+  }, [application?.id]);
+
+  const uploadRequestedDoc = async (requestId: string) => {
+    if (!user || !application?.id) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.jpg,.jpeg,.png,.pdf';
+    input.onchange = async (e: any) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (file.size > 10 * 1024 * 1024) {
+        toast({ title: 'File too large', description: 'Max 10MB allowed', variant: 'destructive' });
+        return;
+      }
+      setUploadingReqId(requestId);
+      const ext = file.name.split('.').pop() || 'pdf';
+      const path = `${user.id}/requested/${requestId}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('student-documents')
+        .upload(path, file, { contentType: file.type, upsert: true });
+      if (uploadError) {
+        toast({ title: 'Upload failed', description: uploadError.message, variant: 'destructive' });
+        setUploadingReqId(null);
+        return;
+      }
+      await supabase.from('document_requests').update({
+        uploaded_path: path,
+        status: 'uploaded',
+      }).eq('id', requestId);
+      setDocRequests(prev => prev.map(r => r.id === requestId ? { ...r, uploaded_path: path, status: 'uploaded' } : r));
+      toast({ title: 'Document uploaded!', description: 'The admissions team will be notified.' });
+      setUploadingReqId(null);
+    };
+    input.click();
+  };
 
   const downloadLetter = async () => {
     if (!application?.admission_letter_path) return;
@@ -696,6 +745,55 @@ function DocumentsTab({ application, sessions, centres, combos }: {
           <li>Tuition receipt is generated automatically after payment</li>
         </ul>
       </div>
+
+      {/* Requested Documents */}
+      {docRequests.length > 0 && (
+        <div className="space-y-3">
+          <div>
+            <h3 className="font-bold text-base flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-500 inline-block" />
+              Documents Requested by Admissions
+            </h3>
+            <p className="text-xs text-muted-foreground mt-0.5">
+              The admissions team has requested additional documents. Please upload them below.
+            </p>
+          </div>
+          <div className="space-y-3">
+            {docRequests.map((req: any) => (
+              <div key={req.id} className={`bg-white rounded-2xl border p-5 space-y-3 hover:shadow-md transition-shadow ${req.status === 'pending' ? 'border-amber-300' : 'border-green-200'}`}>
+                <div className="flex items-start gap-3">
+                  <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${req.status === 'uploaded' || req.status === 'reviewed' ? 'bg-green-100' : 'bg-amber-100'}`}>
+                    {req.status === 'uploaded' || req.status === 'reviewed'
+                      ? <CheckCircle size={18} className="text-green-600" />
+                      : <AlertCircle size={18} className="text-amber-600" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold leading-relaxed">{req.message}</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {new Date(req.created_at).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })}
+                      {' · '}
+                      <span className={`font-semibold ${req.status === 'pending' ? 'text-amber-600' : 'text-green-700'}`}>
+                        {req.status === 'pending' ? 'Upload required' : req.status === 'uploaded' ? 'Uploaded — under review' : 'Reviewed'}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                {req.status === 'pending' && (
+                  <button
+                    onClick={() => uploadRequestedDoc(req.id)}
+                    disabled={uploadingReqId === req.id}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl bg-amber-500 hover:bg-amber-600 text-white transition-colors disabled:opacity-60"
+                  >
+                    {uploadingReqId === req.id
+                      ? <><Loader2 size={14} className="animate-spin" /> Uploading…</>
+                      : <><Download size={14} className="rotate-180" /> Upload Requested Document</>}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -870,6 +968,68 @@ function DashboardShell({ children, currentTab, onNavigate, profile, user, onSig
   );
 }
 
+// ── Centre Reselect Modal ─────────────────────────────────────────────────────
+function CentreReselectModal({ centres, onSave }: {
+  centres: any[];
+  onSave: (centreId: string) => Promise<void>;
+}) {
+  const [selected, setSelected] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    if (!selected) return;
+    setSaving(true);
+    await onSave(selected);
+    setSaving(false);
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-5">
+        <div className="text-center space-y-2">
+          <div className="w-14 h-14 rounded-2xl bg-amber-100 flex items-center justify-center mx-auto">
+            <AlertCircle size={28} className="text-amber-600" />
+          </div>
+          <h2 className="font-black text-lg text-foreground">Please Reselect Your Centre</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            Your previously selected study centre is no longer available. Only the centres below are currently open for this session. Please choose one to continue.
+          </p>
+        </div>
+
+        <div className="rounded-xl border-2 border-red-400 bg-red-50 p-3 text-center">
+          <p className="font-black text-red-600 text-xs uppercase tracking-wide">Only 2 Centres Currently Open</p>
+          <p className="font-bold text-red-700 text-sm mt-1">
+            {centres.map((c: any) => `${c.name.toUpperCase()}, ${c.state.toUpperCase()}`).join('  |  ')}
+          </p>
+          <p className="text-xs text-red-600 mt-1">Accommodation is available at both centres</p>
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Select Your Study Centre</label>
+          <select
+            className="w-full h-10 rounded-xl border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            value={selected}
+            onChange={e => setSelected(e.target.value)}
+          >
+            <option value="">— Choose a centre —</option>
+            {centres.map((c: any) => (
+              <option key={c.id} value={c.id}>{c.name} — {c.state} (Accommodation available)</option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          onClick={handleSave}
+          disabled={!selected || saving}
+          className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50"
+        >
+          {saving ? <><Loader2 size={16} className="animate-spin inline mr-2" />Saving…</> : 'Confirm Centre Selection'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Main Dashboard ─────────────────────────────────────────────────────────────
 const Dashboard = () => {
   const {
@@ -890,6 +1050,22 @@ const Dashboard = () => {
   const formFeePaid = application?.form_fee_paid || false;
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application.status);
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
+
+  // Centre reselect: show blocking modal if user's preferred centre is not in the active list
+  const needsCentreReselect = !loading && centres.length > 0 && application !== undefined &&
+    application !== null &&
+    application.preferred_centre_id !== null &&
+    application.preferred_centre_id !== undefined &&
+    !centres.some((c: any) => c.id === application.preferred_centre_id);
+
+  const handleCentreReselect = async (centreId: string) => {
+    if (!application?.id) return;
+    await supabase.from('applications').update({
+      preferred_centre_id: centreId,
+      updated_at: new Date().toISOString(),
+    }).eq('id', application.id);
+    await fetchData();
+  };
   const isPaymentPending = application?.status === 'payment_pending';
   const isFormDetailsPending = application?.status === 'paid_details_pending';
   // Show the form only if they haven't filled their details yet.
@@ -944,6 +1120,16 @@ const Dashboard = () => {
           <button onClick={handleSignOut} className="text-xs text-muted-foreground hover:text-red-600 transition-colors">Sign out and try again</button>
         </div>
       </div>
+    );
+  }
+
+  // Centre reselect modal — blocks everything until resolved
+  if (needsCentreReselect) {
+    return (
+      <>
+        <SEOHead title="Update Centre – IJMB" description="Please reselect your study centre." />
+        <CentreReselectModal centres={centres} onSave={handleCentreReselect} />
+      </>
     );
   }
 
@@ -1027,8 +1213,8 @@ const Dashboard = () => {
               <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide mb-5">Your Journey</p>
               <ProgressTracker status="payment_pending" />
             </div>
-            <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName, amount) => {
-              await handlePaymentSuccess(feeName, amount);
+            <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName, amount, reference) => {
+              await handlePaymentSuccess(feeName, amount, reference);
             }} />
           </div>
         </DashboardShell>
@@ -1150,14 +1336,14 @@ const Dashboard = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 text-xs text-blue-800">
                 Acceptance, Tuition, and Hostel fees become available after your admission is approved.
               </div>
-              <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName, amount) => {
-                await handlePaymentSuccess(feeName, amount);
+              <DashboardPayments user={user} application={application} onFeePaymentSuccess={async (feeName, amount, reference) => {
+                await handlePaymentSuccess(feeName, amount, reference);
               }} />
             </div>
           )}
 
           {currentTab === 'documents' && (
-            <DocumentsTab application={application} sessions={sessions} centres={centres} combos={combos} />
+            <DocumentsTab application={application} sessions={sessions} centres={centres} combos={combos} user={user} />
           )}
 
           {currentTab === 'profile' && (

@@ -12,8 +12,10 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  ArrowLeft, ExternalLink, Loader2, CheckCircle, XCircle, Eye, AlertCircle, Upload
+  ArrowLeft, ExternalLink, Loader2, CheckCircle, XCircle, Eye, AlertCircle, Upload,
+  MessageSquarePlus, FileUp, Clock as ClockIcon
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 // ── helpers ────────────────────────────────────────────────────────────────
 const STATUS_OPTIONS = [
@@ -85,10 +87,15 @@ const AdminApplicationDetail = () => {
   const [letterFile, setLetterFile] = useState<File | null>(null);
   const [uploadingLetter, setUploadingLetter] = useState(false);
 
+  // Document request state
+  const [docRequests, setDocRequests] = useState<any[]>([]);
+  const [docRequestMsg, setDocRequestMsg] = useState('');
+  const [sendingDocRequest, setSendingDocRequest] = useState(false);
+
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [appRes, centreRes, olRes] = await Promise.all([
+      const [appRes, centreRes, olRes, docReqRes] = await Promise.all([
         supabase.from('applications').select(`
           *,
           profiles:user_id(full_name, phone, id, email),
@@ -99,6 +106,7 @@ const AdminApplicationDetail = () => {
         `).eq('id', id).single(),
         supabase.from('centres').select('id, name, state'),
         supabase.from('olevel_results').select('*').eq('application_id', id),
+        supabase.from('document_requests').select('*').eq('application_id', id).order('created_at', { ascending: false }),
       ]);
       if (appRes.data) {
         const a = appRes.data;
@@ -113,6 +121,7 @@ const AdminApplicationDetail = () => {
         setOlevels(olRes.data || []);
       }
       setCentres(centreRes.data || []);
+      setDocRequests(docReqRes.data || []);
       setLoading(false);
     };
     load();
@@ -164,10 +173,10 @@ const AdminApplicationDetail = () => {
       }
 
       if (studentEmail && isRejecting) {
-        sendEmail('account_update', {
+        sendEmail('rejection', {
           email: studentEmail,
           fullName: studentName,
-          changeDescription: `Your IJMB application (ID: ${appId}) has been reviewed and was not successful at this time. Please contact support for further guidance.`,
+          applicationId: appId,
         }, toast);
       }
     } catch (err: any) {
@@ -246,6 +255,44 @@ const AdminApplicationDetail = () => {
       toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
     } finally {
       setSavingOlevel(false);
+    }
+  };
+
+  const sendDocumentRequest = async () => {
+    if (!app || !docRequestMsg.trim()) return;
+    setSendingDocRequest(true);
+    try {
+      const { data, error } = await supabase.from('document_requests').insert({
+        application_id: app.id,
+        message: docRequestMsg.trim(),
+        status: 'pending',
+      }).select().single();
+
+      if (error) {
+        toast({ title: 'Error', description: error.message, variant: 'destructive' });
+        return;
+      }
+
+      setDocRequests(prev => [data, ...prev]);
+      setDocRequestMsg('');
+      toast({ title: 'Request sent', description: 'Document request created and email sent to student.' });
+
+      // Email the student
+      const studentEmail = app.profiles?.email;
+      const studentName = app.first_name
+        ? `${app.first_name} ${app.surname}`
+        : (app.profiles?.full_name || 'Student');
+      if (studentEmail) {
+        sendEmail('document_request', {
+          email: studentEmail,
+          studentName,
+          message: docRequestMsg.trim(),
+        }, toast);
+      }
+    } catch (err: any) {
+      toast({ title: 'Error', description: err.message || 'Something went wrong', variant: 'destructive' });
+    } finally {
+      setSendingDocRequest(false);
     }
   };
 
@@ -607,6 +654,87 @@ const AdminApplicationDetail = () => {
                   </Button>
                   <p className="text-xs text-muted-foreground">PDF only, max 10 MB. Student can download once uploaded.</p>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Document Requests */}
+            <Card>
+              <CardHeader className="pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">Request Document</CardTitle>
+                  <MessageSquarePlus size={16} className="text-muted-foreground" />
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <p className="text-xs text-muted-foreground">Ask the student to upload a specific document. They will receive an email with your message.</p>
+
+                {/* Preset examples */}
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    'Please upload a clear copy of your WAEC result slip.',
+                    'Please upload a government-issued ID (NIN slip or national ID card).',
+                    'Please upload a recent passport photograph with white background.',
+                    'Please upload your birth certificate or age declaration.',
+                    'Please upload a letter of good conduct from your last school.',
+                  ].map(preset => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setDocRequestMsg(preset)}
+                      className="text-[10px] px-2 py-1 rounded-md bg-muted hover:bg-muted/70 text-muted-foreground border border-border transition-colors text-left leading-tight"
+                    >
+                      {preset.length > 40 ? preset.slice(0, 40) + '…' : preset}
+                    </button>
+                  ))}
+                </div>
+
+                <Textarea
+                  placeholder="Type your request here, or click a preset above…"
+                  value={docRequestMsg}
+                  onChange={e => setDocRequestMsg(e.target.value)}
+                  className="text-sm min-h-[70px]"
+                />
+                <Button
+                  size="sm"
+                  className="w-full"
+                  disabled={sendingDocRequest || !docRequestMsg.trim()}
+                  onClick={sendDocumentRequest}
+                >
+                  {sendingDocRequest
+                    ? <><Loader2 size={13} className="animate-spin mr-1" /> Sending…</>
+                    : <><MessageSquarePlus size={13} className="mr-1" /> Send Request to Student</>}
+                </Button>
+
+                {/* Previous requests */}
+                {docRequests.length > 0 && (
+                  <div className="space-y-2 pt-1">
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Previous Requests</p>
+                    {docRequests.map((req: any) => (
+                      <div key={req.id} className="rounded-lg border p-2.5 text-xs space-y-1.5">
+                        <p className="text-muted-foreground leading-relaxed">{req.message}</p>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            req.status === 'uploaded' ? 'bg-green-100 text-green-700' :
+                            req.status === 'reviewed' ? 'bg-blue-100 text-blue-700' :
+                            'bg-amber-100 text-amber-700'
+                          }`}>
+                            {req.status === 'uploaded' ? <><CheckCircle size={9} /> Uploaded</> :
+                             req.status === 'reviewed' ? <><CheckCircle size={9} /> Reviewed</> :
+                             <><ClockIcon size={9} /> Pending</>}
+                          </span>
+                          {req.uploaded_path && (
+                            <button
+                              className="text-primary hover:underline text-[10px] flex items-center gap-1"
+                              onClick={() => openDoc(req.uploaded_path)}
+                            >
+                              <ExternalLink size={10} /> View file
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
 
