@@ -1103,12 +1103,11 @@ const Dashboard = () => {
   };
   const isPaymentPending = application?.status === 'payment_pending';
   const isFormDetailsPending = application?.status === 'paid_details_pending';
-  // Show the form only if they haven't filled their details yet.
-  // Once they've submitted (surname exists), fall through to the payment stage.
+  // Show the form when there is no application yet or it is still in draft.
+  // payment_pending means the user already completed and submitted all 4 steps — go to payment.
   const isDraft = !application ||
     application.status === 'draft' ||
-    !application.status ||
-    (application.status === 'payment_pending' && !application.form_fee_paid && !application.surname);
+    !application.status;
 
   const handlePrint = () => {
     // Only wait for images that have a real src and haven't loaded yet
