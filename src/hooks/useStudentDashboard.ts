@@ -96,21 +96,12 @@ export const useStudentDashboard = () => {
 
     const app = userData.application;
     if (app === null) {
-      // No application yet — create one in payment_pending
+      // No application yet — create one in draft so user fills details before paying
       autoCreateRef.current = true;
       supabase.from('applications').insert({
         user_id: user.id,
-        status: 'payment_pending',
+        status: 'draft',
       }).then(() => {
-        queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
-      });
-    } else if (app.status === 'draft') {
-      // Draft application — move to payment_pending so payment comes first
-      autoCreateRef.current = true;
-      supabase.from('applications').update({
-        status: 'payment_pending',
-        updated_at: new Date().toISOString(),
-      }).eq('id', app.id).then(() => {
         queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });
       });
     }

@@ -892,7 +892,12 @@ const Dashboard = () => {
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
   const isPaymentPending = application?.status === 'payment_pending';
   const isFormDetailsPending = application?.status === 'paid_details_pending';
-  const isDraft = !application || application.status === 'draft' || !application.status;
+  // Show the form if: no application, draft status, or legacy pay-first user who
+  // hasn't filled details yet and hasn't paid (redirect them to fill form first)
+  const isDraft = !application ||
+    application.status === 'draft' ||
+    !application.status ||
+    (application.status === 'payment_pending' && !application.form_fee_paid && !application.surname);
 
   const handlePrint = () => {
     // Only wait for images that have a real src and haven't loaded yet
@@ -977,7 +982,6 @@ const Dashboard = () => {
   // Stage 2: Pay Form Fee
   if (isPaymentPending && !formFeePaid) {
     // Distinguish pay-first flow (no form details yet) from fill-first flow
-    const isPayFirstFlow = !application?.surname;
     return (
       <>
         <SEOHead title="Payment – IJMB" description="Pay your IJMB registration fee." />
@@ -990,11 +994,8 @@ const Dashboard = () => {
                   <CheckCircle size={24} />
                 </div>
                 <div>
-                  <p className="font-black text-xl mb-1">{isPayFirstFlow ? 'One Step to Get Started!' : 'Application Submitted!'}</p>
-                  <p className="text-white/70 text-sm">{isPayFirstFlow
-                    ? `Pay the ₦${formFee.toLocaleString()} registration fee now — you'll fill in your application details right after.`
-                    : `One final step — pay the ₦${formFee.toLocaleString()} registration fee to send your application for review.`
-                  }</p>
+                  <p className="font-black text-xl mb-1">Application Submitted!</p>
+                  <p className="text-white/70 text-sm">One final step — pay the ₦{formFee.toLocaleString()} registration fee to send your application for review.</p>
                 </div>
               </div>
             </div>

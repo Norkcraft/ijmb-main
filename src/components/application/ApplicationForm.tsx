@@ -231,7 +231,7 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
       // Validate current step fields before moving
       let fieldsToValidate: any[] = [];
       if (step === 1) {
-        fieldsToValidate = ['surname', 'first_name', 'middle_name', 'gender', 'date_of_birth', 'state_of_origin', 'lga', 'residential_address', 'guardian_phone'];
+        fieldsToValidate = ['surname', 'first_name', 'middle_name', 'gender', 'date_of_birth', 'state_of_origin', 'lga', 'residential_address', 'guardian_phone', 'preferred_centre_id'];
         const basicValid = await form.trigger(fieldsToValidate);
 
         // Basic age validation logic (must be at least 14 years old)
@@ -298,7 +298,7 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
       }
 
       if (step === 3) {
-        fieldsToValidate = ['intended_course', 'session_id', 'preferred_centre_id', 'subject_combination_id'];
+        fieldsToValidate = ['intended_course', 'session_id', 'subject_combination_id'];
         const isValid = await form.trigger(fieldsToValidate);
         if (isValid) {
           await handleAutoSave();
@@ -360,6 +360,20 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
             {/* Step 1: Personal & Contact */}
             {step === 1 && (
               <div className="space-y-6">
+
+                {/* Centre availability notice */}
+                <div className="rounded-xl border-2 border-red-500 bg-red-50 p-4 text-center space-y-1">
+                  <p className="font-black text-red-600 text-sm uppercase tracking-wide">
+                    ⚠ ONLY 2 CENTRES ARE CURRENTLY AVAILABLE
+                  </p>
+                  <p className="font-bold text-red-700">
+                    {centres.length > 0
+                      ? centres.map((c: any) => `${c.name.toUpperCase()}, ${c.state.toUpperCase()}`).join('  |  ')
+                      : 'OKO, ANAMBRA  |  ILORIN, KWARA'}
+                  </p>
+                  <p className="text-sm text-red-600">Accommodation is available at both centres</p>
+                </div>
+
                 <div className="space-y-4">
                   <h3 className="font-semibold text-lg border-b pb-2">Personal Information</h3>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -480,6 +494,28 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
                     <FormItem>
                       <FormLabel>Residential Address</FormLabel>
                       <FormControl><Input placeholder="Full residential address" {...field} disabled={readOnly} /></FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )} />
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="font-semibold text-lg border-b pb-2">Study Centre</h3>
+                  <FormField control={form.control} name="preferred_centre_id" render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Select Your Preferred Centre <span className="text-destructive">*</span></FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value} disabled={readOnly}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Select a centre" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          {centres.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name} – {c.state}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        Have questions about a centre?{' '}
+                        <a href="https://wa.link/udcjk0" target="_blank" rel="noopener noreferrer" className="text-primary underline">
+                          Chat with us on WhatsApp
+                        </a>
+                      </p>
                       <FormMessage />
                     </FormItem>
                   )} />
@@ -677,19 +713,6 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
                         <FormControl><SelectTrigger><SelectValue placeholder="Select session" /></SelectTrigger></FormControl>
                         <SelectContent>
                           {sessions.map(s => <SelectItem key={s.id} value={s.id}>{s.name} ({s.code})</SelectItem>)}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )} />
-
-                  <FormField control={form.control} name="preferred_centre_id" render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Preferred Study Centre</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value} disabled={readOnly}>
-                        <FormControl><SelectTrigger><SelectValue placeholder="Select centre" /></SelectTrigger></FormControl>
-                        <SelectContent>
-                          {centres.map(c => <SelectItem key={c.id} value={c.id}>{c.name} – {c.state}</SelectItem>)}
                         </SelectContent>
                       </Select>
                       <FormMessage />
