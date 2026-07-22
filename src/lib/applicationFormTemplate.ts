@@ -60,7 +60,7 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 
   /* ── O-Level rows (padded to 9) ───────────────────────────────── */
   const olevelData = data.olevelResults || [];
-  const olevelRows = Array.from({ length: 9 }, (_, i) => {
+  const olevelRows = Array.from({ length: 8 }, (_, i) => {
     const r = olevelData[i];
     return `<tr>
       <td class="rn">${i + 1}</td>
@@ -96,7 +96,7 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 
   body {
     font-family: Arial, Helvetica, sans-serif;
-    font-size: 10.5px;
+    font-size: 9px;
     background: #ccc;
     display: flex;
     justify-content: center;
@@ -105,7 +105,7 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 
   .page {
     width: 210mm;
-    min-height: 297mm;
+    height: 297mm;
     background: #fff;
     position: relative;
     overflow: hidden;
@@ -117,8 +117,8 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 370px;
-    height: 370px;
+    width: 320px;
+    height: 320px;
     opacity: 0.065;
     z-index: 0;
     pointer-events: none;
@@ -131,8 +131,8 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 5px 12mm;
-    font-size: 8.5px;
+    padding: 3px 10mm;
+    font-size: 7.5px;
     font-weight: bold;
     background: #1a6b3a;
     color: #fff;
@@ -141,83 +141,83 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
 
   .header {
     display: grid;
-    grid-template-columns: 88px 1fr 130px;
+    grid-template-columns: 72px 1fr 110px;
     align-items: center;
-    gap: 8px;
-    padding: 8px 12mm 4px;
+    gap: 6px;
+    padding: 5px 10mm 3px;
   }
 
   .passport-box {
-    width: 82px;
-    height: 100px;
+    width: 68px;
+    height: 80px;
     border: 1.5px solid #333;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    font-size: 8.5px;
+    font-size: 7.5px;
     text-align: center;
     color: #555;
     font-weight: bold;
-    line-height: 1.6;
+    line-height: 1.5;
     background: #fafafa;
     overflow: hidden;
   }
-  .passport-box .passport-icon { font-size: 22px; margin-bottom: 2px; opacity: 0.3; }
+  .passport-box .passport-icon { font-size: 18px; margin-bottom: 2px; opacity: 0.3; }
 
   .header-center {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
+    gap: 1px;
   }
-  .header-center img { width: 80px; height: 80px; object-fit: contain; }
+  .header-center img { width: 60px; height: 60px; object-fit: contain; }
 
   .form-no-box {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     justify-content: flex-start;
-    padding-top: 4px;
-    gap: 3px;
+    padding-top: 3px;
+    gap: 2px;
   }
-  .form-no-box .fn-label { font-size: 8.5px; font-weight: bold; text-transform: uppercase; color: #333; }
+  .form-no-box .fn-label { font-size: 7.5px; font-weight: bold; text-transform: uppercase; color: #333; }
   .form-no-box .fn-value {
     font-family: 'Courier New', monospace;
-    font-size: 10px;
+    font-size: 9px;
     font-weight: bold;
     color: #1a6b3a;
-    width: 115px;
+    width: 105px;
     text-align: right;
     border-bottom: 1.5px solid #333;
-    min-height: 15px;
+    min-height: 13px;
     padding-bottom: 1px;
   }
 
   .form-title {
     text-align: center;
-    padding: 5px 12mm 6px;
-    border-bottom: 2px dashed #888;
-    margin: 0 12mm;
+    padding: 3px 10mm 4px;
+    border-bottom: 1.5px dashed #888;
+    margin: 0 10mm;
   }
-  .form-title h1 { font-size: 20px; font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase; line-height: 1.2; }
-  .form-title h2 { font-size: 9px; font-weight: normal; color: #444; letter-spacing: 0.4px; margin-top: 3px; }
+  .form-title h1 { font-size: 15px; font-weight: 900; letter-spacing: 1px; color: #111; text-transform: uppercase; line-height: 1.2; }
+  .form-title h2 { font-size: 8px; font-weight: normal; color: #444; letter-spacing: 0.4px; margin-top: 2px; }
 
-  .form-body { padding: 6px 12mm 0; }
+  .form-body { padding: 4px 10mm 0; }
 
-  .section { margin-bottom: 8px; }
+  .section { margin-bottom: 5px; }
 
   .section-header {
     background-color: #1a6b3a;
     color: #fff;
     font-weight: bold;
-    font-size: 10px;
-    padding: 4px 8px;
+    font-size: 8.5px;
+    padding: 3px 7px;
     display: flex;
     align-items: center;
-    gap: 7px;
-    margin-bottom: 6px;
+    gap: 6px;
+    margin-bottom: 4px;
     letter-spacing: 0.4px;
     text-transform: uppercase;
   }
@@ -225,9 +225,9 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
     background: #fff;
     color: #1a6b3a;
     font-weight: 900;
-    font-size: 9.5px;
-    width: 17px;
-    height: 17px;
+    font-size: 8.5px;
+    width: 14px;
+    height: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -235,10 +235,10 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
     flex-shrink: 0;
   }
 
-  .field-row { display: flex; gap: 10px; margin-bottom: 6px; align-items: flex-end; }
+  .field-row { display: flex; gap: 8px; margin-bottom: 4px; align-items: flex-end; }
   .field { display: flex; flex-direction: column; flex: 1; min-width: 0; }
   .field label {
-    font-size: 8px;
+    font-size: 7px;
     font-weight: bold;
     color: #222;
     margin-bottom: 1px;
@@ -248,17 +248,17 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
   }
   .field .underline {
     border-bottom: 1px dotted #555;
-    height: 15px;
+    height: 13px;
     width: 100%;
     padding-bottom: 1px;
-    font-size: 9px;
+    font-size: 8.5px;
     color: #111;
     font-weight: bold;
   }
 
-  .inline-field { display: flex; align-items: flex-end; gap: 5px; flex: 1; min-width: 0; }
+  .inline-field { display: flex; align-items: flex-end; gap: 4px; flex: 1; min-width: 0; }
   .inline-field .lbl {
-    font-size: 8px;
+    font-size: 7px;
     font-weight: bold;
     text-transform: uppercase;
     white-space: nowrap;
@@ -269,9 +269,9 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
   .inline-field .underline {
     flex: 1;
     border-bottom: 1px dotted #555;
-    height: 15px;
+    height: 13px;
     min-width: 30px;
-    font-size: 9px;
+    font-size: 8.5px;
     color: #111;
     font-weight: bold;
     padding-bottom: 1px;
@@ -281,70 +281,70 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 6px;
-    font-size: 8.5px;
+    gap: 7px;
+    margin-bottom: 4px;
+    font-size: 7.5px;
   }
-  .cb-label { font-weight: bold; text-transform: uppercase; white-space: nowrap; color: #222; font-size: 8px; }
-  .cb-item { display: flex; align-items: center; gap: 3px; font-weight: bold; font-size: 8.5px; white-space: nowrap; }
-  .cb-item input[type="checkbox"] { width: 10px; height: 10px; margin: 0; accent-color: #1a6b3a; flex-shrink: 0; }
+  .cb-label { font-weight: bold; text-transform: uppercase; white-space: nowrap; color: #222; font-size: 7px; }
+  .cb-item { display: flex; align-items: center; gap: 2px; font-weight: bold; font-size: 7.5px; white-space: nowrap; }
+  .cb-item input[type="checkbox"] { width: 8px; height: 8px; margin: 0; accent-color: #1a6b3a; flex-shrink: 0; }
   .cb-divider { flex: 1; }
 
-  .olevel-table { width: 100%; border-collapse: collapse; margin-top: 4px; font-size: 9px; }
+  .olevel-table { width: 100%; border-collapse: collapse; margin-top: 3px; font-size: 8px; }
   .olevel-table th {
     background: #1a6b3a;
     color: #fff;
     font-weight: bold;
-    padding: 4px 6px;
+    padding: 2px 5px;
     border: 1px solid #1a6b3a;
     text-align: left;
-    font-size: 8.5px;
+    font-size: 7.5px;
     text-transform: uppercase;
     letter-spacing: 0.2px;
   }
-  .olevel-table td { border: 1px solid #ccc; padding: 3px 6px; height: 18px; font-size: 9px; }
+  .olevel-table td { border: 1px solid #ccc; padding: 1px 5px; height: 14px; font-size: 8px; }
   .olevel-table tr:nth-child(even) td { background: #f7fbf9; }
-  .olevel-table .rn { color: #777; font-weight: bold; text-align: center; font-size: 8px; width: 18px; }
+  .olevel-table .rn { color: #777; font-weight: bold; text-align: center; font-size: 7px; width: 14px; }
 
   .declaration {
-    border: 1.5px solid #1a6b3a;
-    padding: 7px 12px;
-    margin-bottom: 8px;
+    border: 1px solid #1a6b3a;
+    padding: 4px 10px;
+    margin-bottom: 4px;
     background: #f6fcf8;
     text-align: center;
     font-style: italic;
-    font-size: 9px;
+    font-size: 8px;
     color: #222;
-    line-height: 1.5;
+    line-height: 1.4;
     border-radius: 2px;
   }
 
-  .sig-row { display: flex; align-items: flex-end; gap: 16px; margin-bottom: 7px; }
-  .sig-field { display: flex; align-items: flex-end; gap: 5px; flex: 1; min-width: 0; }
-  .sig-field .lbl { font-size: 8px; font-weight: bold; text-transform: uppercase; white-space: nowrap; padding-bottom: 1px; flex-shrink: 0; }
-  .sig-field .underline { flex: 1; border-bottom: 1px dotted #555; height: 13px; min-width: 40px; }
+  .sig-row { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 4px; }
+  .sig-field { display: flex; align-items: flex-end; gap: 4px; flex: 1; min-width: 0; }
+  .sig-field .lbl { font-size: 7px; font-weight: bold; text-transform: uppercase; white-space: nowrap; padding-bottom: 1px; flex-shrink: 0; }
+  .sig-field .underline { flex: 1; border-bottom: 1px dotted #555; height: 12px; min-width: 40px; }
 
-  .date-group { display: flex; align-items: flex-end; gap: 3px; flex-shrink: 0; }
-  .date-group .lbl { font-size: 8px; font-weight: bold; text-transform: uppercase; padding-bottom: 2px; white-space: nowrap; }
-  .date-group .dbox { border-bottom: 1px dotted #555; height: 13px; }
-  .date-group .dbox.dd { width: 20px; }
-  .date-group .dbox.mm { width: 20px; }
-  .date-group .dbox.yyyy { width: 34px; }
-  .date-group .dsep { font-size: 9px; font-weight: bold; padding-bottom: 2px; }
+  .date-group { display: flex; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+  .date-group .lbl { font-size: 7px; font-weight: bold; text-transform: uppercase; padding-bottom: 2px; white-space: nowrap; }
+  .date-group .dbox { border-bottom: 1px dotted #555; height: 12px; }
+  .date-group .dbox.dd { width: 18px; }
+  .date-group .dbox.mm { width: 18px; }
+  .date-group .dbox.yyyy { width: 30px; }
+  .date-group .dsep { font-size: 8px; font-weight: bold; padding-bottom: 2px; }
 
-  .official-box { border: 1.5px solid #1a6b3a; padding: 6px 10px 8px; margin-top: 2px; border-radius: 2px; }
-  .official-title { font-size: 8.5px; font-weight: 900; text-transform: uppercase; color: #1a6b3a; text-decoration: underline; margin-bottom: 7px; letter-spacing: 0.5px; }
+  .official-box { border: 1px solid #1a6b3a; padding: 4px 8px 5px; margin-top: 2px; border-radius: 2px; }
+  .official-title { font-size: 7.5px; font-weight: 900; text-transform: uppercase; color: #1a6b3a; text-decoration: underline; margin-bottom: 4px; letter-spacing: 0.5px; }
 
   .footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 6px 12mm;
+    padding: 4px 10mm;
     border-top: 1.5px solid #1a6b3a;
-    margin-top: 8px;
+    margin-top: 5px;
     background: #f5f5f5;
   }
-  .footer .website { color: #1a6b3a; font-weight: bold; font-size: 9.5px; letter-spacing: 0.5px; text-align: center; }
+  .footer .website { color: #1a6b3a; font-weight: bold; font-size: 8px; letter-spacing: 0.5px; text-align: center; }
 
   @media print { body { background: none; padding: 0; } .page { box-shadow: none; } }
 </style>
@@ -376,10 +376,10 @@ export const buildApplicationFormHTML = (data: ApplicationFormData): string => {
       <!-- Logo + title (center) -->
       <div class="header-center">
         <img src="${logoSrc}" alt="IJMB">
-        <div style="text-align:center;font-weight:900;font-size:12px;text-transform:uppercase;line-height:1.2;margin-top:2px;">Interim Joint Matriculation Board</div>
-        <div style="text-align:center;font-size:9px;font-weight:bold;">(IJMB)</div>
-        <div style="text-align:center;font-size:8px;color:#555;">Permanent Secretary, ABU, Zaria</div>
-        <div style="text-align:center;font-size:8px;color:#1a6b3a;font-weight:bold;">www.ijmb.info</div>
+        <div style="text-align:center;font-weight:900;font-size:10px;text-transform:uppercase;line-height:1.2;margin-top:1px;">Interim Joint Matriculation Board</div>
+        <div style="text-align:center;font-size:8px;font-weight:bold;">(IJMB)</div>
+        <div style="text-align:center;font-size:7px;color:#555;">Permanent Secretary, ABU, Zaria</div>
+        <div style="text-align:center;font-size:7px;color:#1a6b3a;font-weight:bold;">www.ijmb.info</div>
       </div>
 
       <!-- Form number + QR (right) -->
