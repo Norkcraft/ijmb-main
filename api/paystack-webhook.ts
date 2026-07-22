@@ -133,85 +133,90 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       // If it's the Form Fee, update application status and Generate PDF
       if (paymentType === 'form_fee') {
 
-        // Update Application Status
+        // Check if the student has already filled in their details.
+        // If surname is missing they are in the pay-first (impulse-buyer) flow —
+        // set paid_details_pending so the form is shown to them next.
+        // If details are filled, go straight to submitted.
+        const { data: appRow } = await supabaseServer
+          .from('applications')
+          .select('surname, status')
+          .eq('id', applicationId)
+          .single();
+
+        const detailsFilled = !!(appRow?.surname);
+        const newStatus = detailsFilled ? 'submitted' : 'paid_details_pending';
+
+        // Only update status if it hasn't already been resolved by the client
+        const alreadyResolved = ['submitted', 'admitted', 'active', 'fees_pending'].includes(appRow?.status);
+
         await supabaseServer
           .from('applications')
           .update({
             form_fee_paid: true,
-            status: 'submitted',
+            ...(alreadyResolved ? {} : { status: newStatus }),
             updated_at: new Date().toISOString()
           })
           .eq('id', applicationId);
 
-        // Generate PDF
-        console.log(`Generating PDF for application: ${applicationId}`);
-        try {
-          const pdfBuffer = await generateApplicationPDF(applicationId);
-          
-          // Upload to Supabase Storage
-          const fileName = `${applicationId}/application-form.pdf`;
-          const { data: uploadData, error: uploadError } = await supabaseServer
-            .storage
-            .from('student-documents')
-            .upload(fileName, pdfBuffer, {
-              contentType: 'application/pdf',
-              upsert: true
-            });
-
-          if (uploadError) {
-            console.error('PDF Upload Failed:', uploadError);
-          } else {
-          // Get Public URL
-          const { data: urlData } = supabaseServer
-            .storage
-            .from('student-documents')
-            .getPublicUrl(fileName);
-
-          const publicUrl = urlData.publicUrl;
-
-          // Add a small delay to ensure URL is accessible
-          await new Promise(resolve => setTimeout(resolve, 1000));
-
-          // Save URL to Application Record
-          const { error: updateError } = await supabaseServer
-            .from('applications')
-            .update({ application_form_url: publicUrl })
-            .eq('id', applicationId);
-            
-          if (updateError) {
-             console.error('Failed to update DB with PDF URL:', updateError);
-          } else {
-             console.log(`PDF generated and saved: ${publicUrl}`);
-          }
-          }
-
-        } catch (pdfError) {
-          console.error('PDF Generation failed:', pdfError);
-          // We swallow the error so we don't fail the webhook response
-        }
-
-        // Send application submitted email
-        if (userEmail) {
+        if (detailsFilled) {
+          // Generate PDF (only when the form is fully complete)
+          console.log(`Generating PDF for application: ${applicationId}`);
           try {
-            const { data: appData } = await supabaseServer
-              .from('applications')
-              .select('id, preferred_centre_id, subject_combination_id, centres(name), subject_combinations(name)')
-              .eq('id', applicationId)
-              .single();
+            const pdfBuffer = await generateApplicationPDF(applicationId);
 
-            const centreName = (appData as any)?.centres?.name || 'To be assigned';
-            const subjectsName = (appData as any)?.subject_combinations?.name || 'As selected';
+            const fileName = `${applicationId}/application-form.pdf`;
+            const { error: uploadError } = await supabaseServer
+              .storage
+              .from('student-documents')
+              .upload(fileName, pdfBuffer, { contentType: 'application/pdf', upsert: true });
 
-            const { html, subject } = applicationSubmittedEmail(
-              userFullName,
-              applicationId,
-              centreName,
-              subjectsName
-            );
-            await sendEmail({ to: userEmail, subject, html });
-          } catch (emailErr) {
-            console.error('Failed to send application submitted email:', emailErr);
+            if (uploadError) {
+              console.error('PDF Upload Failed:', uploadError);
+            } else {
+              const { data: urlData } = supabaseServer
+                .storage
+                .from('student-documents')
+                .getPublicUrl(fileName);
+
+              await new Promise(resolve => setTimeout(resolve, 1000));
+
+              const { error: updateError } = await supabaseServer
+                .from('applications')
+                .update({ application_form_url: urlData.publicUrl })
+                .eq('id', applicationId);
+
+              if (updateError) console.error('Failed to update DB with PDF URL:', updateError);
+              else console.log(`PDF generated and saved: ${urlData.publicUrl}`);
+            }
+          } catch (pdfError) {
+            console.error('PDF Generation failed:', pdfError);
           }
+
+          // Send application submitted email (only when details are complete)
+          if (userEmail) {
+            try {
+              const { data: appData } = await supabaseServer
+                .from('applications')
+                .select('id, preferred_centre_id, subject_combination_id, centres(name), subject_combinations(name)')
+                .eq('id', applicationId)
+                .single();
+
+              const centreName = (appData as any)?.centres?.name || 'To be assigned';
+              const subjectsName = (appData as any)?.subject_combinations?.name || 'As selected';
+
+              const { html, subject } = applicationSubmittedEmail(
+                userFullName,
+                applicationId,
+                centreName,
+                subjectsName
+              );
+              await sendEmail({ to: userEmail, subject, html });
+            } catch (emailErr) {
+              console.error('Failed to send application submitted email:', emailErr);
+            }
+          }
+        } else {
+          console.log(`Pay-first flow: application ${applicationId} pending details — PDF and submission email deferred`);
         }
       }
 
