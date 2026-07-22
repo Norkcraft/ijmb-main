@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar,
-  DollarSign, LogOut, Bell, Users, FileText, ChevronRight, Loader2
+  DollarSign, LogOut, Bell, Users, FileText, ChevronRight, Loader2, Megaphone
 } from "lucide-react";
 import { useState } from "react";
 
@@ -18,6 +18,7 @@ const sidebarItems = [
   { icon: BookOpen,        label: "Subjects",     href: "/portal-admin?tab=subjects",       id: 'subjects' },
   { icon: Calendar,        label: "Sessions",     href: "/portal-admin?tab=sessions",       id: 'sessions' },
   { icon: DollarSign,      label: "Fees",         href: "/portal-admin?tab=fees",           id: 'fees' },
+  { icon: Megaphone,       label: "Communications", href: "/portal-admin?tab=messaging",    id: 'messaging' },
 ];
 
 interface AdminSidebarProps {

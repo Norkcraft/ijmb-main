@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Edit, Loader2, MapPin } from 'lucide-react';
+import { Plus, Edit, Loader2, MapPin, Trash2 } from 'lucide-react';
 import { STATES_OF_NIGERIA } from '@/types/application';
 
 export default function AdminCentres() {
@@ -18,6 +18,7 @@ export default function AdminCentres() {
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<any>(null);
   const [saving, setSaving] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Form state
   const [name, setName] = useState('');
@@ -92,6 +93,35 @@ export default function AdminCentres() {
       fetchCentres();
     }
     setSaving(false);
+  };
+
+  const handleDelete = async (centre: any) => {
+    // Check if any applications reference this centre
+    const { count } = await supabase
+      .from('applications')
+      .select('id', { count: 'exact', head: true })
+      .or(`preferred_centre_id.eq.${centre.id},assigned_centre_id.eq.${centre.id}`);
+
+    if ((count || 0) > 0) {
+      toast({
+        title: 'Cannot delete',
+        description: `This centre has ${count} application(s) referencing it. Deactivate it instead.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!confirm(`Delete "${centre.name}"? This cannot be undone.`)) return;
+
+    setDeletingId(centre.id);
+    const { error } = await supabase.from('centres').delete().eq('id', centre.id);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      toast({ title: 'Centre deleted' });
+      fetchCentres();
+    }
+    setDeletingId(null);
   };
 
   const toggleStatus = async (centre: any) => {
@@ -184,7 +214,18 @@ export default function AdminCentres() {
                     </Button>
                   </TableCell>
                   <TableCell>
-                    <Button variant="outline" size="sm" onClick={() => openModal(c)}><Edit size={14} /></Button>
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={() => openModal(c)}><Edit size={14} /></Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive hover:bg-destructive/10 hover:border-destructive"
+                        onClick={() => handleDelete(c)}
+                        disabled={deletingId === c.id}
+                      >
+                        {deletingId === c.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

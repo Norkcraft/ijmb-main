@@ -161,6 +161,13 @@ const AdminApplicationDetail = () => {
     if (!app) return;
     setSaving(true);
     try {
+      // Require a centre assignment before admitting
+      if (newStatus === 'admitted' && !assignedCentreId && !app.preferred_centre_id) {
+        toast({ title: 'Centre required', description: 'Please assign a study centre before admitting this student.', variant: 'destructive' });
+        setSaving(false);
+        return;
+      }
+
       const wasAdmittedBefore = ['admitted', 'fees_pending', 'active'].includes(app.status);
       const isAdmitting = newStatus === 'admitted' && !wasAdmittedBefore;
       const isRejecting = newStatus === 'rejected' && app.status !== 'rejected';
@@ -415,7 +422,7 @@ const AdminApplicationDetail = () => {
       formData.append('file', letterFile);
       formData.append('applicationId', app.id);
 
-      const res = await fetch('/api/upload-admission-letter', {
+      const res = await fetch('/api/admin/upload-admission-letter', {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },
         body: formData,

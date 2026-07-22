@@ -85,13 +85,14 @@ function ProgressTracker({ status }: { status?: string }) {
 }
 
 // ── Sidebar ───────────────────────────────────────────────────────────────────
-function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid, status }: {
+function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid, status, passportUrl }: {
   currentTab: string;
   onNavigate: (tab: string) => void;
   profile: any; user: any;
   onSignOut: () => void;
   formFeePaid: boolean;
   status?: string;
+  passportUrl?: string;
 }) {
   const statusInfo = STATUS_MAP[status || 'draft'] || STATUS_MAP.draft;
   const [signingOut, setSigningOut] = useState(false);
@@ -123,8 +124,12 @@ function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid
       {/* User card */}
       <div className="px-4 py-4 border-b border-white/10">
         <div className="flex items-center gap-3 px-2 py-3 rounded-xl bg-white/10">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm shrink-0">
-            {initials}
+          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+            {passportUrl ? (
+              <img src={passportUrl} alt="Profile" className="w-full h-full object-cover" />
+            ) : (
+              initials
+            )}
           </div>
           <div className="min-w-0">
             <p className="font-semibold text-sm truncate leading-tight">{firstName}</p>
@@ -226,7 +231,7 @@ function MobileBottomNav({ currentTab, onNavigate }: { currentTab: string; onNav
 }
 
 // ── Mobile drawer ─────────────────────────────────────────────────────────────
-function MobileDrawer({ open, onClose, profile, user, currentTab, onNavigate, onSignOut, status }: any) {
+function MobileDrawer({ open, onClose, profile, user, currentTab, onNavigate, onSignOut, status, passportUrl }: any) {
   const statusInfo = STATUS_MAP[status || 'draft'] || STATUS_MAP.draft;
   const [signingOut, setSigningOut] = useState(false);
   const handleSignOutClick = async () => { setSigningOut(true); await onSignOut(); };
@@ -246,7 +251,13 @@ function MobileDrawer({ open, onClose, profile, user, currentTab, onNavigate, on
       <div className="fixed inset-y-0 left-0 z-50 w-72 bg-[hsl(145,63%,18%)] text-white flex flex-col shadow-2xl">
         <div className="px-5 py-5 flex items-center justify-between border-b border-white/10">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center font-bold text-sm">{initials}</div>
+            <div className="w-8 h-8 rounded-xl bg-white/20 flex items-center justify-center font-bold text-sm overflow-hidden">
+              {passportUrl ? (
+                <img src={passportUrl} alt="Profile" className="w-full h-full object-cover rounded-xl" />
+              ) : (
+                initials
+              )}
+            </div>
             <div>
               <p className="font-bold text-sm">{firstName}</p>
               <p className="text-xs text-white/60">{user?.email}</p>
@@ -943,7 +954,7 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
 }
 
 // ── Shell wrapper ─────────────────────────────────────────────────────────────
-function DashboardShell({ children, currentTab, onNavigate, profile, user, onSignOut, status, formFeePaid }: {
+function DashboardShell({ children, currentTab, onNavigate, profile, user, onSignOut, status, formFeePaid, passportUrl }: {
   children: React.ReactNode;
   currentTab: string;
   onNavigate: (tab: string) => void;
@@ -951,13 +962,14 @@ function DashboardShell({ children, currentTab, onNavigate, profile, user, onSig
   onSignOut: () => void;
   status?: string;
   formFeePaid: boolean;
+  passportUrl?: string;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   return (
     <div className="min-h-screen bg-slate-50">
-      <Sidebar currentTab={currentTab} onNavigate={onNavigate} profile={profile} user={user} onSignOut={onSignOut} formFeePaid={formFeePaid} status={status} />
+      <Sidebar currentTab={currentTab} onNavigate={onNavigate} profile={profile} user={user} onSignOut={onSignOut} formFeePaid={formFeePaid} status={status} passportUrl={passportUrl} />
       <MobileHeader profile={profile} currentTab={currentTab} onMenuOpen={() => setDrawerOpen(true)} />
-      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} profile={profile} user={user} currentTab={currentTab} onNavigate={onNavigate} onSignOut={onSignOut} status={status} />
+      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} profile={profile} user={user} currentTab={currentTab} onNavigate={onNavigate} onSignOut={onSignOut} status={status} passportUrl={passportUrl} />
       <main className="lg:pl-64 xl:pl-72 pb-24 lg:pb-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {children}
@@ -1051,6 +1063,15 @@ const Dashboard = () => {
   const isAdmitted = application && ['admitted', 'fees_pending', 'active'].includes(application.status);
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
 
+  // Build a signed URL for the passport photo (used as avatar)
+  const [passportUrl, setPassportUrl] = useState<string>('');
+  useEffect(() => {
+    if (!application?.passport_path) return;
+    supabase.storage.from('student-documents')
+      .createSignedUrl(application.passport_path, 3600)
+      .then(({ data }) => { if (data?.signedUrl) setPassportUrl(data.signedUrl); });
+  }, [application?.passport_path]);
+
   // Centre reselect: show blocking modal if user's preferred centre is not in the active list
   const needsCentreReselect = !loading && centres.length > 0 && application !== undefined &&
     application !== null &&
@@ -1139,7 +1160,7 @@ const Dashboard = () => {
     return (
       <>
         <SEOHead title="Complete Application – IJMB" description="Complete your IJMB application." />
-        <DashboardShell currentTab="application" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
+        <DashboardShell currentTab="application" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid} passportUrl={passportUrl}>
           <div className="space-y-6">
             <div className="relative overflow-hidden rounded-2xl bg-[hsl(145,63%,18%)] text-white p-6 sm:p-8">
               <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
@@ -1195,7 +1216,7 @@ const Dashboard = () => {
     return (
       <>
         <SEOHead title="Payment – IJMB" description="Pay your IJMB registration fee." />
-        <DashboardShell currentTab="payments" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
+        <DashboardShell currentTab="payments" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid} passportUrl={passportUrl}>
           <div className="space-y-5">
             <div className="relative overflow-hidden rounded-2xl bg-[hsl(145,63%,18%)] text-white p-6 sm:p-8">
               <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
@@ -1227,7 +1248,7 @@ const Dashboard = () => {
     return (
       <>
         <SEOHead title="Complete Application – IJMB" description="Complete your IJMB application details." />
-        <DashboardShell currentTab="application" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
+        <DashboardShell currentTab="application" onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid} passportUrl={passportUrl}>
           <div className="space-y-6">
             <div className="relative overflow-hidden rounded-2xl bg-[hsl(145,63%,18%)] text-white p-6 sm:p-8">
               <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/4" />
@@ -1270,7 +1291,7 @@ const Dashboard = () => {
       />
 
       <div className="print:hidden">
-        <DashboardShell currentTab={currentTab} onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid}>
+        <DashboardShell currentTab={currentTab} onNavigate={navigate} profile={profile} user={user} onSignOut={handleSignOut} status={application?.status} formFeePaid={formFeePaid} passportUrl={passportUrl}>
 
           {currentTab === 'dashboard' && (
             <OverviewTab
