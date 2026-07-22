@@ -892,12 +892,11 @@ const Dashboard = () => {
   const hasPaidAcceptanceFee = application && ['fees_pending', 'active'].includes(application.status);
   const isPaymentPending = application?.status === 'payment_pending';
   const isFormDetailsPending = application?.status === 'paid_details_pending';
-  // Show the form if: no application, draft status, or legacy pay-first user who
-  // hasn't filled details yet and hasn't paid (redirect them to fill form first)
+  // Show the form for anyone who hasn't paid yet — lets them go back and edit at any time
   const isDraft = !application ||
     application.status === 'draft' ||
     !application.status ||
-    (application.status === 'payment_pending' && !application.form_fee_paid && !application.surname);
+    (application.status === 'payment_pending' && !application.form_fee_paid);
 
   const handlePrint = () => {
     // Only wait for images that have a real src and haven't loaded yet
@@ -949,6 +948,7 @@ const Dashboard = () => {
 
   // Stage 1: Fill Application
   if (isDraft) {
+    const isReadyToPay = application?.status === 'payment_pending' && !!application?.surname;
     return (
       <>
         <SEOHead title="Complete Application – IJMB" description="Complete your IJMB application." />
@@ -962,6 +962,26 @@ const Dashboard = () => {
                 <p className="text-white/70 text-sm">Fill in all required fields and upload your documents to submit your IJMB application.</p>
               </div>
             </div>
+
+            {/* Show pay banner once form has been submitted, allow editing */}
+            {isReadyToPay && (
+              <div className="bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center justify-between gap-4 flex-wrap">
+                <div className="flex items-center gap-3">
+                  <CheckCircle size={20} className="text-green-600 shrink-0" />
+                  <div>
+                    <p className="font-bold text-sm text-green-900">Application saved!</p>
+                    <p className="text-xs text-green-700">You can still edit your details below. When you're ready, proceed to payment.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('payments')}
+                  className="shrink-0 px-4 py-2 bg-primary text-white text-sm font-bold rounded-xl hover:bg-primary/90 transition-colors"
+                >
+                  Proceed to Payment →
+                </button>
+              </div>
+            )}
+
             <ApplicationForm
               application={application}
               initialOlevels={olevelResults}

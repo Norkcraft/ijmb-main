@@ -66,7 +66,14 @@ interface ApplicationFormProps {
 
 export function ApplicationForm({ application, initialOlevels, user, sessions, centres, combos, onSave, onFileUpload, uploading, readOnly }: ApplicationFormProps) {
   const { toast } = useToast();
-  const [step, setStep] = useState(1);
+  const stepKey = application?.id ? `ijmb-step-${application.id}` : null;
+  const [step, setStep] = useState(() => {
+    if (typeof window !== 'undefined' && stepKey) {
+      const saved = localStorage.getItem(stepKey);
+      if (saved) return Math.min(parseInt(saved, 10), 4);
+    }
+    return 1;
+  });
   const [saving, setSaving] = useState(false);
   const [nextLoading, setNextLoading] = useState(false);
   
@@ -140,6 +147,11 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
     }
   }, [initialOlevels]);
 
+  // Persist step so user picks up where they left off
+  useEffect(() => {
+    if (stepKey) localStorage.setItem(stepKey, step.toString());
+  }, [step, stepKey]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setSaving(true);
     try {
@@ -157,8 +169,8 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
         form.reset(values);
         toast({ title: "Progress Saved", description: "Your application has been saved as a draft." });
       } else {
-        // If submitting, we might want to ensure we don't trigger validation errors again
-        // But the form submission already validated.
+        // Clear saved step so next visit starts fresh
+        if (stepKey) localStorage.removeItem(stepKey);
       }
     } catch (error: any) {
       // Don't show a generic error if the mutation already showed a specific one
@@ -742,7 +754,7 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
                           </div>
                           <div>
                             <p className="font-medium text-sm text-green-800">Passport Uploaded</p>
-                            <Button type="button" variant="link" size="sm" className="h-auto p-0 text-green-700" onClick={() => window.open(`https://hmdsrxqftndohdcvxxyw.supabase.co/storage/v1/object/public/student-documents/${application.passport_path}`, '_blank')}>
+                            <Button type="button" variant="link" size="sm" className="h-auto p-0 text-green-700" onClick={() => window.open(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/student-documents/${application.passport_path}`, '_blank')}>
                               View Document
                             </Button>
                           </div>
@@ -771,7 +783,7 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
                           </div>
                           <div>
                             <p className="font-medium text-sm text-green-800">O-Level Result Uploaded</p>
-                            <Button type="button" variant="link" size="sm" className="h-auto p-0 text-green-700" onClick={() => window.open(`https://hmdsrxqftndohdcvxxyw.supabase.co/storage/v1/object/public/student-documents/${application.olevel_path}`, '_blank')}>
+                            <Button type="button" variant="link" size="sm" className="h-auto p-0 text-green-700" onClick={() => window.open(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/student-documents/${application.olevel_path}`, '_blank')}>
                               View Document
                             </Button>
                           </div>
