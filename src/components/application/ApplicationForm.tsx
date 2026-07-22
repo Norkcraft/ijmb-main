@@ -95,6 +95,19 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
   const [newSubName, setNewSubName] = useState('');
   const [newSubGrade, setNewSubGrade] = useState('');
 
+  // Load any unsaved Step 2 draft from localStorage (DB takes priority if it has values)
+  const draftKey = application?.id ? `ijmb-draft-${application.id}` : null;
+  const getDraftDefaults = () => {
+    if (typeof window !== 'undefined' && draftKey) {
+      try {
+        const saved = localStorage.getItem(draftKey);
+        if (saved) return JSON.parse(saved);
+      } catch { /* ignore */ }
+    }
+    return {};
+  };
+  const draft = getDraftDefaults();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -107,10 +120,11 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
       lga: application?.lga || '',
       residential_address: application?.residential_address || '',
       guardian_phone: application?.guardian_phone || '',
-      olevel_awaiting: application?.olevel_status === 'awaiting',
-      olevel_exam_type: application?.olevel_exam_type || '',
-      olevel_exam_year: application?.olevel_exam_year || '',
-      olevel_exam_number: application?.olevel_exam_number || '',
+      // Step 2 fields: prefer DB value, fall back to localStorage draft
+      olevel_awaiting: application?.olevel_status === 'awaiting' ? true : (draft.olevel_awaiting ?? false),
+      olevel_exam_type: application?.olevel_exam_type || draft.olevel_exam_type || '',
+      olevel_exam_year: application?.olevel_exam_year || draft.olevel_exam_year || '',
+      olevel_exam_number: application?.olevel_exam_number || draft.olevel_exam_number || '',
       intended_course: application?.intended_course || '',
       session_id: application?.session_id || '',
       preferred_centre_id: application?.preferred_centre_id || '',
@@ -169,6 +183,23 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
     }
   }, [olevels, olevelsKey]);
 
+  // Persist Step 2 fields to localStorage on every change
+  const olevelAwaiting = form.watch('olevel_awaiting');
+  const olevelExamType = form.watch('olevel_exam_type');
+  const olevelExamYear = form.watch('olevel_exam_year');
+  const olevelExamNumber = form.watch('olevel_exam_number');
+  useEffect(() => {
+    if (!draftKey) return;
+    try {
+      localStorage.setItem(draftKey, JSON.stringify({
+        olevel_awaiting: olevelAwaiting,
+        olevel_exam_type: olevelExamType,
+        olevel_exam_year: olevelExamYear,
+        olevel_exam_number: olevelExamNumber,
+      }));
+    } catch { /* ignore */ }
+  }, [olevelAwaiting, olevelExamType, olevelExamYear, olevelExamNumber, draftKey]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setSaving(true);
     try {
@@ -186,9 +217,10 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
         form.reset(values);
         toast({ title: "Progress Saved", description: "Your application has been saved as a draft." });
       } else {
-        // Clear saved step and olevels so next visit starts fresh
+        // Clear all localStorage draft data so next visit starts fresh
         if (stepKey) localStorage.removeItem(stepKey);
         if (olevelsKey) localStorage.removeItem(olevelsKey);
+        if (draftKey) localStorage.removeItem(draftKey);
       }
     } catch (error: any) {
       // Don't show a generic error if the mutation already showed a specific one
