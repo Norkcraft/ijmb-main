@@ -388,13 +388,13 @@ const Index = () => {
           <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
             Follow this step-by-step video tutorial to complete your IJMB registration in minutes.
           </p>
-          <div className="rounded-2xl overflow-hidden shadow-xl border border-border bg-black">
+          <div className="max-w-sm mx-auto rounded-2xl overflow-hidden shadow-xl border border-border bg-black">
             <video
               controls
               playsInline
               preload="none"
               poster="/registration-tutorial-poster.jpg"
-              className="w-full aspect-video"
+              className="w-full"
             >
               <source src="/registration-tutorial.mp4" type="video/mp4" />
               Your browser does not support the video tag.
