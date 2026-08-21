@@ -424,16 +424,16 @@ export function ApplicationForm({ application, initialOlevels, user, sessions, c
               <div className="space-y-6">
 
                 {/* Centre availability notice */}
-                <div className="rounded-xl border-2 border-red-500 bg-red-50 p-4 text-center space-y-1">
-                  <p className="font-black text-red-600 text-sm uppercase tracking-wide">
-                    ⚠ ONLY 2 CENTRES ARE CURRENTLY AVAILABLE
+                <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 text-center space-y-1">
+                  <p className="font-bold text-primary text-sm uppercase tracking-wide">
+                    {centres.length} {centres.length === 1 ? 'CENTRE' : 'CENTRES'} AVAILABLE
                   </p>
-                  <p className="font-bold text-red-700">
+                  <p className="font-semibold text-foreground text-sm">
                     {centres.length > 0
-                      ? centres.map((c: any) => `${c.name.toUpperCase()}, ${c.state.toUpperCase()}`).join('  |  ')
-                      : 'OKO, ANAMBRA  |  ILORIN, KWARA'}
+                      ? centres.map((c: any) => `${c.name}, ${c.state}`).join('  |  ')
+                      : 'Loading centres...'}
                   </p>
-                  <p className="text-sm text-red-600">Accommodation is available at both centres</p>
+                  <p className="text-sm text-muted-foreground">Accommodation is available at all centres</p>
                 </div>
 
                 <div className="space-y-4">

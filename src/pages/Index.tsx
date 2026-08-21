@@ -527,44 +527,32 @@ const Index = () => {
                 IJMB Accredited Study Centres Across Nigeria
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                IJMB accredited study centres are located in major cities across all 36 states of Nigeria.
-                Our accredited IJMB study centres are located in <strong className="text-foreground">Oko, Anambra State</strong> and <strong className="text-foreground">Ilorin, Kwara State</strong> — and we work with approved centres across all 36 states of Nigeria.
+                We operate multiple accredited IJMB study centres across Nigeria, with locations in <strong className="text-foreground">Anambra</strong>, <strong className="text-foreground">Kwara</strong>, and other states — giving you the flexibility to study close to home.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-6">
-                Each accredited centre provides structured A-Level tuition, study materials, and examination preparation guided by experienced lecturers — giving you the best chance of scoring high in your IJMB exams and securing your preferred university course.
+                Each accredited centre provides structured A-Level tuition, study materials, hostel accommodation, and examination preparation guided by experienced lecturers — giving you the best chance of scoring high in your IJMB exams and securing your preferred university course.
               </p>
-              <div className="grid sm:grid-cols-2 gap-3 mb-6">
-                <Link href="/ijmb-centre-oko-anambra" className="flex items-start gap-3 p-4 rounded-xl border border-border/60 hover:border-primary/30 hover:bg-primary/5 hover:shadow-sm transition-all group">
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
-                    <MapPin size={16} className="text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">Oko, Anambra State</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Accredited centre · Slots available</p>
-                  </div>
-                </Link>
-                <Link href="/ijmb-centre-ilorin-kwara" className="flex items-start gap-3 p-4 rounded-xl border border-border/60 hover:border-primary/30 hover:bg-primary/5 hover:shadow-sm transition-all group">
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/15 transition-colors">
-                    <MapPin size={16} className="text-primary" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">Ilorin, Kwara State</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">Accredited centre · UNILORIN nearby</p>
-                  </div>
-                </Link>
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-5 mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <MapPin size={18} className="text-primary" />
+                  <p className="font-heading font-bold text-sm text-primary uppercase tracking-wide">Available Study Centres</p>
+                </div>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Multiple accredited centres with accommodation are open for the current session. Visit the centres page to see all locations, available slots, and details for each centre.
+                </p>
               </div>
               <Link
                 href="/ijmb-centres-in-nigeria"
-                className="text-primary font-medium inline-flex items-center gap-1 hover:gap-2 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 font-bold text-sm rounded-xl bg-primary text-primary-foreground hover:opacity-90 transition-all group"
               >
-                View All Centres <ArrowRight size={16} />
+                View All Centres <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
               </Link>
-              <div className="mt-4 pt-4 border-t border-border">
+              <div className="mt-5 pt-4 border-t border-border">
                 <p className="text-xs text-muted-foreground mb-2 font-medium uppercase tracking-wide">Learn More</p>
-                <div className="flex flex-wrap gap-2">
-                  <Link href="/blog/ijmb-centre-oko-anambra-2026" className="text-xs text-primary hover:underline">→ Oko Centre Guide</Link>
-                  <Link href="/blog/ijmb-centre-ilorin-kwara-2026" className="text-xs text-primary hover:underline">→ Ilorin Centre Guide</Link>
-                  <Link href="/blog/what-is-ijmb-complete-guide" className="text-xs text-primary hover:underline">→ What is IJMB?</Link>
+                <div className="flex flex-wrap gap-3">
+                  <Link href="/blog/what-is-ijmb-complete-guide" className="text-xs text-primary hover:underline font-medium">→ What is IJMB?</Link>
+                  <Link href="/ijmb-admission-requirements" className="text-xs text-primary hover:underline font-medium">→ Admission Requirements</Link>
+                  <Link href="/ijmb-fees" className="text-xs text-primary hover:underline font-medium">→ IJMB Fees</Link>
                 </div>
               </div>
             </div>
