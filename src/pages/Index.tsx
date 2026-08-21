@@ -378,6 +378,34 @@ const Index = () => {
         </div>
       </section>
 
+      {/* Video Tutorial */}
+      <section className="section-alt section-padding">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">Watch How It Works</p>
+          <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">
+            How to Register on the IJMB Portal
+          </h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto mb-8">
+            Follow this step-by-step video tutorial to complete your IJMB registration in minutes.
+          </p>
+          <div className="rounded-2xl overflow-hidden shadow-xl border border-border bg-black">
+            <video
+              controls
+              playsInline
+              preload="none"
+              poster="/registration-tutorial-poster.jpg"
+              className="w-full aspect-video"
+            >
+              <source src="/registration-tutorial.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <p className="text-sm text-muted-foreground mt-4">
+            Need help? Call or WhatsApp us for assistance with your registration.
+          </p>
+        </div>
+      </section>
+
       {/* Testimonials Slider */}
       <section className="section-alt section-padding overflow-hidden">
         <div className="max-w-4xl mx-auto">
