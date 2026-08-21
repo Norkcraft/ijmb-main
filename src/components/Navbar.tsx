@@ -57,9 +57,9 @@ const Navbar = () => {
   const dashboardHref = isAdmin ? '/portal-admin' : '/dashboard';
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-md border-b border-border">
+    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl backdrop-saturate-150 border-b border-border/60 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-20">
+        <div className="flex items-center justify-between h-16 lg:h-[72px]">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="IJMB Home">
@@ -188,7 +188,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   href="/register"
-                  className="px-5 py-2.5 text-sm font-bold rounded-lg cta-gradient text-accent-foreground hover:opacity-90 transition-opacity"
+                  className="px-5 py-2.5 text-sm font-bold rounded-lg cta-gradient text-accent-foreground transition-all"
                 >
                   Register Now →
                 </Link>
@@ -209,7 +209,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {open && (
-        <div className="lg:hidden border-t border-border bg-background shadow-lg">
+        <div className="lg:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl shadow-xl animate-slide-up">
           <div className="px-4 py-4 space-y-1">
 
             {/* If logged in, show user info at top of mobile menu */}
