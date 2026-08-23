@@ -181,6 +181,10 @@ export default function AdmissionLetterPage() {
                   <span className="font-mono font-bold">{regNumber}</span>
                   <span className="font-bold">Programme:</span>
                   <span>INTERIM JOINT MATRICULATION BOARD - IJMB</span>
+                  <span className="font-bold">Intended Course:</span>
+                  <span>{data.intended_course || '—'}</span>
+                  <span className="font-bold">Subject Combination:</span>
+                  <span>{data.subject_combo?.name || '—'}</span>
                 </div>
               </div>
             </div>

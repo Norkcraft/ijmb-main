@@ -83,6 +83,10 @@ export default function AdmissionLetterPreview() {
                   <span className="font-mono font-bold">{regNumber}</span>
                   <span className="font-bold">Programme:</span>
                   <span>INTERIM JOINT MATRICULATION BOARD - IJMB</span>
+                  <span className="font-bold">Intended Course:</span>
+                  <span>Medicine</span>
+                  <span className="font-bold">Subject Combination:</span>
+                  <span>Physics, Chemistry, Biology</span>
                 </div>
               </div>
             </div>
