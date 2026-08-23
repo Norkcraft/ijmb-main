@@ -763,14 +763,14 @@ const AdminApplicationDetail = () => {
               </CardContent>
             </Card>
 
-            {/* Admission Letter — Step 2 of admission flow */}
+            {/* Admission Letter — auto-generated */}
             <Card>
               <CardHeader className="pb-2">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base">Admission Letter</CardTitle>
-                  {app.admission_letter_path
-                    ? <Badge className="bg-green-600 text-white text-xs">Uploaded</Badge>
-                    : <Badge variant="outline" className="text-amber-600 border-amber-400 text-xs">Not uploaded</Badge>}
+                  {['admitted', 'fees_pending', 'active'].includes(app.status)
+                    ? <Badge className="bg-green-600 text-white text-xs">Auto-generated</Badge>
+                    : <Badge variant="outline" className="text-slate-500 border-slate-300 text-xs">Pending admission</Badge>}
                 </div>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -779,41 +779,27 @@ const AdminApplicationDetail = () => {
                   <p className="text-xs font-bold text-blue-800">Admission flow</p>
                   <div className="flex items-start gap-2 text-xs text-blue-700">
                     <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5 ${['admitted','fees_pending','active'].includes(app.status) ? 'bg-green-500 text-white' : 'bg-blue-200 text-blue-700'}`}>1</span>
-                    <span>Set status to <strong>Admitted</strong> — sends "pay acceptance fee" email</span>
+                    <span>Set status to <strong>Admitted</strong> — admission letter is auto-generated</span>
                   </div>
                   <div className="flex items-start gap-2 text-xs text-blue-700">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5 ${app.admission_letter_path ? 'bg-green-500 text-white' : 'bg-blue-200 text-blue-700'}`}>2</span>
-                    <span>Upload admission letter below — sends "letter ready" email to student</span>
-                  </div>
-                  <div className="flex items-start gap-2 text-xs text-blue-700">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5 ${['fees_pending','active'].includes(app.status) ? 'bg-green-500 text-white' : 'bg-blue-200 text-blue-700'}`}>3</span>
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5 ${['fees_pending','active'].includes(app.status) ? 'bg-green-500 text-white' : 'bg-blue-200 text-blue-700'}`}>2</span>
                     <span>Student pays acceptance fee → auto-moves to Fees Pending</span>
                   </div>
                   <div className="flex items-start gap-2 text-xs text-blue-700">
-                    <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5 ${app.status === 'active' ? 'bg-green-500 text-white' : 'bg-blue-200 text-blue-700'}`}>4</span>
+                    <span className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5 ${app.status === 'active' ? 'bg-green-500 text-white' : 'bg-blue-200 text-blue-700'}`}>3</span>
                     <span>Student pays tuition → auto-moves to Active</span>
                   </div>
                 </div>
 
-                {app.admission_letter_path && (
-                  <Button size="sm" variant="outline" className="w-full" onClick={() => openDoc(app.admission_letter_path)}>
-                    <ExternalLink size={13} className="mr-1" /> View Current Letter
+                {['admitted', 'fees_pending', 'active'].includes(app.status) ? (
+                  <Button size="sm" variant="outline" className="w-full" onClick={() => window.open(`/admission-letter/${app.id}`, '_blank')}>
+                    <ExternalLink size={13} className="mr-1" /> Preview Admission Letter
                   </Button>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic text-center py-2">
+                    Admission letter will be automatically generated once the student is admitted.
+                  </p>
                 )}
-                <div className="space-y-2">
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    className="w-full text-xs text-muted-foreground file:mr-2 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
-                    onChange={e => setLetterFile(e.target.files?.[0] || null)}
-                  />
-                  <Button size="sm" className="w-full" disabled={!letterFile || uploadingLetter} onClick={uploadAdmissionLetter}>
-                    {uploadingLetter
-                      ? <><Loader2 size={13} className="animate-spin mr-1" /> Uploading…</>
-                      : <><Upload size={13} className="mr-1" /> {app.admission_letter_path ? 'Replace Letter' : 'Upload Letter'}</>}
-                  </Button>
-                  <p className="text-xs text-muted-foreground">PDF only, max 10 MB. Student can download once uploaded.</p>
-                </div>
               </CardContent>
             </Card>
 

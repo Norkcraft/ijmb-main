@@ -310,17 +310,9 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
   const assignedCentre = centres?.find((c: any) => c.id === application?.assigned_centre_id);
   const combo = combos?.find((c: any) => c.id === application?.subject_combination_id);
 
-  const downloadLetter = async () => {
+  const viewAdmissionLetter = () => {
     if (!application?.id) return;
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData?.session?.access_token;
-    if (!token) return;
-    const res = await fetch(`/api/application/${application.id}/admission-letter`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const { url } = await res.json();
-    if (url) window.open(url, '_blank');
+    window.open(`/admission-letter/${application.id}`, '_blank');
   };
 
   const stats = [
@@ -379,7 +371,7 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
           sub: 'Your acceptance fee has been received. Download your official admission letter and present it at your assigned centre.',
           gradient: 'from-emerald-50 to-teal-50',
           border: 'border-emerald-200',
-          cta: { label: 'Download Admission Letter', action: downloadLetter },
+          cta: { label: 'View Admission Letter', action: viewAdmissionLetter },
         };
       case 'active':
         return {
@@ -681,20 +673,12 @@ function DocumentsTab({ application, sessions, centres, combos, user }: {
     input.click();
   };
 
-  const downloadLetter = async () => {
+  const viewAdmissionLetterDoc = () => {
     if (!application?.id) return;
-    const { data: sessionData } = await supabase.auth.getSession();
-    const token = sessionData?.session?.access_token;
-    if (!token) return;
-    const res = await fetch(`/api/application/${application.id}/admission-letter`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const { url } = await res.json();
-    if (url) window.open(url, '_blank');
+    window.open(`/admission-letter/${application.id}`, '_blank');
   };
 
-  const hasAdmissionLetter = !!application?.admission_letter_path;
+  const hasAdmissionLetter = isAdmitted;
 
   return (
     <div className="space-y-4">
@@ -736,15 +720,15 @@ function DocumentsTab({ application, sessions, centres, combos, user }: {
             </div>
             <div>
               <h3 className="font-bold text-sm">Admission Letter</h3>
-              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Official IJMB admission letter uploaded by the board</p>
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">Auto-generated provisional admission letter</p>
             </div>
           </div>
           {hasAdmissionLetter ? (
             <button
-              onClick={downloadLetter}
+              onClick={viewAdmissionLetterDoc}
               className="w-full flex items-center justify-center gap-2 py-2.5 text-sm font-semibold rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors"
             >
-              <Download size={14} /> Download Letter
+              <Download size={14} /> View & Print Letter
             </button>
           ) : (
             <div className="flex items-center gap-2 py-2.5 px-4 bg-muted/50 rounded-xl border border-dashed border-muted-foreground/30">
@@ -752,7 +736,7 @@ function DocumentsTab({ application, sessions, centres, combos, user }: {
                 <Clock size={10} className="text-muted-foreground" />
               </div>
               <span className="text-xs text-muted-foreground font-medium">
-                {isAdmitted ? 'Your admission letter will appear here once uploaded by the board' : 'Available after admission is granted'}
+                Available after admission is granted
               </span>
             </div>
           )}
@@ -764,7 +748,7 @@ function DocumentsTab({ application, sessions, centres, combos, user }: {
         <p className="font-semibold mb-1">Document availability</p>
         <ul className="space-y-1 text-xs text-blue-700 list-disc list-inside">
           <li>Application form is available after paying the registration fee</li>
-          <li>Admission letter is available after paying the acceptance fee</li>
+          <li>Admission letter is automatically generated once you are admitted</li>
           <li>Tuition receipt is generated automatically after payment</li>
         </ul>
       </div>
