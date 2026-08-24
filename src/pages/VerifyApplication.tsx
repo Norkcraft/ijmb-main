@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { supabase } from '@/lib/supabaseClient';
 import { CheckCircle2, XCircle, Loader2, ShieldCheck, Home } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -26,24 +25,9 @@ const VerifyApplication = () => {
       }
 
       try {
-        const { data, error } = await supabase
-          .from('applications')
-          .select(`
-            id,
-            application_number,
-            surname,
-            first_name,
-            middle_name,
-            created_at,
-            intended_course,
-            status,
-            assigned_centre:assigned_centre_id(name,state),
-            preferred_centre:preferred_centre_id(name,state)
-          `)
-          .eq('id', applicationId)
-          .single();
-
-        if (error) throw error;
+        const res = await fetch(`/api/verify-application?id=${applicationId}`);
+        if (!res.ok) throw new Error('Not found');
+        const data = await res.json();
         setApplication(data);
       } catch (err) {
         console.error('Verification error:', err);
