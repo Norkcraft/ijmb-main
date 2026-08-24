@@ -1,7 +1,8 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import crypto from 'crypto';
 import { supabaseServer } from '../src/lib/supabaseServer';
-import { generateApplicationPDF } from '../src/lib/generateApplicationPDF';
+// Lazy-loaded to avoid crashing the function with heavy puppeteer imports
+const loadPDFGenerator = () => import('../src/lib/generateApplicationPDF').then(m => m.generateApplicationPDF);
 import { sendEmail } from '../src/lib/resendClient';
 import { paymentConfirmationEmail, applicationSubmittedEmail } from '../src/lib/emailTemplates';
 
@@ -146,6 +147,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // Generate PDF
         console.log(`Generating PDF for application: ${applicationId}`);
         try {
+          const generateApplicationPDF = await loadPDFGenerator();
           const pdfBuffer = await generateApplicationPDF(applicationId);
 
           const fileName = `${applicationId}/application-form.pdf`;
