@@ -345,10 +345,15 @@ export const useStudentDashboard = () => {
       const appId = application?.id || (await supabase.from('applications').select('id').eq('user_id', user.id).maybeSingle()).data?.id;
       if (appId) {
         const column = type === 'passport' ? 'passport_path' : 'olevel_path';
-        await supabase.from('applications').update({
+        const updateData: Record<string, any> = {
           [column]: path,
           updated_at: new Date().toISOString(),
-        }).eq('id', appId);
+        };
+        // When an "awaiting" student uploads their O-Level, mark it as pending for admin review
+        if (type === 'olevel' && application?.olevel_status === 'awaiting') {
+          updateData.olevel_status = 'pending';
+        }
+        await supabase.from('applications').update(updateData).eq('id', appId);
       }
 
       queryClient.invalidateQueries({ queryKey: ['dashboard-user', user.id] });

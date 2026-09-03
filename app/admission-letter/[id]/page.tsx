@@ -40,8 +40,8 @@ export default function AdmissionLetterPage() {
           *,
           profiles:user_id(full_name, email),
           session:session_id(name, code),
-          preferred_centre:preferred_centre_id(name, state, address),
-          assigned_centre:assigned_centre_id(name, state, address),
+          preferred_centre:preferred_centre_id(name, state, location),
+          assigned_centre:assigned_centre_id(name, state, location),
           subject_combo:subject_combination_id(name, track)
         `)
         .eq('id', id)

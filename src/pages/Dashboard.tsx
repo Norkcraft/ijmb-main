@@ -105,7 +105,7 @@ function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid
     { key: 'application', icon: <BookOpen size={18} />, label: 'Application' },
     { key: 'payments', icon: <Wallet size={18} />, label: 'Payments' },
     { key: 'documents', icon: <FolderOpen size={18} />, label: 'Documents' },
-    { key: 'profile', icon: <User size={18} />, label: 'My Account' },
+    { key: 'profile', icon: <User size={18} />, label: 'My Profile' },
   ];
 
   return (
@@ -183,7 +183,7 @@ function Sidebar({ currentTab, onNavigate, profile, user, onSignOut, formFeePaid
 function MobileHeader({ profile, currentTab, onMenuOpen }: { profile: any; currentTab: string; onMenuOpen: () => void }) {
   const tabLabels: Record<string, string> = {
     dashboard: 'Overview', application: 'Application',
-    payments: 'Payments', documents: 'Documents', profile: 'My Account',
+    payments: 'Payments', documents: 'Documents', profile: 'My Profile',
   };
   return (
     <header className="lg:hidden sticky top-0 z-30 bg-[hsl(145,63%,18%)] text-white px-4 h-14 flex items-center justify-between shadow-md">
@@ -242,7 +242,7 @@ function MobileDrawer({ open, onClose, profile, user, currentTab, onNavigate, on
     { key: 'application', icon: <BookOpen size={18} />, label: 'Application' },
     { key: 'payments', icon: <Wallet size={18} />, label: 'Payments' },
     { key: 'documents', icon: <FolderOpen size={18} />, label: 'Documents' },
-    { key: 'profile', icon: <User size={18} />, label: 'My Account' },
+    { key: 'profile', icon: <User size={18} />, label: 'My Profile' },
   ];
   if (!open) return null;
   return (
@@ -806,7 +806,7 @@ function DocumentsTab({ application, sessions, centres, combos, user }: {
 }
 
 // ── Profile tab ───────────────────────────────────────────────────────────────
-function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPhone, updateProfile, handleSignOut }: any) {
+function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPhone, updateProfile, handleSignOut, application, passportUrl, onFileUpload, uploading }: any) {
   const [savingProfile, setSavingProfile] = useState(false);
   const [signingOut, setSigningOut] = useState(false);
   const handleSignOutClick = async () => { setSigningOut(true); await handleSignOut(); };
@@ -816,6 +816,15 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
   const [savingEmail, setSavingEmail] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const { toast } = useToast();
+  const [olevelUrl, setOlevelUrl] = useState<string>('');
+
+  // Build a signed URL for the O-Level document
+  useEffect(() => {
+    if (!application?.olevel_path) return;
+    supabase.storage.from('student-documents')
+      .createSignedUrl(application.olevel_path, 3600)
+      .then(({ data }) => { if (data?.signedUrl) setOlevelUrl(data.signedUrl); });
+  }, [application?.olevel_path]);
 
   const handleSaveProfile = async () => {
     setSavingProfile(true);
@@ -851,38 +860,172 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
     setSavingPassword(false);
   };
 
-  const sections = [
-    {
-      icon: <User size={18} className="text-primary" />,
-      title: 'Account Information',
-      content: (
-        <div className="space-y-4">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Full Name</label>
-              <input value={editName || '—'} disabled
-                className="w-full h-10 px-3 rounded-xl border text-sm bg-muted text-muted-foreground cursor-not-allowed" />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Phone Number</label>
-              <input value={editPhone || '—'} disabled
-                className="w-full h-10 px-3 rounded-xl border text-sm bg-muted text-muted-foreground cursor-not-allowed" />
-            </div>
-          </div>
-          <div>
-            <label className="text-xs font-bold text-muted-foreground uppercase tracking-wide block mb-1.5">Current Email</label>
-            <input value={user?.email || ''} disabled
-              className="w-full h-10 px-3 rounded-xl border text-sm bg-muted text-muted-foreground cursor-not-allowed" />
-          </div>
-          <p className="text-xs text-muted-foreground">Name and phone are set from your application form and cannot be changed here.</p>
+  const initials = (profile?.full_name || 'S').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase();
+  const fullName = [application?.surname, application?.first_name, application?.middle_name].filter(Boolean).join(' ') || profile?.full_name || '—';
+
+  const olevelStatus = application?.olevel_status;
+  const canUploadOlevel = olevelStatus === 'awaiting' || (olevelStatus === 'rejected');
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h2 className="text-lg font-bold">My Profile</h2>
+        <p className="text-sm text-muted-foreground mt-0.5">Your personal information, documents, and account settings</p>
+      </div>
+
+      {/* Passport & Bio Data Card */}
+      <div className="bg-white rounded-2xl border p-5 hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 pb-3 border-b mb-4">
+          <User size={18} className="text-primary" />
+          <h3 className="font-bold text-sm">Personal Information</h3>
         </div>
-      ),
-    },
-    {
-      icon: <Mail size={18} className="text-blue-600" />,
-      title: 'Change Email Address',
-      desc: "Enter your new email. We'll send a confirmation link — your email won't change until you click it.",
-      content: (
+        <div className="flex flex-col sm:flex-row gap-5">
+          {/* Passport Photo */}
+          <div className="flex flex-col items-center gap-2 shrink-0">
+            <div className="w-28 h-28 rounded-2xl border-2 border-dashed border-muted-foreground/30 bg-muted/30 flex items-center justify-center overflow-hidden">
+              {passportUrl ? (
+                <img src={passportUrl} alt="Passport" className="w-full h-full object-cover rounded-xl" />
+              ) : (
+                <div className="flex flex-col items-center gap-1 text-muted-foreground">
+                  <User size={32} />
+                  <span className="text-[10px] font-medium">No photo</span>
+                </div>
+              )}
+            </div>
+            <span className={`text-xs font-semibold flex items-center gap-1 ${application?.passport_path ? 'text-green-700' : 'text-amber-600'}`}>
+              {application?.passport_path ? <><CheckCircle size={11} /> Uploaded</> : <><Clock size={11} /> Not uploaded</>}
+            </span>
+          </div>
+
+          {/* Bio Data */}
+          <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground">Full Name</p>
+              <p className="font-semibold">{fullName}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Gender</p>
+              <p className="font-semibold">{application?.gender || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Date of Birth</p>
+              <p className="font-semibold">{application?.date_of_birth ? new Date(application.date_of_birth).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">State of Origin</p>
+              <p className="font-semibold">{application?.state_of_origin || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">LGA</p>
+              <p className="font-semibold">{application?.lga || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Phone Number</p>
+              <p className="font-semibold">{application?.guardian_phone || profile?.phone || '—'}</p>
+            </div>
+            <div className="col-span-2">
+              <p className="text-xs text-muted-foreground">Residential Address</p>
+              <p className="font-semibold">{application?.residential_address || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Email</p>
+              <p className="font-semibold">{user?.email || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Application Number</p>
+              <p className="font-semibold font-mono">{application?.application_number || '—'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* O-Level Status Card */}
+      <div className="bg-white rounded-2xl border p-5 hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 pb-3 border-b mb-4">
+          <GraduationCap size={18} className="text-primary" />
+          <h3 className="font-bold text-sm">O-Level Result</h3>
+        </div>
+
+        <div className="flex items-start gap-4">
+          {/* Status indicator */}
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 ${
+            olevelStatus === 'approved' ? 'bg-green-100' :
+            olevelStatus === 'awaiting' ? 'bg-amber-100' :
+            olevelStatus === 'rejected' ? 'bg-red-100' :
+            application?.olevel_path ? 'bg-blue-100' : 'bg-muted'
+          }`}>
+            {olevelStatus === 'approved' ? <CheckCircle size={20} className="text-green-600" /> :
+             olevelStatus === 'awaiting' ? <Clock size={20} className="text-amber-600" /> :
+             olevelStatus === 'rejected' ? <AlertCircle size={20} className="text-red-600" /> :
+             application?.olevel_path ? <FileText size={20} className="text-blue-600" /> :
+             <FileText size={20} className="text-muted-foreground" />}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-sm">
+              {olevelStatus === 'approved' ? 'O-Level result approved' :
+               olevelStatus === 'awaiting' ? 'Awaiting O-Level result' :
+               olevelStatus === 'rejected' ? 'O-Level result rejected' :
+               olevelStatus === 'pending' ? 'O-Level result under review' :
+               application?.olevel_path ? 'O-Level result uploaded' : 'No O-Level result uploaded'}
+            </p>
+            <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+              {olevelStatus === 'approved' ? 'Your O-Level result has been verified and approved by the admissions team.' :
+               olevelStatus === 'awaiting' ? 'You indicated that you are awaiting your O-Level result. Once your result is available, upload it below.' :
+               olevelStatus === 'rejected' ? (application?.olevel_msg || 'Your O-Level result was not accepted. Please upload a clearer copy or the correct document.') :
+               olevelStatus === 'pending' ? 'Your O-Level result has been uploaded and is being reviewed by the admissions team.' :
+               application?.olevel_path ? 'Your O-Level result document is on file.' : 'Please upload your O-Level result document.'}
+            </p>
+
+            {/* Show uploaded document preview/link */}
+            {application?.olevel_path && olevelUrl && (
+              <a href={olevelUrl} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 text-xs font-semibold text-primary border border-primary/30 rounded-xl hover:bg-primary/5 transition-colors">
+                <FileText size={12} /> View Uploaded Document
+              </a>
+            )}
+
+            {/* Upload button for awaiting/rejected students */}
+            {canUploadOlevel && onFileUpload && (
+              <button
+                onClick={() => onFileUpload('olevel')}
+                disabled={uploading === 'olevel'}
+                className="mt-3 w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors disabled:opacity-60"
+              >
+                {uploading === 'olevel'
+                  ? <><Loader2 size={14} className="animate-spin" /> Uploading...</>
+                  : <><Download size={14} className="rotate-180" /> Upload O-Level Result</>}
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* O-Level details if available */}
+        {application?.olevel_exam_type && (
+          <div className="mt-4 pt-3 border-t grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+            <div>
+              <p className="text-xs text-muted-foreground">Exam Type</p>
+              <p className="font-semibold">{application.olevel_exam_type}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Exam Year</p>
+              <p className="font-semibold">{application.olevel_exam_year || '—'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">Exam Number</p>
+              <p className="font-semibold">{application.olevel_exam_number || '—'}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Account Settings */}
+      <div className="bg-white rounded-2xl border p-5 space-y-4 hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 pb-3 border-b">
+          <Mail size={18} className="text-blue-600" />
+          <h3 className="font-bold text-sm">Change Email Address</h3>
+        </div>
+        <p className="text-sm text-muted-foreground">Enter your new email. We'll send a confirmation link — your email won't change until you click it.</p>
         <div className="flex gap-2">
           <input type="email" value={newEmail} onChange={e => setNewEmail(e.target.value)} placeholder="new@email.com"
             className="flex-1 h-10 px-3 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background" />
@@ -891,12 +1034,13 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
             {savingEmail ? <Loader2 size={14} className="animate-spin" /> : 'Send Link'}
           </button>
         </div>
-      ),
-    },
-    {
-      icon: <KeyRound size={18} className="text-amber-600" />,
-      title: 'Change Password',
-      content: (
+      </div>
+
+      <div className="bg-white rounded-2xl border p-5 space-y-4 hover:shadow-md transition-shadow">
+        <div className="flex items-center gap-2 pb-3 border-b">
+          <KeyRound size={18} className="text-amber-600" />
+          <h3 className="font-bold text-sm">Change Password</h3>
+        </div>
         <div className="space-y-3">
           <input type="password" value={newPassword} onChange={e => setNewPassword(e.target.value)}
             placeholder="New password (min. 6 characters)"
@@ -910,27 +1054,7 @@ function ProfileTab({ user, profile, editName, setEditName, editPhone, setEditPh
             Update Password
           </button>
         </div>
-      ),
-    },
-  ];
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-lg font-bold">My Account</h2>
-        <p className="text-sm text-muted-foreground mt-0.5">Manage your personal information and security</p>
       </div>
-
-      {sections.map((sec) => (
-        <div key={sec.title} className="bg-white rounded-2xl border p-5 space-y-4 hover:shadow-md transition-shadow">
-          <div className="flex items-center gap-2 pb-3 border-b">
-            {sec.icon}
-            <h3 className="font-bold text-sm">{sec.title}</h3>
-          </div>
-          {sec.desc && <p className="text-sm text-muted-foreground">{sec.desc}</p>}
-          {sec.content}
-        </div>
-      ))}
 
       <div className="bg-white rounded-2xl border border-red-100 p-5 hover:shadow-md transition-shadow">
         <div className="flex items-center gap-2 pb-3 border-b border-red-100 mb-4">
@@ -1370,6 +1494,8 @@ const Dashboard = () => {
               editName={editName} setEditName={setEditName}
               editPhone={editPhone} setEditPhone={setEditPhone}
               updateProfile={updateProfile} handleSignOut={handleSignOut}
+              application={application} passportUrl={passportUrl}
+              onFileUpload={handleFileUpload} uploading={uploading}
             />
           )}
 
