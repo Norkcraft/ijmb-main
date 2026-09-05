@@ -14,8 +14,13 @@ import { Textarea } from '@/components/ui/textarea';
 import {
   ArrowLeft, ExternalLink, Loader2, CheckCircle, XCircle, Eye, AlertCircle, Upload,
   MessageSquarePlus, Clock as ClockIcon, Download, Ban, ThumbsUp, ThumbsDown,
-  FileText
+  FileText, Trash2
 } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 // ── Status transition rules ─────────────────────────────────────────────────
 // payment_pending and fees_pending are set automatically by payments — not by admin
@@ -120,6 +125,9 @@ const AdminApplicationDetail = () => {
 
   // PDF download
   const [downloadingPdf, setDownloadingPdf] = useState(false);
+
+  // Delete applicant
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -451,6 +459,35 @@ const AdminApplicationDetail = () => {
       toast({ title: 'Upload failed', description: err.message, variant: 'destructive' });
     } finally {
       setUploadingLetter(false);
+    }
+  };
+
+  // ── delete applicant ────────────────────────────────────────────────────
+  const deleteApplicant = async () => {
+    if (!app) return;
+    setDeleting(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Not authenticated');
+
+      const res = await fetch('/api/admin/delete-applicant', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ applicationId: app.id, userId: app.user_id }),
+      });
+
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.message || 'Delete failed');
+
+      toast({ title: 'Applicant deleted', description: 'The student and all their data have been permanently removed.' });
+      router.push('/portal-admin');
+    } catch (err: any) {
+      toast({ title: 'Delete failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -988,6 +1025,48 @@ const AdminApplicationDetail = () => {
                       : <><MessageSquarePlus size={14} className="mr-2" /> Send Request & Email Student</>}
                   </Button>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Danger Zone — Delete Applicant */}
+            <Card className="border-red-200">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base text-destructive">Danger Zone</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" className="w-full" disabled={deleting}>
+                      <Trash2 size={14} className="mr-2" /> Delete This Applicant
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                      <AlertDialogDescription className="space-y-2">
+                        <span className="block">
+                          You are about to permanently delete <strong>{fullName}</strong> ({appId}) and all their data including:
+                        </span>
+                        <span className="block text-destructive font-medium">
+                          Application, payments, documents, O-level results, uploaded files, and their account.
+                        </span>
+                        <span className="block font-semibold">
+                          This action cannot be undone.
+                        </span>
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive hover:bg-destructive/90 text-white"
+                        onClick={deleteApplicant}
+                        disabled={deleting}
+                      >
+                        {deleting ? <><Loader2 size={14} className="animate-spin mr-2" /> Deleting...</> : 'Yes, Delete Permanently'}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </CardContent>
             </Card>
 
