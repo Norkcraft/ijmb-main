@@ -23,7 +23,7 @@ const Login = () => {
   const { user, profile } = useAuth();
 
   if (user) {
-    const isAdmin = profile?.role === 'super_admin' || profile?.role === 'coordinator';
+    const isAdmin = profile?.role && ['super_admin', 'admin', 'coordinator'].includes(profile.role);
     router.replace(isAdmin ? '/portal-admin' : '/dashboard');
     return null;
   }

@@ -22,11 +22,12 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const router = useRouter();
 
   if (user) {
-    router.replace('/dashboard');
+    const isAdmin = profile?.role && ['super_admin', 'admin', 'coordinator'].includes(profile.role);
+    router.replace(isAdmin ? '/portal-admin' : '/dashboard');
     return null;
   }
 
