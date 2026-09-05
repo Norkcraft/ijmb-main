@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar,
-  DollarSign, LogOut, Bell, Users, FileText, ChevronRight, Loader2, Megaphone
+  DollarSign, LogOut, Bell, Users, FileText, ChevronRight, Loader2, Megaphone, Mail
 } from "lucide-react";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ const sidebarItems = [
   { icon: Calendar,        label: "Sessions",     href: "/portal-admin?tab=sessions",       id: 'sessions' },
   { icon: DollarSign,      label: "Fees",         href: "/portal-admin?tab=fees",           id: 'fees' },
   { icon: Megaphone,       label: "Communications", href: "/portal-admin?tab=messaging",    id: 'messaging' },
+  { icon: Mail,            label: "Email Logs",     href: "/portal-admin?tab=emails",       id: 'emails' },
 ];
 
 interface AdminSidebarProps {

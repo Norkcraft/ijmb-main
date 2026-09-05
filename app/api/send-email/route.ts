@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: `Unknown email type: ${type}` }, { status: 400 });
     }
 
-    const result = await sendEmail({ to: recipientEmail, subject: email.subject, html: email.html, replyTo });
+    const result = await sendEmail({ to: recipientEmail, subject: email.subject, html: email.html, replyTo, emailType: type });
     if (!result.success) {
       const errMsg = typeof result.error === 'object'
         ? JSON.stringify(result.error)

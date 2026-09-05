@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, X, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign, FileText, Users, ChevronRight, Loader2 } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign, FileText, Users, ChevronRight, Loader2, Megaphone, Mail } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -14,6 +14,8 @@ const sidebarItems = [
   { icon: BookOpen,        label: "Subjects",     href: "/portal-admin?tab=subjects",       id: 'subjects' },
   { icon: Calendar,        label: "Sessions",     href: "/portal-admin?tab=sessions",       id: 'sessions' },
   { icon: DollarSign,      label: "Fees",         href: "/portal-admin?tab=fees",           id: 'fees' },
+  { icon: Megaphone,       label: "Communications", href: "/portal-admin?tab=messaging",  id: 'messaging' },
+  { icon: Mail,            label: "Email Logs",   href: "/portal-admin?tab=emails",         id: 'emails' },
 ];
 
 interface AdminMobileHeaderProps {

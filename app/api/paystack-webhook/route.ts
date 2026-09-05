@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
           reference,
           paymentType || 'payment'
         );
-        await sendEmail({ to: userEmail, subject, html });
+        await sendEmail({ to: userEmail, subject, html, emailType: 'payment_confirmation' });
       }
 
       // Update application fields based on payment type
@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
               centreName,
               subjectsName
             );
-            await sendEmail({ to: userEmail, subject, html });
+            await sendEmail({ to: userEmail, subject, html, emailType: 'application_submitted' });
           } catch (emailErr) {
             console.error('Failed to send application submitted email:', emailErr);
           }
