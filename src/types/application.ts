@@ -45,6 +45,7 @@ export interface Application {
   tuition_amount_paid: number;
   installments_allowed: boolean;
   hostel_fee_paid: boolean;
+  exam_fee_paid: boolean;
 
   created_at: string;
   updated_at: string;

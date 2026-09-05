@@ -15,6 +15,7 @@ const FEE_LABELS: Record<string, string> = {
   acceptance_fee: 'Acceptance Fee',
   tuition_fee: 'Tuition Fee',
   hostel_fee: 'Hostel Fee',
+  exam_fee: 'Exam Fee',
 };
 
 function checkMagicBytes(buffer: Buffer, magic: number[]): boolean {
@@ -127,6 +128,8 @@ export async function POST(request: NextRequest) {
         updates.status = 'active';
       } else if (paymentType === 'hostel_fee') {
         updates.hostel_fee_paid = true;
+      } else if (paymentType === 'exam_fee') {
+        updates.exam_fee_paid = true;
       }
 
       await adminClient.from('applications').update(updates).eq('id', applicationId);

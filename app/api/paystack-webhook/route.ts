@@ -111,6 +111,13 @@ export async function POST(request: NextRequest) {
           .eq('id', applicationId);
       }
 
+      if (paymentType === 'exam_fee') {
+        await supabaseServer
+          .from('applications')
+          .update({ exam_fee_paid: true, updated_at: new Date().toISOString() })
+          .eq('id', applicationId);
+      }
+
       if (paymentType === 'tuition_fee') {
         const amountNaira = amount / 100;
         await supabaseServer

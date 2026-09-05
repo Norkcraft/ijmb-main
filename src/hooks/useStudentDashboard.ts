@@ -395,6 +395,8 @@ export const useStudentDashboard = () => {
       updates.status = 'active';
     } else if (paymentType === 'hostel_fee') {
       updates.hostel_fee_paid = true;
+    } else if (paymentType === 'exam_fee') {
+      updates.exam_fee_paid = true;
     }
 
     await supabase.from('applications').update(updates).eq('id', application.id);
@@ -405,6 +407,7 @@ export const useStudentDashboard = () => {
       acceptance_fee: 'Acceptance confirmed. You can now pay your programme fees.',
       tuition_fee: 'Tuition fee paid. You are now an active student!',
       hostel_fee: 'Hostel fee confirmed.',
+      exam_fee: 'Exam fee confirmed.',
     };
     toast({ title: 'Payment Successful!', description: messages[paymentType] || 'Payment recorded successfully.' });
 

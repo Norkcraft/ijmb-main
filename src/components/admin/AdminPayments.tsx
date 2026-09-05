@@ -12,6 +12,7 @@ const FEE_LABELS: Record<string, string> = {
   acceptance_fee: 'Acceptance Fee',
   tuition_fee: 'Tuition Fee',
   hostel_fee: 'Hostel Fee',
+  exam_fee: 'Exam Fee',
 };
 
 const FEE_COLORS: Record<string, string> = {
@@ -19,6 +20,7 @@ const FEE_COLORS: Record<string, string> = {
   acceptance_fee: 'bg-purple-100 text-purple-800',
   tuition_fee: 'bg-green-100 text-green-800',
   hostel_fee: 'bg-orange-100 text-orange-800',
+  exam_fee: 'bg-red-100 text-red-800',
 };
 
 export default function AdminPayments() {

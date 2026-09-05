@@ -20,6 +20,7 @@ const FEE_LABELS: Record<string, string> = {
   acceptance_fee: 'Acceptance Fee',
   tuition_fee: 'Tuition Fee',
   hostel_fee: 'Hostel Fee',
+  exam_fee: 'Exam Fee',
 };
 
 export default function BankTransferInfo({

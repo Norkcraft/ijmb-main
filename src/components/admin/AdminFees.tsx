@@ -20,6 +20,7 @@ const FEE_LABELS: Record<string, string> = {
   acceptance_fee: 'Acceptance Fee',
   tuition_fee: 'Tuition Fee (Standard)',
   hostel_fee: 'Hostel Fee (Standard)',
+  exam_fee: 'Exam Fee',
 };
 
 const AdminFees = () => {

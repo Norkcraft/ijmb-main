@@ -101,11 +101,12 @@ export const DashboardPayments = ({
       acceptance_fee: 'Acceptance Fee',
       tuition_fee: 'Tuition Fee',
       hostel_fee: 'Hostel Fee',
+      exam_fee: 'Exam Fee',
     };
     return labels[name] || name;
   };
 
-  const requiresAdmission = (name: string) => ['acceptance_fee', 'tuition_fee', 'hostel_fee'].includes(name);
+  const requiresAdmission = (name: string) => ['acceptance_fee', 'tuition_fee', 'hostel_fee', 'exam_fee'].includes(name);
 
   return (
     <div className="space-y-6">
@@ -156,6 +157,8 @@ export const DashboardPayments = ({
                     amountPaid = Number(application?.tuition_amount_paid) || 0;
                   } else if (name === 'hostel_fee') {
                     paid = !!application?.hostel_fee_paid || optimisticPaid.has('hostel_fee') || paidFeeNames.has('hostel_fee');
+                  } else if (name === 'exam_fee') {
+                    paid = !!application?.exam_fee_paid || optimisticPaid.has('exam_fee') || paidFeeNames.has('exam_fee');
                   } else {
                     paid = paidFeeNames.has(name) || optimisticPaid.has(name);
                   }
