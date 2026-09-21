@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import ExportPaymentRecords from './ExportPaymentRecords';
 import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
@@ -112,7 +113,7 @@ export default function AdminPayments() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Payment Records</CardTitle>
+          <div className="flex flex-wrap items-center justify-between gap-3"><CardTitle>Recent Payments</CardTitle><ExportPaymentRecords search={search} feeType={filterType} /></div>
           <CardDescription>All transactions across all students.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
