@@ -63,7 +63,7 @@ export default function ExportPaymentRecords({ search = '', feeType = '' }: { se
       <DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Export Payment Records</DialogTitle>
-          <DialogDescription>Download an official PDF with current payment details, admission statuses, and totals for your coordinators.</DialogDescription>
+          <DialogDescription>Download a student-grouped PDF with intended centres, complete transaction histories, current statuses, and totals.</DialogDescription>
         </DialogHeader>
         <form onSubmit={event => { event.preventDefault(); void generate(); }} className="space-y-4">
           <div className="space-y-2">
@@ -79,7 +79,7 @@ export default function ExportPaymentRecords({ search = '', feeType = '' }: { se
           </div>}
           {period === 'custom' && start && end && start > end && <p className="text-sm text-destructive">The end date must be on or after the start date.</p>}
           {hasFilters && <label className="flex items-start gap-2 text-sm"><input type="checkbox" className="mt-1" checked={useFilters} disabled={busy} onChange={e => { setUseFilters(e.target.checked); setError(''); }} /><span>Apply current search and payment-type filters<span className="block text-xs text-muted-foreground break-words">{search || 'All students'} / {paymentLabels[feeType] || 'All payment types'}</span></span></label>}
-          <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">The report includes all matching payments. Total received counts successful payments only. Student and payment statuses are refreshed when you generate the PDF.</p>
+          <p className="rounded-md bg-muted p-3 text-sm text-muted-foreground">Payments are grouped by student with the newest transaction first. Every payment and reference remains visible. Totals count successful payments only.</p>
           {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
           <DialogFooter>
             <Button type="button" variant="outline" disabled={busy} onClick={() => setOpen(false)}>Cancel</Button>

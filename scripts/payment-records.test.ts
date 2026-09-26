@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { filterPaymentRecords, paymentTotals, reportDate, type PaymentRecord } from '../src/lib/paymentRecords';
+import { filterPaymentRecords, groupPaymentRecords, paymentTotals, reportDate, type PaymentRecord } from '../src/lib/paymentRecords';
 const records: PaymentRecord[] = [
-  {id:'1', studentId:'a', reference:'REF1', fullName:'Ada Okafor', course:'Medicine', amount:100.10, paymentType:'tuition', paymentDate:'2026-07-23T09:25:53Z', paymentStatus:'success', admissionStatus:'Admitted'},
-  {id:'2', studentId:'a', reference:'REF2', fullName:'Ada Okafor', course:'Medicine', amount:200.20, paymentType:'tuition_fee', paymentDate:'2026-07-23T09:25:53Z', paymentStatus:'success', admissionStatus:'Admitted'},
-  {id:'3', studentId:'b', reference:'REF3', fullName:'Bola Ade', course:'Law', amount:9000, paymentType:'form_fee', paymentDate:'2026-07-23T09:25:53Z', paymentStatus:'pending', admissionStatus:'Pending Admission'},
-  {id:'4', studentId:'c', reference:'REF4', fullName:'Chidi Obi', course:'Law', amount:7000, paymentType:'form_fee', paymentDate:'2026-07-23T09:25:53Z', paymentStatus:'failed', admissionStatus:'Not Admitted'},
+  {id:'1', studentId:'a', reference:'REF1', fullName:'Ada Okafor', course:'Medicine', intendedCenter:'Abuja Centre, Abuja, FCT', amount:100.10, paymentType:'tuition', paymentDate:'2026-07-23T09:25:53Z', paymentStatus:'success', admissionStatus:'Admitted'},
+  {id:'2', studentId:'a', reference:'REF2', fullName:'Ada Okafor', course:'Medicine', intendedCenter:'Abuja Centre, Abuja, FCT', amount:200.20, paymentType:'tuition_fee', paymentDate:'2026-07-24T09:25:54Z', paymentStatus:'success', admissionStatus:'Admitted'},
+  {id:'3', studentId:'b', reference:'REF3', fullName:'Bola Ade', course:'Law', intendedCenter:'Ilorin Centre, Ilorin, Kwara', amount:9000, paymentType:'form_fee', paymentDate:'2026-07-23T09:25:53Z', paymentStatus:'pending', admissionStatus:'Pending Admission'},
+  {id:'4', studentId:'c', reference:'REF4', fullName:'Chidi Obi', course:'Law', intendedCenter:'Oko Centre, Oko, Anambra', amount:7000, paymentType:'form_fee', paymentDate:'2026-07-23T09:25:53Z', paymentStatus:'failed', admissionStatus:'Not Admitted'},
 ];
 test('keeps separate payments sharing student and timestamp; totals only confirmed receipts', () => {
   assert.deepEqual(paymentTotals(records), {students:3, payments:4, received:300.30});
@@ -18,6 +18,17 @@ test('filters fee aliases, names and references before calculating report totals
 });
 test('empty selection has zero totals', () => assert.deepEqual(paymentTotals([]), {students:0,payments:0,received:0}));
 test('dates include time to the second in Nigeria time', () => assert.match(reportDate(records[0].paymentDate), /10:25:53/));
+
+test('groups each student once, keeps newest payment first, and totals successful payments only', () => {
+  const groups = groupPaymentRecords(records);
+  assert.equal(groups.length, 3);
+  assert.equal(groups[0].studentId, 'a');
+  assert.equal(groups[0].intendedCenter, 'Abuja Centre, Abuja, FCT');
+  assert.deepEqual(groups[0].payments.map(payment => payment.id), ['2', '1']);
+  assert.equal(groups[0].latestPaymentDate, records[1].paymentDate);
+  assert.equal(groups[0].totalPaid, 300.30);
+  assert.equal(groups[1].totalPaid, 0);
+});
 
 test('omits only the specified internal test reference from export rows and totals', () => {
   const internalTest = {...records[0], id:'test', studentId:'test-student', reference:'T505759112493846', amount:50000};
