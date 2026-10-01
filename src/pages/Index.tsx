@@ -7,6 +7,7 @@ import SEOHead from "@/components/SEOHead";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
+import { RegistrationClosingSection } from "@/components/RegistrationClosingCampaign";
 import studentsGroup from "@/assets/students-group.jpeg";
 import studentsWalking from "@/assets/students-walking.jpeg";
 import graduateFemale from "@/assets/graduate-female.jpeg";
@@ -253,6 +254,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      <RegistrationClosingSection />
 
       {/* Stats with counter animation */}
       <section className="bg-gradient-to-br from-primary via-primary to-emerald-900 text-primary-foreground py-14 relative overflow-hidden">
