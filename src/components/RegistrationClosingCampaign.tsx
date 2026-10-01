@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ArrowRight, Check, Clock3, GraduationCap, Phone, ShieldCheck } from 'lucide-react';
-import graduateFemale from '@/assets/graduate-female.jpeg';
+import admissionsGuidance from '@/assets/04-ijmb-admissions-guidance.png';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 
 const WHATSAPP_NUMBER = '2348056994540';
@@ -97,7 +97,7 @@ export function RegistrationClosingSection() {
         </div>
 
         <div className="relative order-1 min-h-[245px] overflow-hidden sm:min-h-[340px] lg:order-2 lg:min-h-full">
-          <Image src={graduateFemale} alt="A graduate celebrating her university achievement" fill sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover object-center" />
+          <Image src={admissionsGuidance} alt="Admissions guidance for an IJMB student and parent" fill placeholder="blur" sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover object-center" />
           <div className="absolute inset-0 bg-gradient-to-t from-[#071f15] via-[#071f15]/20 to-transparent lg:bg-gradient-to-r lg:from-[#0a271b] lg:via-transparent lg:to-transparent" />
           <div className="glass-dark absolute inset-x-4 bottom-4 rounded-2xl p-4 sm:inset-x-6 sm:bottom-6 sm:p-5 lg:inset-x-8 lg:bottom-8">
             <div className="flex items-start gap-3">
@@ -137,7 +137,7 @@ export function CampaignPopup() {
       <DialogContent className="bottom-0 left-0 top-auto max-h-[92dvh] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto overflow-x-hidden rounded-b-none rounded-t-[1.75rem] border border-white/15 bg-[#0b281c]/95 p-0 text-white shadow-2xl backdrop-blur-2xl sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-[2rem] [&>button]:right-4 [&>button]:top-4 [&>button]:z-30 [&>button]:rounded-full [&>button]:bg-black/30 [&>button]:p-2.5 [&>button]:text-white [&>button]:opacity-100 [&>button]:backdrop-blur-md [&>button]:hover:bg-black/50 sm:[&>button]:right-5 sm:[&>button]:top-5">
         <div className="grid sm:grid-cols-[0.8fr_1.2fr]">
           <div className="relative min-h-[150px] sm:min-h-full">
-            <Image src={graduateFemale} alt="Graduate celebrating a successful university journey" fill sizes="(max-width: 640px) 100vw, 260px" className="object-cover object-[center_35%]" />
+            <Image src={admissionsGuidance} alt="Admissions guidance for students and parents" fill placeholder="blur" sizes="(max-width: 640px) 100vw, 260px" className="object-cover object-center" />
             <div className="absolute inset-0 bg-gradient-to-t from-[#0b281c] via-transparent to-black/10 sm:bg-gradient-to-r sm:from-transparent sm:to-[#0b281c]/55" />
             <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/25 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md sm:bottom-6 sm:left-6"><GraduationCap className="h-4 w-4 text-accent" /> Direct Entry pathway</span>
           </div>

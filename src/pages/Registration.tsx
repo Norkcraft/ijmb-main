@@ -1,12 +1,13 @@
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
-import studentLibrary from "@/assets/student-library.jpeg";
+import onlineApplication from "@/assets/09-ijmb-student-online-application.png";
 import { CheckCircle, FileText, ArrowRight } from "lucide-react";
 
 const yr = new Date().getFullYear();
@@ -118,7 +119,13 @@ const Registration = () => (
           <div className="lg:col-span-2">
             <div className="sticky top-24 space-y-6">
               <div className="rounded-2xl overflow-hidden shadow-xl">
-                <img src={studentLibrary.src} alt="Student completing IJMB registration form" className="w-full h-[250px] object-cover" loading="lazy" />
+                <Image
+                  src={onlineApplication}
+                  alt="Student applying for IJMB online"
+                  placeholder="blur"
+                  sizes="(max-width: 1024px) 100vw, 40vw"
+                  className="h-[250px] w-full object-cover"
+                />
               </div>
               <div className="bg-primary text-primary-foreground p-6 rounded-xl">
                 <h3 className="font-heading font-bold text-lg mb-3">Start Your Registration</h3>

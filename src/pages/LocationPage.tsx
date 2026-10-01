@@ -4,13 +4,14 @@ import { useMemo } from "react";
 import { useParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import SEOHead from "@/components/SEOHead";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
-import studentsGroup from "@/assets/students-group.jpeg";
-import studentAnkara from "@/assets/student-ankara.jpeg";
+import outdoorStudy from "@/assets/02-ijmb-outdoor-group-study.png";
+import geographyFieldStudy from "@/assets/10-ijmb-geography-field-study.png";
 import { ArrowRight, CheckCircle, MapPin, Star, GraduationCap } from "lucide-react";
 
 const yr = new Date().getFullYear();
@@ -549,11 +550,12 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
             <div className="lg:col-span-2">
               <div className="sticky top-24 space-y-6">
                 <div className="rounded-2xl overflow-hidden shadow-xl">
-                  <img
-                    src={studentsGroup.src}
-                    alt={`IJMB students at a study centre in ${cityName}`}
-                    className="w-full h-[220px] object-cover"
-                    loading="lazy"
+                  <Image
+                    src={outdoorStudy}
+                    alt={`IJMB students learning together outdoors in ${cityName}`}
+                    placeholder="blur"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="h-[220px] w-full object-cover"
                   />
                 </div>
 
@@ -577,11 +579,12 @@ const LocationPage = ({ city: cityProp }: { city?: string }) => {
                 </div>
 
                 <div className="rounded-2xl overflow-hidden shadow-lg">
-                  <img
-                    src={studentAnkara.src}
-                    alt={`Student preparing for IJMB examinations in ${cityName}`}
-                    className="w-full h-[190px] object-cover"
-                    loading="lazy"
+                  <Image
+                    src={geographyFieldStudy}
+                    alt={`IJMB students participating in a geography field study near ${cityName}`}
+                    placeholder="blur"
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="h-[190px] w-full object-cover"
                   />
                 </div>
 

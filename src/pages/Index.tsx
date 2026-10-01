@@ -1,6 +1,7 @@
 'use client';
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
 import SEOHead from "@/components/SEOHead";
@@ -8,12 +9,10 @@ import FAQSection from "@/components/FAQSection";
 import CTASection from "@/components/CTASection";
 import InternalLinks from "@/components/InternalLinks";
 import { RegistrationClosingSection } from "@/components/RegistrationClosingCampaign";
-import studentsGroup from "@/assets/students-group.jpeg";
-import studentsWalking from "@/assets/students-walking.jpeg";
-import graduateFemale from "@/assets/graduate-female.jpeg";
-import graduateMale from "@/assets/graduate-male.jpeg";
-import studentLibrary from "@/assets/student-library.jpeg";
-import studentsLaptop from "@/assets/students-laptop.jpeg";
+import StudentExperienceGallery from "@/components/StudentExperienceGallery";
+import classroomLearning from "@/assets/01-ijmb-classroom-learning.png";
+import campusLife from "@/assets/03-ijmb-campus-student-life.png";
+import studentsArriving from "@/assets/08-ijmb-students-arriving-for-class.png";
 import { useScrollReveal, useCountUp } from "@/hooks/useScrollReveal";
 import { useAuth } from "@/contexts/AuthContext";
 import { GraduationCap, CheckCircle, BookOpen, Users, ArrowRight, MapPin, Star, ChevronLeft, ChevronRight, LayoutDashboard, Play } from "lucide-react";
@@ -208,7 +207,15 @@ const Index = () => {
       {/* Hero */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         <div className="absolute inset-0">
-          <img src={studentsWalking.src} alt="IJMB students walking on campus in Nigeria" className="w-full h-full object-cover scale-105" />
+          <Image
+            src={studentsArriving}
+            alt="IJMB students arriving for a new day of learning"
+            fill
+            priority
+            placeholder="blur"
+            sizes="100vw"
+            className="object-cover object-center scale-105"
+          />
           <div className="absolute inset-0 hero-overlay" />
           {/* Decorative gradient orb */}
           <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
@@ -316,11 +323,12 @@ const Index = () => {
               <InternalLinks />
             </div>
             <div className="relative group rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
-              <img
-                src={studentsLaptop.src}
-                alt="IJMB students studying A-Level subjects at an accredited study centre in Nigeria"
-                className="w-full h-[220px] sm:h-[320px] lg:h-[400px] object-cover group-hover:scale-105 transition-transform duration-700"
-                loading="lazy"
+              <Image
+                src={classroomLearning}
+                alt="IJMB students learning together in a classroom"
+                placeholder="blur"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="h-[220px] w-full object-cover transition-transform duration-700 group-hover:scale-105 sm:h-[320px] lg:h-[400px]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
@@ -423,6 +431,8 @@ const Index = () => {
         </div>
       </section>
 
+      <StudentExperienceGallery />
+
       {/* Testimonials Slider */}
       <section className="section-padding overflow-hidden">
         <div className="max-w-4xl mx-auto">
@@ -517,11 +527,12 @@ const Index = () => {
         <div ref={centresRef} className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative group rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
-              <img
-                src={studentsGroup.src}
-                alt="IJMB students at a study centre in Nigeria"
-                className="w-full h-[220px] sm:h-[320px] lg:h-[400px] object-cover group-hover:scale-105 transition-transform duration-700"
-                loading="lazy"
+              <Image
+                src={campusLife}
+                alt="IJMB students experiencing student life on campus"
+                placeholder="blur"
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="h-[220px] w-full object-cover transition-transform duration-700 group-hover:scale-105 sm:h-[320px] lg:h-[400px]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             </div>
