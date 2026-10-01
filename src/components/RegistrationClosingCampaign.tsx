@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { ArrowRight, Check, Clock3, GraduationCap, Phone, ShieldCheck } from 'lucide-react';
 import admissionsGuidance from '@/assets/04-ijmb-admissions-guidance.png';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
@@ -13,8 +12,7 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
   'Hello Dynamic College of Advance Studies, I would like to register for IJMB. Please send me the registration details.',
 );
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
-const DISMISSED_KEY = 'ijmb-closing-campaign-dismissed-at';
-const DISMISS_DURATION = 24 * 60 * 60 * 1000;
+const DISMISSED_KEY = 'ijmb-closing-campaign-dismissed-session-v1';
 
 function WhatsAppMark({ className = 'h-5 w-5' }: { className?: string }) {
   return (
@@ -25,21 +23,21 @@ function WhatsAppMark({ className = 'h-5 w-5' }: { className?: string }) {
 }
 
 function rememberDismissal() {
-  window.localStorage.setItem(DISMISSED_KEY, Date.now().toString());
+  window.sessionStorage.setItem(DISMISSED_KEY, 'true');
 }
 
 export function CampaignAnnouncementBar() {
   return (
-    <aside className="relative z-40 overflow-hidden border-b border-white/10 bg-[#0b2419] text-white" aria-label="Registration announcement">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,0.15),transparent_35%)]" />
+    <aside className="relative z-40 overflow-hidden border-b border-red-200 bg-[#fff1f2] text-[#9f1239]" aria-label="Registration announcement">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(190,18,60,0.09),transparent_35%)]" />
       <div className="relative mx-auto flex min-h-12 max-w-7xl items-center justify-between gap-2.5 px-3 py-2 sm:gap-4 sm:px-6 lg:px-8">
         <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-red-200 bg-red-100 text-[#b91c1c]">
             <Clock3 className="h-4 w-4" />
           </span>
           <p className="min-w-0 text-[0.78rem] leading-tight sm:text-sm">
-            <strong className="block font-heading font-extrabold text-white sm:inline">IJMB registration closes soon.</strong>{' '}
-            <span className="hidden text-white/65 sm:inline">Enquiries are still being accepted for this session.</span>
+            <strong className="block font-heading font-extrabold text-[#991b1b] sm:inline">IJMB registration closes soon.</strong>{' '}
+            <span className="hidden text-[#9f1239]/75 sm:inline">Enquiries are still being accepted for this session.</span>
           </p>
         </div>
         <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#25D366] px-3 text-xs font-extrabold text-white shadow-lg shadow-black/15 transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-4">
@@ -116,16 +114,13 @@ export function RegistrationClosingSection() {
 }
 
 export function CampaignPopup() {
-  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (pathname !== '/') return;
-    const dismissedAt = Number(window.localStorage.getItem(DISMISSED_KEY) || 0);
-    if (Date.now() - dismissedAt < DISMISS_DURATION) return;
-    const timer = window.setTimeout(() => setOpen(true), 3500);
+    if (window.sessionStorage.getItem(DISMISSED_KEY)) return;
+    const timer = window.setTimeout(() => setOpen(true), 1200);
     return () => window.clearTimeout(timer);
-  }, [pathname]);
+  }, []);
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
@@ -134,21 +129,21 @@ export function CampaignPopup() {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="bottom-0 left-0 top-auto max-h-[92dvh] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto overflow-x-hidden rounded-b-none rounded-t-[1.75rem] border border-white/15 bg-[#0b281c]/95 p-0 text-white shadow-2xl backdrop-blur-2xl sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-[2rem] [&>button]:right-4 [&>button]:top-4 [&>button]:z-30 [&>button]:rounded-full [&>button]:bg-black/30 [&>button]:p-2.5 [&>button]:text-white [&>button]:opacity-100 [&>button]:backdrop-blur-md [&>button]:hover:bg-black/50 sm:[&>button]:right-5 sm:[&>button]:top-5">
+      <DialogContent className="bottom-0 left-0 top-auto max-h-[92dvh] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto overflow-x-hidden rounded-b-none rounded-t-[1.75rem] border border-red-400/35 bg-[linear-gradient(145deg,rgba(127,29,29,0.98),rgba(69,10,10,0.98))] p-0 text-white shadow-[0_30px_100px_rgba(69,10,10,0.5)] backdrop-blur-2xl sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-[2rem] [&>button]:right-4 [&>button]:top-4 [&>button]:z-30 [&>button]:rounded-full [&>button]:bg-black/30 [&>button]:p-2.5 [&>button]:text-white [&>button]:opacity-100 [&>button]:backdrop-blur-md [&>button]:hover:bg-black/50 sm:[&>button]:right-5 sm:[&>button]:top-5">
         <div className="grid sm:grid-cols-[0.8fr_1.2fr]">
           <div className="relative min-h-[150px] sm:min-h-full">
             <Image src={admissionsGuidance} alt="Admissions guidance for students and parents" fill placeholder="blur" sizes="(max-width: 640px) 100vw, 260px" className="object-cover object-center" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0b281c] via-transparent to-black/10 sm:bg-gradient-to-r sm:from-transparent sm:to-[#0b281c]/55" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#7f1d1d] via-transparent to-black/10 sm:bg-gradient-to-r sm:from-transparent sm:to-[#7f1d1d]/70" />
             <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/25 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md sm:bottom-6 sm:left-6"><GraduationCap className="h-4 w-4 text-accent" /> Direct Entry pathway</span>
           </div>
           <div className="relative px-5 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-9">
-            <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-accent"><Clock3 className="h-3.5 w-3.5" /> Registration closing soon</span>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-white"><Clock3 className="h-3.5 w-3.5" /> Registration closing soon</span>
             <DialogTitle className="font-display mt-4 text-[2rem] font-bold leading-[1.05] text-white sm:text-[2.65rem]">Don&apos;t keep waiting for admission.</DialogTitle>
             <DialogDescription className="mt-3 text-sm leading-6 text-white/70 sm:text-base sm:leading-7">Speak with the admissions team about joining the current IJMB session and your route to Direct Entry university admission.</DialogDescription>
             <ul className="mt-5 space-y-2.5">
               {['Get registration guidance', 'Confirm requirements and study centre', 'Begin your application with confidence'].map((item) => (
                 <li key={item} className="flex items-center gap-2.5 text-sm font-medium text-white/[0.82]">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check className="h-3 w-3 stroke-[3]" /></span>{item}
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white text-[#991b1b]"><Check className="h-3 w-3 stroke-[3]" /></span>{item}
                 </li>
               ))}
             </ul>
