@@ -66,7 +66,7 @@ export function RegistrationClosingSection() {
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(255,255,255,0.08),transparent_34%)]" />
           <div className="relative">
             <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-accent sm:text-sm">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-accent motion-reduce:animate-none" /> Registration update
+              <span className="h-2 w-2 animate-pulse rounded-full bg-accent motion-reduce:animate-none" /> Registration closes soon
             </div>
             <h2 id="registration-closing-title" className="font-display max-w-2xl text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-[3.45rem]">
               Still waiting for admission?
@@ -137,8 +137,8 @@ export function CampaignPopup() {
             <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/25 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md sm:bottom-6 sm:left-6"><GraduationCap className="h-4 w-4 text-accent" /> Direct Entry pathway</span>
           </div>
           <div className="relative px-5 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-9">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-white"><Clock3 className="h-3.5 w-3.5" /> Registration closing soon</span>
-            <DialogTitle className="font-display mt-4 text-[2rem] font-bold leading-[1.05] text-white sm:text-[2.65rem]">Don&apos;t keep waiting for admission.</DialogTitle>
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-white"><Clock3 className="h-3.5 w-3.5" /> Registration closes soon</span>
+            <DialogTitle className="font-display mt-4 text-[2rem] font-bold leading-[1.05] text-white sm:text-[2.65rem]">Registration closes soon.</DialogTitle>
             <DialogDescription className="mt-3 text-sm leading-6 text-white/70 sm:text-base sm:leading-7">Speak with the admissions team about joining the current IJMB session and your route to Direct Entry university admission.</DialogDescription>
             <ul className="mt-5 space-y-2.5">
               {['Get registration guidance', 'Confirm requirements and study centre', 'Begin your application with confidence'].map((item) => (
