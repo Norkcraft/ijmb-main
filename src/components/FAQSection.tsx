@@ -38,22 +38,21 @@ const FAQSection = ({ title = "Frequently Asked Questions", faqs, showSchema = t
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       )}
-      <div className="absolute inset-0 pattern-dots opacity-30 pointer-events-none" />
       <div className="relative container-narrow">
-        <div className="text-center mb-12">
+        <div className="mx-auto mb-12 max-w-2xl text-center">
           <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">Got Questions?</p>
-          <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">{title}</h2>
+          <h2 className="font-display mb-4 text-4xl font-bold leading-tight lg:text-5xl">{title}</h2>
           <p className="text-muted-foreground max-w-xl mx-auto">
             Everything you need to know about the IJMB programme and registration process.
           </p>
         </div>
-        <Accordion type="single" collapsible className="max-w-3xl mx-auto space-y-3">
+        <Accordion type="single" collapsible className="mx-auto max-w-3xl space-y-3">
           {faqs.map((faq, i) => (
-            <AccordionItem key={i} value={`faq-${i}`} className="border border-border/60 rounded-xl px-5 bg-card shadow-sm data-[state=open]:shadow-md transition-shadow">
-              <AccordionTrigger className="text-left font-medium text-base hover:no-underline py-5">
+            <AccordionItem key={i} value={`faq-${i}`} className="rounded-2xl border border-border/75 bg-card px-5 shadow-[0_8px_28px_rgba(11,54,36,0.04)] transition-all data-[state=open]:border-primary/20 data-[state=open]:shadow-[0_14px_36px_rgba(11,54,36,0.08)] sm:px-6">
+              <AccordionTrigger className="py-5 text-left text-base font-bold hover:no-underline sm:py-6">
                 {faq.question}
               </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground leading-relaxed pb-5">
+              <AccordionContent className="pb-5 leading-relaxed text-muted-foreground sm:pb-6">
                 {faq.answer}
               </AccordionContent>
             </AccordionItem>

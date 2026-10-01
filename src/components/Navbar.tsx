@@ -57,9 +57,9 @@ const Navbar = () => {
   const dashboardHref = isAdmin ? '/portal-admin' : '/dashboard';
 
   return (
-    <nav className="nav-glass sticky top-0 z-50 border-b border-white/50">
+    <nav className="nav-glass sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 lg:h-[72px]">
+        <div className="flex h-[4.5rem] items-center justify-between lg:h-20">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 shrink-0" aria-label="IJMB Home">
@@ -68,7 +68,7 @@ const Navbar = () => {
               alt="IJMB Logo"
               width={48}
               height={48}
-              className="h-10 w-10 lg:h-12 lg:w-12 rounded-full object-cover ring-2 ring-primary/20"
+              className="h-10 w-10 rounded-xl object-cover ring-1 ring-primary/15 lg:h-11 lg:w-11"
             />
             <div className="hidden sm:block">
               <span className="font-heading font-bold text-lg lg:text-xl text-primary leading-none block">IJMB</span>
@@ -83,10 +83,10 @@ const Navbar = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  className={`rounded-full px-3.5 py-2 text-sm font-semibold transition-colors ${
                     pathname === link.href
-                      ? "text-primary bg-primary/8"
-                      : "text-muted-foreground hover:text-primary hover:bg-secondary"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-secondary hover:text-primary"
                   }`}
                 >
                   {link.label}
@@ -188,7 +188,7 @@ const Navbar = () => {
                 </Link>
                 <Link
                   href="/register"
-                  className="px-5 py-2.5 text-sm font-bold rounded-lg cta-gradient text-accent-foreground transition-all"
+                  className="rounded-full px-5 py-2.5 text-sm font-extrabold cta-gradient text-accent-foreground transition-all"
                 >
                   Register Now →
                 </Link>

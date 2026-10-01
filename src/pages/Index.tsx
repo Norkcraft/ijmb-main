@@ -62,11 +62,11 @@ const faqs = [
 const StatItem = ({ value, suffix, label }: { value: number; suffix: string; label: string }) => {
   const countRef = useCountUp(value);
   return (
-    <div className="relative p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-      <div className="text-3xl lg:text-4xl font-heading font-bold text-accent">
+    <div className="relative rounded-2xl border border-border/80 bg-white p-5 text-left shadow-[0_12px_35px_rgba(11,54,36,0.06)] sm:p-6">
+      <div className="text-3xl font-heading font-extrabold text-primary lg:text-4xl">
         <span ref={countRef as React.RefObject<HTMLSpanElement>}>0</span>{suffix}
       </div>
-      <div className="text-sm mt-1.5 opacity-80 font-medium">{label}</div>
+      <div className="mt-1.5 text-sm font-semibold text-muted-foreground">{label}</div>
     </div>
   );
 };
@@ -205,7 +205,7 @@ const Index = () => {
       )}
 
       {/* Hero */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative flex min-h-[calc(100svh-7.5rem)] items-center overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src={studentsArriving}
@@ -218,42 +218,40 @@ const Index = () => {
           />
           <div className="absolute inset-0 hero-overlay" />
           {/* Decorative gradient orb */}
-          <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
         </div>
-        <div ref={heroRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24">
-          <div className="glass-dark max-w-3xl rounded-[1.75rem] p-5 sm:p-8 lg:p-10">
-            <span className="hero-badge inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-accent/90 text-accent-foreground rounded-full mb-8 shadow-lg glow-accent backdrop-blur-sm">
+        <div ref={heroRef} className="relative z-10 mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8 lg:py-32">
+          <div className="max-w-3xl">
+            <span className="hero-badge mb-7 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-bold text-white backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-accent-foreground/60 animate-pulse" />
               {YEAR} Registration Now Open
             </span>
-            <h1 className="font-display text-4xl font-bold leading-[1.04] text-primary-foreground sm:text-5xl lg:text-[3.5rem] xl:text-6xl mb-6">
+            <h1 className="font-display mb-6 text-4xl font-bold leading-[1.02] text-primary-foreground sm:text-5xl lg:text-[3.75rem] xl:text-[4.25rem]">
               IJMB Registration {YEAR} —{" "}
               <span className="text-accent drop-shadow-sm">200 Level Without UTME</span>
             </h1>
-            <p className="hero-desc text-lg lg:text-xl mb-10 leading-relaxed text-primary-foreground/85 max-w-2xl">
+            <p className="hero-desc mb-9 max-w-2xl text-base leading-7 text-primary-foreground/80 sm:text-lg sm:leading-8 lg:text-xl">
               The IJMB A-Level programme is Nigeria's most trusted path to Direct Entry university admission.
               Skip UTME, enter 200 level, and join 50,000+ students who have already gained admission through IJMB.
             </p>
-            <div className="hero-btns flex flex-col sm:flex-row gap-4">
+            <div className="hero-btns flex flex-col gap-3 sm:flex-row">
               {isStudent ? (
                 <Link
                   href="/dashboard"
-                  className="px-8 py-4 font-bold text-base rounded-xl cta-gradient text-accent-foreground transition-all inline-flex items-center justify-center gap-2"
+                  className="inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-base font-extrabold cta-gradient text-accent-foreground transition-all"
                 >
                   <LayoutDashboard size={18} /> Go to My Dashboard
                 </Link>
               ) : (
                 <Link
                   href="/register"
-                  className="px-8 py-4 font-bold text-base rounded-xl cta-gradient text-accent-foreground transition-all inline-flex items-center justify-center gap-2 group"
+                  className="group inline-flex items-center justify-center gap-2 rounded-full px-7 py-4 text-base font-extrabold cta-gradient text-accent-foreground transition-all"
                 >
                   Register Now <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
               )}
               <Link
                 href="/ijmb-admission-requirements"
-                className="px-8 py-4 font-bold text-base rounded-xl border-2 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 hover:border-primary-foreground/50 transition-all inline-flex items-center justify-center backdrop-blur-sm"
+                className="inline-flex items-center justify-center rounded-full border border-white/25 bg-white/[0.06] px-7 py-4 text-base font-bold text-primary-foreground backdrop-blur-md transition-all hover:border-white/45 hover:bg-white/10"
               >
                 View Requirements
               </Link>
@@ -262,13 +260,10 @@ const Index = () => {
         </div>
       </section>
 
-      <RegistrationClosingSection />
-
       {/* Stats with counter animation */}
-      <section className="bg-gradient-to-br from-primary via-primary to-emerald-900 text-primary-foreground py-14 relative overflow-hidden">
-        <div className="absolute inset-0 pattern-dots opacity-30 pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 text-center">
+      <section className="relative border-b border-border/60 bg-[#f5f9f6] py-10 sm:py-12">
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {stats.map((s) => (
               <StatItem key={s.label} {...s} />
             ))}
@@ -277,7 +272,7 @@ const Index = () => {
       </section>
 
       {/* Trust Bar */}
-      <section className="border-y border-border/60 bg-muted/40 py-5">
+      <section className="border-b border-border/60 bg-background py-5">
         <div className="max-w-7xl mx-auto">
           <div className="overflow-x-auto scrollbar-none">
             <div className="flex items-center gap-x-6 sm:flex-wrap sm:justify-center sm:gap-x-10 sm:gap-y-3 px-4 sm:px-6 lg:px-8 text-sm text-muted-foreground w-max sm:w-auto">
@@ -301,10 +296,10 @@ const Index = () => {
       {/* What is IJMB */}
       <section className="section-padding">
         <div ref={whatIsRef} className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
             <div>
               <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">About the Programme</p>
-              <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-6">
+              <h2 className="font-display mb-6 text-4xl font-bold leading-tight lg:text-5xl">
                 What is <span className="text-primary">IJMB</span>?
               </h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
@@ -322,7 +317,7 @@ const Index = () => {
               </p>
               <InternalLinks />
             </div>
-            <div className="relative group rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow duration-500">
+            <div className="group relative overflow-hidden rounded-[2rem] border border-border/60 shadow-[0_24px_60px_rgba(11,54,36,0.12)] transition-shadow duration-500 hover:shadow-[0_30px_75px_rgba(11,54,36,0.17)]">
               <Image
                 src={classroomLearning}
                 alt="IJMB students learning together in a classroom"
@@ -338,22 +333,21 @@ const Index = () => {
 
       {/* Why IJMB */}
       <section className="section-alt section-padding relative overflow-hidden">
-        <div className="absolute inset-0 pattern-dots opacity-40 pointer-events-none" />
         <div className="relative max-w-7xl mx-auto">
-          <div className="text-center mb-14">
+          <div className="mb-12 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">Why IJMB</p>
-            <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">
+            <h2 className="font-display mb-4 text-4xl font-bold leading-tight lg:text-5xl">
               Why Choose IJMB Over UTME?
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="max-w-2xl text-muted-foreground">
               IJMB gives you a faster, more reliable route to university admission in Nigeria — without the annual JAMB cycle.
             </p>
           </div>
           <div ref={benefitsRef} className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {benefits.map((b) => (
-              <div key={b.title} className="card-elevated p-6 group">
-                <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/15 group-hover:scale-110 transition-all duration-300">
-                  <b.icon className="text-primary" size={22} />
+              <div key={b.title} className="card-elevated group p-6 lg:p-7">
+                <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-full bg-primary/10 transition-all duration-300 group-hover:bg-primary group-hover:text-white">
+                  <b.icon className="text-primary transition-colors group-hover:text-white" size={22} />
                 </div>
                 <h3 className="font-heading font-bold text-lg mb-2">{b.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{b.desc}</p>
@@ -366,38 +360,40 @@ const Index = () => {
       {/* How to Register - 3-step public flow */}
       <section className="section-padding">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
+          <div className="mb-12 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-widest text-primary mb-3">How It Works</p>
-            <h2 className="text-3xl lg:text-4xl font-heading font-bold mb-4">
+            <h2 className="font-display mb-4 text-4xl font-bold leading-tight lg:text-5xl">
               How to Register for IJMB {YEAR}
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="max-w-2xl text-muted-foreground">
               IJMB registration is straightforward. Complete these three steps online and start your Direct Entry journey today.
             </p>
           </div>
           <div ref={stepsRef} className="grid sm:grid-cols-3 gap-6 lg:gap-8">
             {publicSteps.map((s, i) => (
-              <div key={s.num} className="relative text-center card-elevated p-8">
+              <div key={s.num} className="card-elevated relative p-7 text-left lg:p-8">
                 {/* Connector line between steps on desktop */}
                 {i < publicSteps.length - 1 && (
-                  <div className="hidden sm:block absolute top-12 -right-3 lg:-right-4 w-6 lg:w-8 h-0.5 bg-primary/15" />
+                  <div className="absolute -right-3 top-12 hidden h-px w-6 bg-primary/15 sm:block lg:-right-4 lg:w-8" />
                 )}
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 text-primary font-heading font-bold text-xl mb-4">{s.num}</div>
+                <div className="mb-5 inline-flex h-10 min-w-10 items-center justify-center rounded-full bg-primary px-3 font-heading text-sm font-extrabold text-primary-foreground">{s.num}</div>
                 <h3 className="font-heading font-bold text-xl mb-3">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
               </div>
             ))}
           </div>
-          <div className="text-center mt-12">
+          <div className="mt-10">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 px-8 py-4 font-bold rounded-xl cta-gradient text-accent-foreground transition-all group"
+              className="group inline-flex items-center gap-2 rounded-full px-7 py-4 font-extrabold cta-gradient text-accent-foreground transition-all"
             >
               Start Registration <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>
       </section>
+
+      <RegistrationClosingSection />
 
       {/* Video Tutorial */}
       <section className="section-alt section-padding relative overflow-hidden">
