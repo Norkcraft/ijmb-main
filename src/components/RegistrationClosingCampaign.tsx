@@ -1,22 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ArrowRight, Check, Clock3, MessageCircle, Phone } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { ArrowRight, Check, Clock3, GraduationCap, Phone, ShieldCheck } from 'lucide-react';
+import graduateFemale from '@/assets/graduate-female.jpeg';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 
 const WHATSAPP_NUMBER = '2348056994540';
 const WHATSAPP_MESSAGE = encodeURIComponent(
-  'Hello Dynamic College of Advance Studies, I want to register for IJMB. Please send me the registration details.',
+  'Hello Dynamic College of Advance Studies, I would like to register for IJMB. Please send me the registration details.',
 );
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
-const DISMISSED_KEY = 'ijmb-closing-campaign-dismissed';
+const DISMISSED_KEY = 'ijmb-closing-campaign-dismissed-at';
+const DISMISS_DURATION = 24 * 60 * 60 * 1000;
 
 function WhatsAppMark({ className = 'h-5 w-5' }: { className?: string }) {
   return (
@@ -26,89 +24,90 @@ function WhatsAppMark({ className = 'h-5 w-5' }: { className?: string }) {
   );
 }
 
+function rememberDismissal() {
+  window.localStorage.setItem(DISMISSED_KEY, Date.now().toString());
+}
+
 export function CampaignAnnouncementBar() {
   return (
-    <aside className="relative z-40 overflow-hidden bg-[#102a20] text-white" aria-label="Registration announcement">
-      <div className="absolute inset-y-0 left-0 w-1 bg-accent" />
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 sm:px-6 lg:px-8">
-        <div className="flex min-w-0 items-center gap-3">
-          <span className="hidden h-8 w-8 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground sm:flex">
+    <aside className="relative z-40 overflow-hidden border-b border-white/10 bg-[#0b2419] text-white" aria-label="Registration announcement">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,0.15),transparent_35%)]" />
+      <div className="relative mx-auto flex min-h-12 max-w-7xl items-center justify-between gap-2.5 px-3 py-2 sm:gap-4 sm:px-6 lg:px-8">
+        <div className="flex min-w-0 items-center gap-2.5 sm:gap-3">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-accent/30 bg-accent/10 text-accent">
             <Clock3 className="h-4 w-4" />
           </span>
-          <p className="text-sm leading-snug">
-            <strong className="font-heading text-accent">IJMB registration is closing soon.</strong>{' '}
-            <span className="hidden text-white/75 md:inline">Secure your place for this session while enrolment is still open.</span>
+          <p className="min-w-0 text-[0.78rem] leading-tight sm:text-sm">
+            <strong className="block font-heading font-extrabold text-white sm:inline">IJMB registration closes soon.</strong>{' '}
+            <span className="hidden text-white/65 sm:inline">Enquiries are still being accepted for this session.</span>
           </p>
         </div>
-        <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#25D366] px-3.5 py-2 text-xs font-bold text-white transition hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-        >
+        <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 shrink-0 items-center justify-center gap-1.5 rounded-full bg-[#25D366] px-3 text-xs font-extrabold text-white shadow-lg shadow-black/15 transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:px-4">
           <WhatsAppMark className="h-4 w-4" />
-          <span className="hidden sm:inline">WhatsApp us</span>
-          <span className="sm:hidden">Enquire</span>
+          <span className="hidden min-[390px]:inline">WhatsApp</span>
         </a>
       </div>
     </aside>
   );
 }
 
+const nextSteps = [
+  'Confirm that you meet the entry requirements',
+  'Choose a suitable accredited study centre',
+  'Complete your registration for this session',
+];
+
 export function RegistrationClosingSection() {
   return (
-    <section className="relative overflow-hidden bg-[#f6faf7] px-4 py-14 sm:px-6 lg:px-8 lg:py-20" aria-labelledby="registration-closing-title">
-      <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-accent/15 blur-3xl" />
-      <div className="pointer-events-none absolute -bottom-28 -left-20 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-      <div className="relative mx-auto grid max-w-7xl overflow-hidden rounded-[2rem] bg-[#102a20] text-white shadow-2xl shadow-primary/15 lg:grid-cols-[1.25fr_0.75fr]">
-        <div className="relative p-7 sm:p-10 lg:p-14">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3.5 py-2 text-sm font-bold text-accent">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-accent" />
-            Limited registration window
-          </div>
-          <h2 id="registration-closing-title" className="max-w-2xl text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
-            Still waiting for admission? <span className="text-accent">This is your next step.</span>
-          </h2>
-          <p className="mt-5 max-w-2xl text-base leading-relaxed text-white/75 sm:text-lg">
-            IJMB offers an alternative pathway into university through Direct Entry. Registration for this session is closing soon, so now is the time to secure your place.
-          </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#25D366] px-6 py-3.5 font-bold text-white shadow-lg shadow-black/15 transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              <WhatsAppMark /> Send WhatsApp message
-            </a>
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/5 px-6 py-3.5 font-bold text-white transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              Register online <ArrowRight className="h-4 w-4" />
-            </Link>
+    <section className="relative overflow-hidden bg-[linear-gradient(180deg,#f8fbf9_0%,#eef7f1_100%)] px-3 py-12 sm:px-6 sm:py-16 lg:px-8 lg:py-24" aria-labelledby="registration-closing-title">
+      <div className="pointer-events-none absolute -left-32 top-20 h-80 w-80 rounded-full bg-primary/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-accent/15 blur-3xl" />
+
+      <div className="relative mx-auto grid max-w-7xl overflow-hidden rounded-[1.6rem] border border-white/70 bg-[#0a271b] text-white shadow-[0_32px_90px_rgba(7,45,29,0.24)] sm:rounded-[2.25rem] lg:grid-cols-[1.08fr_0.92fr]">
+        <div className="relative order-2 px-5 py-8 sm:px-9 sm:py-11 lg:order-1 lg:px-14 lg:py-16">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_10%_10%,rgba(255,255,255,0.08),transparent_34%)]" />
+          <div className="relative">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-accent sm:text-sm">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-accent motion-reduce:animate-none" /> Registration update
+            </div>
+            <h2 id="registration-closing-title" className="font-display max-w-2xl text-[2.15rem] font-bold leading-[1.05] sm:text-5xl lg:text-[3.45rem]">
+              Still waiting for admission?
+              <span className="mt-1 block text-accent">Your IJMB journey can start now.</span>
+            </h2>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg sm:leading-8">
+              IJMB provides an established Direct Entry route into Nigerian universities. Registration for the current session is closing soon, and prospective students, parents and guardians can still speak with our admissions team.
+            </p>
+            <div className="mt-7 grid gap-2.5 sm:grid-cols-3">
+              {nextSteps.map((item, index) => (
+                <div key={item} className="rounded-2xl border border-white/10 bg-white/[0.065] p-3.5 backdrop-blur-md">
+                  <span className="mb-2 flex h-7 w-7 items-center justify-center rounded-full bg-accent font-heading text-xs font-black text-accent-foreground">{index + 1}</span>
+                  <p className="text-sm leading-5 text-white/80">{item}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-6 py-4 font-extrabold text-white shadow-xl shadow-black/20 transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                <WhatsAppMark /> Send WhatsApp message
+              </a>
+              <Link href="/register" className="inline-flex min-h-[3.25rem] items-center justify-center gap-2 rounded-2xl border border-white/15 bg-white/[0.07] px-6 py-4 font-bold text-white backdrop-blur-lg transition hover:bg-white/[0.12] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white">
+                Register online <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
         </div>
 
-        <div className="flex flex-col justify-between border-t border-white/10 bg-white/[0.055] p-7 sm:p-10 lg:border-l lg:border-t-0 lg:p-12">
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">Why act now</p>
-            <ul className="mt-6 space-y-4">
-              {['Secure your place for this session', 'Start your IJMB journey', 'Take a proactive step towards university admission'].map((item) => (
-                <li key={item} className="flex items-start gap-3 text-white/85">
-                  <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground">
-                    <Check className="h-3.5 w-3.5 stroke-[3]" />
-                  </span>
-                  <span className="leading-relaxed">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="mt-10 border-t border-white/10 pt-6">
-            <p className="font-heading text-sm font-bold uppercase tracking-wide text-white">Dynamic College of Advance Studies</p>
-            <a href="tel:+2348056994540" className="mt-2 inline-flex items-center gap-2 text-lg font-bold text-accent hover:underline">
-              <Phone className="h-4 w-4" /> 0805 699 4540
-            </a>
+        <div className="relative order-1 min-h-[245px] overflow-hidden sm:min-h-[340px] lg:order-2 lg:min-h-full">
+          <Image src={graduateFemale} alt="A graduate celebrating her university achievement" fill sizes="(max-width: 1024px) 100vw, 42vw" className="object-cover object-center" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#071f15] via-[#071f15]/20 to-transparent lg:bg-gradient-to-r lg:from-[#0a271b] lg:via-transparent lg:to-transparent" />
+          <div className="glass-dark absolute inset-x-4 bottom-4 rounded-2xl p-4 sm:inset-x-6 sm:bottom-6 sm:p-5 lg:inset-x-8 lg:bottom-8">
+            <div className="flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-accent text-accent-foreground"><ShieldCheck className="h-5 w-5" /></span>
+              <div className="min-w-0">
+                <p className="font-heading text-sm font-extrabold text-white sm:text-base">Dynamic College of Advance Studies</p>
+                <p className="mt-1 text-xs leading-relaxed text-white/65 sm:text-sm">Registration support for prospective IJMB students.</p>
+                <a href="tel:+2348056994540" className="mt-2 inline-flex items-center gap-1.5 text-sm font-extrabold text-accent hover:underline sm:text-base"><Phone className="h-4 w-4" /> 0805 699 4540</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -122,56 +121,41 @@ export function CampaignPopup() {
 
   useEffect(() => {
     if (pathname !== '/') return;
-    if (window.sessionStorage.getItem(DISMISSED_KEY)) return;
-
-    const timer = window.setTimeout(() => setOpen(true), 1800);
+    const dismissedAt = Number(window.localStorage.getItem(DISMISSED_KEY) || 0);
+    if (Date.now() - dismissedAt < DISMISS_DURATION) return;
+    const timer = window.setTimeout(() => setOpen(true), 3500);
     return () => window.clearTimeout(timer);
   }, [pathname]);
 
   const handleOpenChange = (nextOpen: boolean) => {
     setOpen(nextOpen);
-    if (!nextOpen) window.sessionStorage.setItem(DISMISSED_KEY, 'true');
+    if (!nextOpen) rememberDismissal();
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-h-[90vh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto overflow-hidden border-0 bg-[#102a20] p-0 text-white shadow-2xl sm:rounded-[1.75rem] [&>button]:right-5 [&>button]:top-5 [&>button]:z-20 [&>button]:rounded-full [&>button]:bg-white/10 [&>button]:p-2 [&>button]:text-white [&>button]:opacity-100 [&>button]:hover:bg-white/20">
-        <div className="relative overflow-hidden px-6 pb-7 pt-10 sm:px-9 sm:pb-9 sm:pt-12">
-          <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-accent/20 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-28 -left-20 h-64 w-64 rounded-full bg-[#25D366]/15 blur-3xl" />
-          <div className="relative">
-            <span className="inline-flex items-center gap-2 rounded-full bg-accent px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-accent-foreground">
-              <Clock3 className="h-3.5 w-3.5" /> Closing soon
-            </span>
-            <DialogTitle className="mt-5 max-w-md font-heading text-3xl font-bold leading-tight text-white sm:text-4xl">
-              Don&apos;t let this admission opportunity pass you by.
-            </DialogTitle>
-            <DialogDescription className="mt-4 text-base leading-relaxed text-white/70">
-              IJMB registration for this session is running out. Secure your place and take a practical step towards Direct Entry university admission.
-            </DialogDescription>
-
-            <div className="my-6 grid gap-2.5 sm:grid-cols-3">
-              {['Secure your place', 'Start your journey', 'Move towards admission'].map((item) => (
-                <div key={item} className="flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.06] px-3 py-3 text-sm font-medium text-white/85">
-                  <Check className="h-4 w-4 shrink-0 text-accent" /> {item}
-                </div>
+      <DialogContent className="bottom-0 left-0 top-auto max-h-[92dvh] w-full max-w-none translate-x-0 translate-y-0 overflow-y-auto overflow-x-hidden rounded-b-none rounded-t-[1.75rem] border border-white/15 bg-[#0b281c]/95 p-0 text-white shadow-2xl backdrop-blur-2xl sm:bottom-auto sm:left-[50%] sm:top-[50%] sm:w-[calc(100%-2rem)] sm:max-w-2xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-[2rem] [&>button]:right-4 [&>button]:top-4 [&>button]:z-30 [&>button]:rounded-full [&>button]:bg-black/30 [&>button]:p-2.5 [&>button]:text-white [&>button]:opacity-100 [&>button]:backdrop-blur-md [&>button]:hover:bg-black/50 sm:[&>button]:right-5 sm:[&>button]:top-5">
+        <div className="grid sm:grid-cols-[0.8fr_1.2fr]">
+          <div className="relative min-h-[150px] sm:min-h-full">
+            <Image src={graduateFemale} alt="Graduate celebrating a successful university journey" fill sizes="(max-width: 640px) 100vw, 260px" className="object-cover object-[center_35%]" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0b281c] via-transparent to-black/10 sm:bg-gradient-to-r sm:from-transparent sm:to-[#0b281c]/55" />
+            <span className="absolute bottom-4 left-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/25 px-3 py-1.5 text-xs font-bold text-white backdrop-blur-md sm:bottom-6 sm:left-6"><GraduationCap className="h-4 w-4 text-accent" /> Direct Entry pathway</span>
+          </div>
+          <div className="relative px-5 pb-6 pt-5 sm:px-8 sm:pb-8 sm:pt-9">
+            <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/10 px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider text-accent"><Clock3 className="h-3.5 w-3.5" /> Registration closing soon</span>
+            <DialogTitle className="font-display mt-4 text-[2rem] font-bold leading-[1.05] text-white sm:text-[2.65rem]">Don&apos;t keep waiting for admission.</DialogTitle>
+            <DialogDescription className="mt-3 text-sm leading-6 text-white/70 sm:text-base sm:leading-7">Speak with the admissions team about joining the current IJMB session and your route to Direct Entry university admission.</DialogDescription>
+            <ul className="mt-5 space-y-2.5">
+              {['Get registration guidance', 'Confirm requirements and study centre', 'Begin your application with confidence'].map((item) => (
+                <li key={item} className="flex items-center gap-2.5 text-sm font-medium text-white/[0.82]">
+                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-accent text-accent-foreground"><Check className="h-3 w-3 stroke-[3]" /></span>{item}
+                </li>
               ))}
-            </div>
-
-            <a
-              href={WHATSAPP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => window.sessionStorage.setItem(DISMISSED_KEY, 'true')}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-black/20 transition hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
-            >
-              <WhatsAppMark /> Send WhatsApp message
-            </a>
-            <div className="mt-4 flex flex-col items-center justify-between gap-2 text-center sm:flex-row sm:text-left">
-              <p className="text-xs font-semibold uppercase tracking-wide text-white/55">Dynamic College of Advance Studies</p>
-              <a href="tel:+2348056994540" className="inline-flex items-center gap-1.5 text-sm font-bold text-accent hover:underline">
-                <Phone className="h-3.5 w-3.5" /> 0805 699 4540
-              </a>
+            </ul>
+            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" onClick={rememberDismissal} className="mt-6 flex min-h-[3.25rem] w-full items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 py-4 text-base font-extrabold text-white shadow-lg shadow-black/20 transition hover:-translate-y-0.5 hover:bg-[#20bd5a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"><WhatsAppMark /> Send WhatsApp message</a>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-4">
+              <p className="text-xs font-bold text-white/55">Dynamic College of Advance Studies</p>
+              <a href="tel:+2348056994540" className="inline-flex items-center gap-1.5 text-sm font-extrabold text-accent hover:underline"><Phone className="h-3.5 w-3.5" /> 0805 699 4540</a>
             </div>
           </div>
         </div>

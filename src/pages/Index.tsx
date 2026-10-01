@@ -215,12 +215,12 @@ const Index = () => {
           <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-primary/10 blur-3xl pointer-events-none" />
         </div>
         <div ref={heroRef} className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-24">
-          <div className="max-w-3xl">
+          <div className="glass-dark max-w-3xl rounded-[1.75rem] p-5 sm:p-8 lg:p-10">
             <span className="hero-badge inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-accent/90 text-accent-foreground rounded-full mb-8 shadow-lg glow-accent backdrop-blur-sm">
               <span className="w-2 h-2 rounded-full bg-accent-foreground/60 animate-pulse" />
               {YEAR} Registration Now Open
             </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-[3.5rem] xl:text-6xl font-heading font-bold leading-[1.1] mb-6 text-primary-foreground">
+            <h1 className="font-display text-4xl font-bold leading-[1.04] text-primary-foreground sm:text-5xl lg:text-[3.5rem] xl:text-6xl mb-6">
               IJMB Registration {YEAR} —{" "}
               <span className="text-accent drop-shadow-sm">200 Level Without UTME</span>
             </h1>

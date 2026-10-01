@@ -57,7 +57,7 @@ const Navbar = () => {
   const dashboardHref = isAdmin ? '/portal-admin' : '/dashboard';
 
   return (
-    <nav className="sticky top-0 z-50 bg-background/80 backdrop-blur-xl backdrop-saturate-150 border-b border-border/60 shadow-sm">
+    <nav className="nav-glass sticky top-0 z-50 border-b border-white/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-[72px]">
 

@@ -1,18 +1,24 @@
 import type { Metadata } from 'next';
-import { Space_Grotesk, DM_Sans } from 'next/font/google';
+import { Manrope, Playfair_Display, Plus_Jakarta_Sans } from 'next/font/google';
 import './globals.css';
 import Providers from '@/components/Providers';
 import AppShell from '@/components/AppShell';
 
-const spaceGrotesk = Space_Grotesk({
+const manrope = Manrope({
   subsets: ['latin'],
   variable: '--font-heading',
   display: 'swap',
 });
 
-const dmSans = DM_Sans({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-body',
+  display: 'swap',
+});
+
+const playfairDisplay = Playfair_Display({
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -55,7 +61,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${dmSans.variable}`}>
+    <html lang="en" className={`${manrope.variable} ${plusJakartaSans.variable} ${playfairDisplay.variable}`}>
       <body>
         <Providers>
           <AppShell>{children}</AppShell>
