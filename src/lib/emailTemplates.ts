@@ -134,14 +134,25 @@ export function paymentConfirmationEmail(
   reference: string,
   paymentType: 'form_fee' | 'tuition' | 'hostel' | string
 ) {
+  const isTuitionPayment = paymentType === 'tuition' || paymentType === 'tuition_fee';
   const typeLabel = paymentType === 'form_fee' ? 'IJMB Registration Form Fee'
-    : paymentType === 'tuition' ? 'IJMB Tuition Fee'
-    : paymentType === 'hostel'  ? 'IJMB Hostel Fee'
+    : isTuitionPayment ? 'IJMB Tuition Fee'
+    : paymentType === 'hostel' || paymentType === 'hostel_fee' ? 'IJMB Hostel Fee'
+    : paymentType === 'acceptance_fee' ? 'IJMB Acceptance Fee'
+    : paymentType === 'exam_fee' ? 'IJMB Examination Fee'
     : 'Payment';
 
   const nextStep = paymentType === 'form_fee'
     ? 'Complete your application form and upload your documents on your dashboard.'
+    : isTuitionPayment
+      ? 'Your tuition payment is confirmed. Your school requirements, declaration form, lecture timetable, and oath-swearing document are available under Dashboard → Documents.'
     : 'Your payment has been recorded. View your payment history on your dashboard.';
+
+  const dashboardUrl = isTuitionPayment
+    ? `${SITE}/dashboard?tab=documents`
+    : `${SITE}/dashboard`;
+
+  const ctaLabel = isTuitionPayment ? 'View My Documents' : 'View My Dashboard';
 
   const body = `
     ${header('Payment Confirmed', 'Your payment has been received')}
@@ -168,7 +179,7 @@ export function paymentConfirmationEmail(
         <p style="margin:4px 0 0;font-size:13px;color:#92400e">${nextStep}</p>
       </div>
 
-      ${ctaButton('View My Dashboard', `${SITE}/dashboard`)}
+      ${ctaButton(ctaLabel, dashboardUrl)}
       <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px">
         Save this email as your receipt &mdash; Ref: <strong>${esc(reference)}</strong>
       </p>

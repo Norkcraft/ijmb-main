@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { paymentConfirmationEmail } from '@/lib/emailTemplates';
+import { sendEmail } from '@/lib/resendClient';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,9 +29,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ message: 'Payment not found' }, { status: 404 });
     }
 
+    if (payment.status === 'success') {
+      return NextResponse.json({ message: 'Payment already confirmed' });
+    }
+
     await supabase.from('payments').update({ status: 'success' }).eq('id', paymentId);
 
-    const paymentType = payment.metadata?.payment_type;
+    const paymentType = payment.metadata?.payment_type || payment.fee_type || payment.type;
     const appId = payment.application_id;
 
     if (appId && paymentType) {
@@ -49,6 +55,28 @@ export async function POST(request: NextRequest) {
       }
 
       await supabase.from('applications').update(updates).eq('id', appId);
+    }
+
+    if (paymentType === 'tuition_fee' && payment.user_id) {
+      const [{ data: profile }, { data: authUser }] = await Promise.all([
+        supabase.from('profiles').select('full_name, email').eq('id', payment.user_id).maybeSingle(),
+        supabase.auth.admin.getUserById(payment.user_id),
+      ]);
+      const recipient = profile?.email || authUser?.user?.email;
+      if (recipient) {
+        const { html, subject } = paymentConfirmationEmail(
+          profile?.full_name || 'Student',
+          Number(payment.amount),
+          payment.reference,
+          paymentType,
+        );
+        await sendEmail({
+          to: recipient,
+          subject,
+          html,
+          emailType: 'payment_confirmation',
+        });
+      }
     }
 
     return NextResponse.json({ message: 'Payment confirmed' });

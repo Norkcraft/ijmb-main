@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendEmail } from '@/lib/resendClient';
+import { paymentConfirmationEmail } from '@/lib/emailTemplates';
 
 const ALLOWED_TYPES: Record<string, { magic: number[] | null }> = {
   'image/jpeg': { magic: [0xFF, 0xD8, 0xFF] },
@@ -133,6 +134,28 @@ export async function POST(request: NextRequest) {
       }
 
       await adminClient.from('applications').update(updates).eq('id', applicationId);
+    }
+
+    // A bank-transfer receipt is confirmed immediately, so send the student
+    // the tuition confirmation and direct document link from this server route.
+    if (paymentType === 'tuition_fee' && user.email) {
+      const { data: studentProfile } = await adminClient
+        .from('profiles')
+        .select('full_name')
+        .eq('id', user.id)
+        .maybeSingle();
+      const { html, subject } = paymentConfirmationEmail(
+        studentProfile?.full_name || 'Student',
+        parseFloat(amount),
+        ref,
+        paymentType,
+      );
+      await sendEmail({
+        to: user.email,
+        subject,
+        html,
+        emailType: 'payment_confirmation',
+      });
     }
 
     // Fetch student profile for the notification email (fire-and-forget)
