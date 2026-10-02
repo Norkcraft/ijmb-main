@@ -274,7 +274,14 @@ export function admissionOfferEmail(
         </p>
       </div>
 
-      ${ctaButton('Download Admission Letter', `${SITE}/dashboard`)}
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;font-size:14px;color:#14532d;font-weight:700">Your admitted-student documents are ready</p>
+        <p style="margin:6px 0 0;font-size:13px;color:#166534;line-height:1.7">
+          View and download your school requirements, declaration form, lecture timetable, and oath-swearing document under <strong>Dashboard → Documents</strong>.
+        </p>
+      </div>
+
+      ${ctaButton('View My Documents', `${SITE}/dashboard?tab=documents`)}
       <p style="color:#64748b;font-size:13px;text-align:center;margin-top:16px;line-height:1.7">
         Upon completing IJMB, you qualify for <strong>Direct Entry into 200 Level</strong> at over 200 Nigerian universities &mdash; without UTME.
       </p>

@@ -14,6 +14,7 @@ import { DashboardPrintView } from '@/components/dashboard/DashboardPrintView';
 import { DashboardPayments } from '@/components/dashboard/DashboardPayments';
 import { ApplicationForm } from '@/components/application/ApplicationForm';
 import { DownloadApplicationPDF } from '@/components/dashboard/DownloadApplicationPDF';
+import { AdmittedStudentDocuments } from '@/components/dashboard/AdmittedStudentDocuments';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -686,6 +687,8 @@ function DocumentsTab({ application, sessions, centres, combos, user }: {
         <h2 className="text-lg font-bold">Documents</h2>
         <p className="text-sm text-muted-foreground mt-0.5">Your official IJMB documents</p>
       </div>
+
+      <AdmittedStudentDocuments application={application} />
 
       <div className="grid sm:grid-cols-2 gap-4">
 

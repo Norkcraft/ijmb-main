@@ -1,6 +1,6 @@
 'use client';
 
-import { Menu, X, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign, FileText, Users, ChevronRight, Loader2, Megaphone, Mail } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, CreditCard, MapPin, BookOpen, Calendar, DollarSign, FileText, Users, ChevronRight, Loader2, Megaphone, Mail, FolderOpen } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -9,6 +9,7 @@ const sidebarItems = [
   { icon: LayoutDashboard, label: "Overview",     href: "/portal-admin",                    id: 'overview' },
   { icon: FileText,        label: "Applications", href: "/portal-admin?tab=applications",   id: 'applications' },
   { icon: Users,           label: "Students",     href: "/portal-admin?tab=students",       id: 'students' },
+  { icon: FolderOpen,      label: "Documents",    href: "/portal-admin?tab=documents",      id: 'documents' },
   { icon: CreditCard,      label: "Payments",     href: "/portal-admin?tab=payments",       id: 'payments' },
   { icon: MapPin,          label: "Centres",      href: "/portal-admin?tab=centres",        id: 'centres' },
   { icon: BookOpen,        label: "Subjects",     href: "/portal-admin?tab=subjects",       id: 'subjects' },

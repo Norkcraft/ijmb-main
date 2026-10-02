@@ -16,6 +16,7 @@ import AdminFees from '@/components/admin/AdminFees';
 import AdminStudents from '@/components/admin/AdminStudents';
 import AdminMessaging from '@/components/admin/AdminMessaging';
 import AdminEmailLogs from '@/components/admin/AdminEmailLogs';
+import AdminAdmittedDocuments from '@/components/admin/AdminAdmittedDocuments';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
 import { AdminMobileHeader } from '@/components/admin/AdminMobileHeader';
 
@@ -126,6 +127,7 @@ const AdminDashboard = () => {
                 {currentTab === 'students' && <AdminStudents onMount={() => setNewStudentNotification(false)} />}
                 {currentTab === 'messaging' && <AdminMessaging />}
                 {currentTab === 'emails' && <AdminEmailLogs />}
+                {currentTab === 'documents' && <AdminAdmittedDocuments />}
               </div>
             </div>
           </main>
