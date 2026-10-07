@@ -360,10 +360,11 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
         return {
           icon: <Star size={22} className="text-amber-500" />,
           headline: 'Congratulations — you have been admitted!',
-          sub: 'Pay your acceptance fee to confirm your place and unlock your official admission letter.',
+          sub: 'Your admission letter is ready now. View or print it, then pay the acceptance fee to accept your admission and confirm your place.',
           gradient: 'from-green-50 to-emerald-50',
           border: 'border-green-200',
-          cta: { label: 'Pay Acceptance Fee', action: () => onNavigate('payments') },
+          cta: { label: 'View Admission Letter', action: viewAdmissionLetter },
+          secondaryCta: { label: 'Pay Acceptance Fee', action: () => onNavigate('payments') },
         };
       case 'fees_pending':
         return {
@@ -442,12 +443,22 @@ function OverviewTab({ application, profile, user, centres, combos, formFee, ses
               <p className="font-bold text-foreground text-base mb-1">{nextAction.headline}</p>
               <p className="text-sm text-muted-foreground leading-relaxed">{nextAction.sub}</p>
               {(nextAction as any).cta && (
-                <button
-                  onClick={(nextAction as any).cta.action}
-                  className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 bg-primary text-primary-foreground text-sm font-semibold rounded-xl hover:bg-primary/90 transition-colors shadow-sm"
-                >
-                  {(nextAction as any).cta.label} <ArrowRight size={14} />
-                </button>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <button
+                    onClick={(nextAction as any).cta.action}
+                    className="inline-flex items-center gap-2 rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                  >
+                    {(nextAction as any).cta.label} <ArrowRight size={14} />
+                  </button>
+                  {(nextAction as any).secondaryCta && (
+                    <button
+                      onClick={(nextAction as any).secondaryCta.action}
+                      className="inline-flex items-center gap-2 rounded-xl border border-primary bg-white px-5 py-2.5 text-sm font-semibold text-primary shadow-sm transition-colors hover:bg-primary/5"
+                    >
+                      {(nextAction as any).secondaryCta.label} <CreditCard size={14} />
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
