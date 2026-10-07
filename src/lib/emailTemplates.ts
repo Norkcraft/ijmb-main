@@ -286,13 +286,19 @@ export function admissionOfferEmail(
       </div>
 
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:16px 20px;margin-bottom:24px">
-        <p style="margin:0;font-size:14px;color:#14532d;font-weight:700">Your admitted-student documents are ready</p>
-        <p style="margin:6px 0 0;font-size:13px;color:#166534;line-height:1.7">
-          View and download your school requirements, declaration form, lecture timetable, and oath-swearing document under <strong>Dashboard → Documents</strong>.
+        <p style="margin:0 0 10px;font-size:14px;color:#14532d;font-weight:700">Complete these two admission steps</p>
+        <p style="margin:5px 0;font-size:13px;color:#166534;line-height:1.7"><strong>1.</strong> View, download, and print your admission letter—it is available immediately.</p>
+        <p style="margin:5px 0;font-size:13px;color:#166534;line-height:1.7"><strong>2.</strong> Pay the acceptance fee from your dashboard to accept the offer and confirm your place.</p>
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:16px 20px;margin-bottom:8px">
+        <p style="margin:0;font-size:13px;color:#475569;line-height:1.7">
+          Your school requirements, declaration form, lecture timetable, and oath-swearing document are also ready under
+          <a href="${SITE}/dashboard?tab=documents" style="color:#006400;font-weight:700;text-decoration:none">Dashboard → Documents</a>.
         </p>
       </div>
 
-      ${ctaButton('View My Documents', `${SITE}/dashboard?tab=documents`)}
+      ${ctaButton('View Letter & Accept Admission', `${SITE}/dashboard`)}
       <p style="color:#64748b;font-size:13px;text-align:center;margin-top:16px;line-height:1.7">
         Upon completing IJMB, you qualify for <strong>Direct Entry into 200 Level</strong> at over 200 Nigerian universities &mdash; without UTME.
       </p>
@@ -302,6 +308,44 @@ export function admissionOfferEmail(
   return {
     html: wrapper(body),
     subject: `🎉 Admission Offer — IJMB ${YEAR} | ${esc(fullName)}`
+  };
+}
+
+// ─── ADMISSION ACCEPTANCE REMINDER ───────────────────────────────────────
+export function acceptanceFeeReminderEmail(fullName: string, applicationId: string) {
+  const body = `
+    ${header('Accept Your IJMB Admission', 'Your admission offer is ready for confirmation')}
+    <div style="padding:40px 40px 32px">
+      <p style="color:#0f172a;font-size:18px;font-weight:700;margin:0 0 12px">Hello ${esc(fullName)},</p>
+      <p style="color:#475569;font-size:15px;line-height:1.8;margin:0 0 22px">
+        Congratulations again on your IJMB admission. Your offer is available, but your acceptance fee has not yet been recorded.
+      </p>
+
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px 24px;margin-bottom:22px">
+        <p style="margin:0 0 10px;font-size:14px;font-weight:700;color:#14532d">Your next steps</p>
+        <p style="margin:5px 0;font-size:13px;color:#166534;line-height:1.7"><strong>1.</strong> Log in and view or download your admission letter.</p>
+        <p style="margin:5px 0;font-size:13px;color:#166534;line-height:1.7"><strong>2.</strong> Pay the acceptance fee to accept your admission and confirm your place.</p>
+        <p style="margin:5px 0;font-size:13px;color:#166534;line-height:1.7"><strong>3.</strong> Check Dashboard → Documents for your school requirements and other admitted-student PDFs.</p>
+      </div>
+
+      <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px 20px;margin-bottom:24px">
+        <p style="margin:0;font-size:13px;color:#92400e;line-height:1.7">
+          <strong>Application ID:</strong> ${esc(applicationId)}<br/>
+          Your admission is accepted only after the acceptance fee is confirmed on your dashboard.
+        </p>
+      </div>
+
+      ${ctaButton('View Letter & Accept Admission', `${SITE}/dashboard`)}
+      <p style="color:#94a3b8;font-size:12px;text-align:center;margin-top:16px;line-height:1.7">
+        If you have already paid and your dashboard has not updated, reply to this email with your payment reference.
+      </p>
+    </div>
+    ${footer()}
+  `;
+
+  return {
+    html: wrapper(body),
+    subject: `Action required: accept your IJMB admission — ${esc(applicationId)}`,
   };
 }
 

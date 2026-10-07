@@ -22,6 +22,7 @@ const TYPE_LABELS: Record<string, string> = {
   reminder_no_application: 'Reminder (No App)',
   reminder_abandoned_draft: 'Reminder (Draft)',
   reminder_payment_pending: 'Reminder (Payment)',
+  reminder_acceptance_fee: 'Reminder (Acceptance)',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -33,6 +34,7 @@ const TYPE_COLORS: Record<string, string> = {
   rejection: 'bg-red-100 text-red-800',
   document_request: 'bg-amber-100 text-amber-800',
   admin_direct_message: 'bg-indigo-100 text-indigo-800',
+  reminder_acceptance_fee: 'bg-amber-100 text-amber-800',
 };
 
 export default function AdminEmailLogs() {
