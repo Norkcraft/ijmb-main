@@ -94,8 +94,15 @@ export async function processVerifiedPayment(tx: VerifiedPaystackTransaction, hi
     applicationId = data?.id;
   }
   if (!applicationId) throw new Error(`No application is linked to payment ${tx.reference}`);
-  const { data: app, error: appError } = await supabaseServer.from('applications').select('*').eq('id', applicationId).single();
-  if (appError || !app) throw new Error(`Application lookup failed: ${appError?.message || 'not found'}`);
+  let { data: app, error: appError } = await supabaseServer.from('applications').select('*').eq('id', applicationId).maybeSingle();
+  if (appError || !app) {
+    const fallback = await supabaseServer.from('applications').select('*').eq('user_id', userId)
+      .order('created_at', { ascending: false }).limit(1).maybeSingle();
+    app = fallback.data;
+    appError = fallback.error;
+    applicationId = app?.id;
+  }
+  if (appError || !app || !applicationId) throw new Error(`Application lookup failed: ${appError?.message || 'not found'}`);
   if (app.user_id !== userId) throw new Error(`Payment ${tx.reference} belongs to another application`);
 
   const amount = tx.amount / 100;
