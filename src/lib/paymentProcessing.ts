@@ -80,7 +80,7 @@ export async function processVerifiedPayment(tx: VerifiedPaystackTransaction, hi
     .from('payments').select('*').eq('reference', tx.reference).maybeSingle();
   if (existingError) throw new Error(`Payment lookup failed: ${existingError.message}`);
   const metadata = tx.metadata || {};
-  const userId = metadataField(metadata, 'user_id') || existing?.user_id || hints.userId;
+  let userId = metadataField(metadata, 'user_id') || existing?.user_id || hints.userId;
   let applicationId = metadataField(metadata, 'application_id') || existing?.application_id || hints.applicationId;
   const type = normalizePaymentType(
     metadataField(metadata, 'payment_type') || metadataField(metadata, 'fee_type') ||
@@ -101,6 +101,18 @@ export async function processVerifiedPayment(tx: VerifiedPaystackTransaction, hi
     app = fallback.data;
     appError = fallback.error;
     applicationId = app?.id;
+  }
+  if (!app && tx.customer?.email) {
+    const { data: profile } = await supabaseServer.from('profiles').select('id')
+      .ilike('email', tx.customer.email).limit(1).maybeSingle();
+    if (profile?.id) {
+      const fallback = await supabaseServer.from('applications').select('*').eq('user_id', profile.id)
+        .order('created_at', { ascending: false }).limit(1).maybeSingle();
+      app = fallback.data;
+      appError = fallback.error;
+      userId = profile.id;
+      applicationId = app?.id;
+    }
   }
   if (appError || !app || !applicationId) throw new Error(`Application lookup failed: ${appError?.message || 'not found'}`);
   if (app.user_id !== userId) throw new Error(`Payment ${tx.reference} belongs to another application`);
