@@ -438,7 +438,7 @@ export const useStudentDashboard = () => {
           body: JSON.stringify({
             type: 'payment_confirmation',
             data: {
-              email: user.email,
+              email: user?.email || '',
               fullName: studentName,
               amount: paidAmount,
               reference,
