@@ -10,8 +10,8 @@ const aliases: Record<string, PaymentType> = {
   hostel: 'hostel_fee', hostel_fee: 'hostel_fee', exam: 'exam_fee', exam_fee: 'exam_fee',
 };
 const legacyType: Record<PaymentType, string> = {
-  form_fee: 'form_fee', acceptance_fee: 'acceptance', tuition_fee: 'tuition',
-  hostel_fee: 'hostel', exam_fee: 'exam_fee',
+  form_fee: 'form_fee', acceptance_fee: 'acceptance_fee', tuition_fee: 'tuition_fee',
+  hostel_fee: 'hostel_fee', exam_fee: 'exam_fee',
 };
 
 export interface VerifiedPaystackTransaction {
