@@ -56,6 +56,19 @@ const PaymentButton = ({ email, amount, onSuccess, userId, applicationId, paymen
             return;
           }
 
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) throw new Error('Your session expired. Please sign in again.');
+          const verification = await fetch('/api/paystack-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+            body: JSON.stringify({ reference: reference.reference, applicationId, paymentType }),
+          });
+          const result = await verification.json();
+          if (!verification.ok) throw new Error(result?.message || 'Payment verification failed');
+          toast({ title: 'Payment Successful!', description: `Reference: ${reference.reference}` });
+          await onSuccess({ reference: reference.reference, paymentType, amount });
+          return;
+
           // Guard 1: check this reference hasn't already been recorded
           const { data: existing } = await supabase
             .from('payments')

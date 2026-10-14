@@ -379,6 +379,16 @@ export const useStudentDashboard = () => {
   const handlePaymentSuccess = async (paymentType: string = 'form_fee', amountPaid?: number, reference?: string) => {
     if (!application?.id) return;
 
+    await queryClient.invalidateQueries({ queryKey: ['dashboard-user', user?.id] });
+    const serverMessages: Record<string, string> = {
+      form_fee: 'Your application has been submitted and is now under review.',
+      acceptance_fee: 'Acceptance confirmed. You can now pay your programme fees.',
+      tuition_fee: 'Tuition fee paid. You are now an active student!',
+      hostel_fee: 'Hostel fee confirmed.', exam_fee: 'Exam fee confirmed.',
+    };
+    toast({ title: 'Payment Successful!', description: serverMessages[paymentType] || 'Payment recorded successfully.' });
+    return;
+
     const updates: Record<string, any> = { updated_at: new Date().toISOString() };
 
     if (paymentType === 'form_fee') {

@@ -89,7 +89,8 @@ export const DashboardPayments = ({
     const set = new Set<string>();
     for (const p of payments) {
       if (p.status !== 'success') continue;
-      const t = p.metadata?.payment_type;
+      const rawType = p.metadata?.payment_type || p.metadata?.fee_type || p.fee_type || p.type;
+      const t = ({ acceptance: 'acceptance_fee', tuition: 'tuition_fee', hostel: 'hostel_fee', exam: 'exam_fee' } as Record<string, string>)[rawType] || rawType;
       if (typeof t === 'string' && t) set.add(t);
     }
     return set;

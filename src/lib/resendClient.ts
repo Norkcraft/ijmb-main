@@ -42,12 +42,14 @@ export async function sendEmail({
   html,
   replyTo,
   emailType,
+  idempotencyKey,
 }: {
   to: string;
   subject: string;
   html: string;
   replyTo?: string;
   emailType?: string;
+  idempotencyKey?: string;
 }) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('[Resend] Skipping email — no API key configured');
@@ -55,13 +57,10 @@ export async function sendEmail({
   }
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: FROM_EMAIL,
-      to,
-      subject,
-      html,
-      ...(replyTo ? { reply_to: replyTo } : {}),
-    });
+    const { data, error } = await resend.emails.send(
+      { from: FROM_EMAIL, to, subject, html, ...(replyTo ? { reply_to: replyTo } : {}) },
+      ...(idempotencyKey ? [{ idempotencyKey }] : []),
+    );
 
     if (error) {
       console.error('[Resend] Failed to send email:', error);
