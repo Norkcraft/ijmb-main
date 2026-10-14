@@ -88,7 +88,8 @@ export async function processVerifiedPayment(tx: VerifiedPaystackTransaction, hi
   );
   if (!userId || !type) throw new Error(`Payment ${tx.reference} is missing student or fee metadata`);
   if (!applicationId) {
-    const { data, error } = await supabaseServer.from('applications').select('id').eq('user_id', userId).maybeSingle();
+    const { data, error } = await supabaseServer.from('applications').select('id')
+      .eq('user_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle();
     if (error) throw new Error(`Application lookup failed: ${error.message}`);
     applicationId = data?.id;
   }

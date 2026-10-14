@@ -27,6 +27,9 @@ export async function POST(request: NextRequest) {
       for (const transaction of transactions) {
         const metadata = transaction.metadata || {};
         const customFields = Array.isArray(metadata.custom_fields) ? metadata.custom_fields : [];
+        const rawType = metadata.payment_type || metadata.fee_type ||
+          customFields.find((field: any) => field?.variable_name === 'payment_type')?.value;
+        if (!['form_fee', 'form', 'registration_fee', 'acceptance_fee', 'acceptance'].includes(rawType)) continue;
         const hasApplication = metadata.application_id || customFields.some((field: any) => field?.variable_name === 'application_id' && field?.value);
         const hasUser = metadata.user_id;
         if (!hasApplication && !hasUser) continue;
